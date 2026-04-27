@@ -4,12 +4,16 @@ import 'app_routes.dart';
 // Import file yang baru saja kita buat
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/login_view.dart';
+import '../modules/auth/views/register_view.dart';
 
 import '../modules/dashboard/bindings/dashboard_binding.dart';
 import '../modules/dashboard/views/dashboard_view.dart';
 
 import '../modules/article/views/article_detail_view.dart';
 import '../modules/article/controllers/article_detail_controller.dart';
+
+import '../modules/profile/views/profile_view.dart';
+import '../modules/profile/controllers/profile_controller.dart';
 
 class AppPages {
   AppPages._();
@@ -24,6 +28,9 @@ class AppPages {
       page: () => const LoginView(),
       binding: AuthBinding(),
     ),
+    GetPage(name: Routes.REGISTER,
+            page: () => const RegisterView(),
+            binding: AuthBinding()),
     GetPage(
       name: Routes.DASHBOARD,
       page: () => const DashboardView(),
@@ -37,5 +44,13 @@ class AppPages {
       Get.lazyPut<ArticleDetailController>(() => ArticleDetailController());
     }),
   ),
+  GetPage(
+  name: Routes.PROFILE,
+  page: () => const ProfileView(),
+  binding: BindingsBuilder(() {
+    Get.lazyPut<ProfileController>(() => ProfileController());
+  }),
+),
   ];
+  
 }

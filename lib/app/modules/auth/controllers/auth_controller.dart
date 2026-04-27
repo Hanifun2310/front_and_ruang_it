@@ -15,7 +15,7 @@ class AuthController extends GetxController {
 
   // Form Controllers tambahan untuk Register
   final nameController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final professionController = TextEditingController();
 
   var isLoading = false.obs;
   var isPasswordHidden = true.obs;
@@ -84,9 +84,12 @@ class AuthController extends GetxController {
   }
 
   // LOGIKA REGISTER
-  Future<void> register() async {
-    if (passwordController.text != confirmPasswordController.text) {
-      Get.snackbar('Error', 'Password tidak cocok!');
+Future<void> register() async {
+    if (nameController.text.isEmpty || 
+        emailController.text.isEmpty || 
+        passwordController.text.isEmpty || 
+        professionController.text.isEmpty) {
+      Get.snackbar('Error', 'Semua kolom wajib diisi!');
       return;
     }
 
@@ -96,14 +99,32 @@ class AuthController extends GetxController {
         nameController.text,
         emailController.text,
         passwordController.text,
-        confirmPasswordController.text,
+        professionController.text,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.snackbar('Sukses', 'Registrasi berhasil! Silakan login.');
-        Get.offNamed(Routes.LOGIN); // Kembali ke halaman login
+        // --- LOGIKA AUTO-LOGIN SETELAH REGISTER ---
+        
+        // 1. Ambil token dan data user dari balasan Laravel
+        String? token = response.data['token'] ?? response.data['access_token'];
+        Map<String, dynamic> user = response.data['user'] ?? {};
+
+        if (token != null && token.isNotEmpty) {
+          // 2. Simpan token ke GetStorage menggunakan AuthService
+          await _authService.saveSession(token, user);
+          
+          Get.snackbar('Sukses', 'Akun berhasil dibuat dan otomatis masuk!');
+          
+          // 3. LANGSUNG ARAHKAN KE PROFILE
+          Get.offAllNamed(Routes.PROFILE); 
+        } else {
+          // Jika Laravel tidak mengirim token, terpaksa diarahkan ke Login saja
+          Get.snackbar('Sukses', 'Akun dibuat, silakan login manual.');
+          Get.offNamed(Routes.LOGIN);
+        }
       }
     } on DioException catch (e) {
+      print("ERROR REGISTRASI: ${e.response?.data}");
       String message = e.response?.data['message'] ?? 'Gagal registrasi.';
       Get.snackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white);
     } finally {
@@ -111,12 +132,12 @@ class AuthController extends GetxController {
     }
   }
 
-  @override
+@override
   void onClose() {
     emailController.dispose();
     passwordController.dispose();
     nameController.dispose();
-    confirmPasswordController.dispose();
+    professionController.dispose();
     super.onClose();
   }
 }

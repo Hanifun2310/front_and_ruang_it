@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' hide Response;
+// KUNCI PERBAIKAN: Sembunyikan Response, FormData, dan MultipartFile milik GetX
+import 'package:get/get.dart' hide Response, FormData, MultipartFile; 
 import '../services/auth_service.dart';
 import '../models/article_model.dart';
 
 class ApiProvider {
-  late Dio _dio;
+  late Dio _dio; // <-- _dio didefinisikan di sini
   
-  // Base URL Asli Anda!
   static const String baseUrl = 'https://ruang-it.vibedev.my.id/api';
 
   ApiProvider() {
@@ -20,7 +20,6 @@ class ApiProvider {
       },
     ));
 
-    // Interceptor untuk menyisipkan Bearer Token otomatis
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         final authService = Get.find<AuthService>();
@@ -55,12 +54,13 @@ class ApiProvider {
     });
   }
 
-  Future<Response> register(String name, String email, String password, String passwordConfirmation) async {
+  Future<Response> register(String name, String email, String password, String profession) async {
     return await _dio.post('/register', data: {
       'name': name,
       'email': email,
       'password': password,
-      'password_confirmation': passwordConfirmation, // Sesuaikan dengan field validasi Laravel Anda
+      'password_confirmation': password, // Trik Ninja
+      'profession': profession,
     });
   }
 
@@ -69,20 +69,17 @@ class ApiProvider {
   }
 
   // ===========================================================================
-  // PUBLIC ROUTES (Articles & Categories)
+  // PUBLIC ROUTES
   // ===========================================================================
 
   Future<List<ArticleModel>> getArticles({int page = 1, String? category}) async {
     try {
       Map<String, dynamic> queryParams = {'page': page};
       if (category != null && category != 'Semua') {
-        queryParams['category'] = category; // Pastikan backend Laravel Anda menerima filter ini
+        queryParams['category'] = category;
       }
-
       final response = await _dio.get('/articles', queryParameters: queryParams);
-
       if (response.statusCode == 200) {
-        // Asumsi data array berada di dalam response.data['data'] (Bawaan Pagination Laravel)
         List<dynamic> data = response.data['data'] ?? response.data;
         return data.map((json) => ArticleModel.fromJson(json)).toList();
       }
@@ -106,7 +103,7 @@ class ApiProvider {
   }
 
   // ===========================================================================
-  // PROTECTED ROUTES (User Actions)
+  // PROTECTED ROUTES (Membutuhkan Token)
   // ===========================================================================
 
   Future<Response> toggleLike(int articleId) async {
@@ -121,5 +118,27 @@ class ApiProvider {
 
   Future<Response> getProfile() async {
     return await _dio.get('/profile');
+  }
+
+  // FUNGSI UPDATE PROFILE YANG BARU
+  Future<Response> updateProfile({
+    required String name,
+    required String profession,
+    required String bio,
+    String? imagePath, // Path file gambar di HP jika user upload foto
+  }) async {
+    Map<String, dynamic> data = {
+      'name': name,
+      'profession': profession,
+      'bio': bio,
+      '_method': 'PUT', // Laravel membutuhkan ini jika mengirim FormData untuk Update
+    };
+
+    // Jika user memilih gambar, masukkan ke FormData
+    if (imagePath != null && imagePath.isNotEmpty) {
+      data['photo_profile'] = await MultipartFile.fromFile(imagePath);
+    }
+
+    return await _dio.post('/profile', data: FormData.fromMap(data));
   }
 }
