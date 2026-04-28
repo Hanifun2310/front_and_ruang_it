@@ -48,7 +48,7 @@ class ProfileController extends GetxController {
       bio.value = user['bio'] ?? "";
       bioController.text = user['bio'] ?? "";
       email.value = user['email'] ?? "";
-      photoProfile.value = user['photo_profile'] ?? "";
+      photoProfile.value = ArticleModel.formatImageUrl(user['photo_profile'] ?? user['profile_photo']);
       userId.value = user['id'] ?? 0;
       
       // Update stats if available in user object

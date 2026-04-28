@@ -6,19 +6,6 @@ import '../controllers/article_detail_controller.dart';
 class ArticleDetailView extends GetView<ArticleDetailController> {
   const ArticleDetailView({Key? key}) : super(key: key);
 
-  // Fungsi perakit URL yang Anti-Crash
-  String _getValidImageUrl(String? path, {bool isAvatar = false}) {
-    // Jika path dari Laravel kosong/null, berikan gambar default
-    if (path == null || path.trim().isEmpty) {
-      return isAvatar 
-          ? 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff' // Avatar default
-          : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'; // Gambar artikel default
-    }
-    if (path.startsWith('http')) return path;
-    
-    return 'https://ruang-it.vibedev.my.id/storage/$path'; 
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +33,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Image.network(
-                        _getValidImageUrl(art.imageUrl),
+                        art.imageUrl ?? 'https://via.placeholder.com/600x400',
                         width: double.infinity,
                         height: 220,
                         fit: BoxFit.cover,
@@ -55,7 +42,11 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                           width: double.infinity,
                           height: 220,
                           color: Colors.grey.shade100,
-                          child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                          child: const Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),
@@ -64,10 +55,14 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     // Judul Artikel
                     Text(
                       art.title ?? 'Tanpa Judul',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, height: 1.2),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        height: 1.2,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // --- INFO PENULIS & KATEGORI ---
                     Row(
                       children: [
@@ -75,53 +70,87 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                         CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage: NetworkImage(_getValidImageUrl(art.user?.photoProfile, isAvatar: true)),
+                          backgroundImage: NetworkImage(
+                            art.user?.photoProfile ??
+                                'https://ui-avatars.com/api/?name=${art.user?.name ?? "User"}',
+                          ),
                         ),
                         const SizedBox(width: 10),
-                        
+
                         Expanded(
                           child: Text(
-                            art.user?.name ?? 'Penulis Anonim', 
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            art.user?.name ?? 'Penulis Anonim',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        
+
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20)
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            art.category?.name ?? 'Umum', 
-                            style: const TextStyle(color: Colors.blue, fontSize: 12, fontWeight: FontWeight.bold)
+                            art.category?.name ?? 'Umum',
+                            style: const TextStyle(
+                              color: Colors.blue,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const Divider(height: 40, thickness: 1, color: Color(0xFFEEEEEE)),
-                    
+                    const Divider(
+                      height: 40,
+                      thickness: 1,
+                      color: Color(0xFFEEEEEE),
+                    ),
+
                     // --- ISI KONTEN HTML ---
                     HtmlWidget(
                       art.content ?? '<p>Konten tidak tersedia.</p>',
-                      textStyle: const TextStyle(fontSize: 16, height: 1.6, color: Colors.black87),
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        height: 1.6,
+                        color: Colors.black87,
+                      ),
                     ),
                     const SizedBox(height: 40),
-                    
-                    const Text("Komentar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+                    const Text(
+                      "Komentar",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    
+
                     // --- LIST KOMENTAR ---
                     if (controller.comments.isEmpty)
-                      const Text("Belum ada komentar. Jadilah yang pertama!", style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
-                      
+                      const Text(
+                        "Belum ada komentar. Jadilah yang pertama!",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: controller.comments.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 16),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final comment = controller.comments[index];
                         return Container(
@@ -137,16 +166,28 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                               CircleAvatar(
                                 radius: 14,
                                 backgroundColor: Colors.grey.shade200,
-                                backgroundImage: NetworkImage(_getValidImageUrl(comment.user?.photoProfile, isAvatar: true)),
+                                backgroundImage: NetworkImage(
+                                  comment.user?.photoProfile ??
+                                      'https://ui-avatars.com/api/?name=${comment.user?.name ?? "User"}',
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(comment.user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                    Text(
+                                      comment.user?.name ?? 'User',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                     const SizedBox(height: 4),
-                                    Text(comment.content ?? '', style: const TextStyle(fontSize: 14)),
+                                    Text(
+                                      comment.content ?? '',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -172,7 +213,13 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Row(
@@ -180,11 +227,18 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
             IconButton(
               onPressed: controller.toggleLike,
               icon: Icon(
-                controller.article.value.isLiked == true ? Icons.thumb_up_rounded : Icons.thumb_up_outlined,
-                color: controller.article.value.isLiked == true ? Colors.blue : Colors.grey,
+                controller.article.value.isLiked == true
+                    ? Icons.thumb_up_rounded
+                    : Icons.thumb_up_outlined,
+                color: controller.article.value.isLiked == true
+                    ? Colors.blue
+                    : Colors.grey,
               ),
             ),
-            Text("${controller.article.value.likesCount ?? 0}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              "${controller.article.value.likesCount ?? 0}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: TextField(
@@ -192,7 +246,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                 decoration: InputDecoration(
                   hintText: "Tulis komentar...",
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade100,
                 ),
@@ -205,7 +262,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                 onPressed: controller.sendComment,
                 icon: const Icon(Icons.send, color: Colors.white, size: 18),
               ),
-            )
+            ),
           ],
         ),
       ),

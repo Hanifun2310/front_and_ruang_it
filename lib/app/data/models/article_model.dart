@@ -24,19 +24,27 @@ class ArticleModel {
     this.category,
   });
 
-factory ArticleModel.fromJson(Map<String, dynamic> json) {
+  static String formatImageUrl(String? path) {
+    if (path == null || path.isEmpty)
+      return 'https://via.placeholder.com/600x400';
+    if (path.startsWith('http')) return path;
+    return 'https://ruang-it.vibedev.my.id/storage/$path';
+  }
+
+  factory ArticleModel.fromJson(Map<String, dynamic> json) {
     return ArticleModel(
       id: json['id'],
       title: json['title'],
       slug: json['slug'],
       content: json['content'],
-      // Kita tambahkan pencarian ganda: cek 'image_url' dulu, kalau null cek 'image'
-      imageUrl: json['image_url'] ?? json['image'], 
+      imageUrl: formatImageUrl(json['image_url'] ?? json['image']),
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
       isLiked: json['is_liked'] ?? false,
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
-      category: json['category'] != null ? CategoryModel.fromJson(json['category']) : null,
+      category: json['category'] != null
+          ? CategoryModel.fromJson(json['category'])
+          : null,
     );
   }
 
@@ -78,30 +86,33 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json['id'],
-        name: json['name'] ?? 'User',
-        email: json['email'],
-        role: json['role'],
-        photoProfile: json['photo_profile'] ?? json['profile_photo'],
-        profession: json['profession'],
-        bio: json['bio'],
-      );
+    id: json['id'],
+    name: json['name'] ?? 'User',
+    email: json['email'],
+    role: json['role'],
+    photoProfile: ArticleModel.formatImageUrl(
+      json['photo_profile'] ?? json['profile_photo'],
+    ),
+    profession: json['profession'],
+    bio: json['bio'],
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'email': email,
-        'role': role,
-        'photo_profile': photoProfile,
-        'profession': profession,
-        'bio': bio,
-      };
+    'id': id,
+    'name': name,
+    'email': email,
+    'role': role,
+    'photo_profile': photoProfile,
+    'profession': profession,
+    'bio': bio,
+  };
 }
 
 class CategoryModel {
   int? id;
   String? name;
   CategoryModel({this.id, this.name});
-  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(id: json['id'], name: json['name']);
+  factory CategoryModel.fromJson(Map<String, dynamic> json) =>
+      CategoryModel(id: json['id'], name: json['name']);
   Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
