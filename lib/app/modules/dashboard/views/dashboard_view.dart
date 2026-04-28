@@ -21,12 +21,9 @@ class DashboardView extends GetView<DashboardController> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Color(0xFF2D46B9)),
-          onPressed: () {}, // Can open drawer if needed
-        ),
+        centerTitle: true,
         title: const Text(
-          'TechFeed', 
+          'Ruang IT', 
           style: TextStyle(
             fontWeight: FontWeight.w900, 
             fontSize: 20, 
@@ -71,8 +68,10 @@ class DashboardView extends GetView<DashboardController> {
                   ),
                 ],
               ),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                textInputAction: TextInputAction.search,
+                onSubmitted: (value) => controller.searchArticles(value),
+                decoration: const InputDecoration(
                   hintText: 'Cari judul atau penulis...',
                   hintStyle: TextStyle(color: Color(0xFF757685), fontSize: 15),
                   prefixIcon: Icon(Icons.search, color: Color(0xFF757685)),
@@ -89,10 +88,14 @@ class DashboardView extends GetView<DashboardController> {
             child: Obx(() => ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: controller.categories.length,
+              itemCount: controller.categories.length + 1,
               itemBuilder: (context, index) {
-                final category = controller.categories[index];
-                final isSelected = controller.selectedCategory.value == category;
+                final isSemua = index == 0;
+                final category = isSemua ? null : controller.categories[index - 1];
+                final isSelected = isSemua 
+                    ? controller.selectedCategory.value == null 
+                    : controller.selectedCategory.value?.id == category?.id;
+                final categoryName = isSemua ? 'Semua' : (category?.name ?? '');
 
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
@@ -110,7 +113,7 @@ class DashboardView extends GetView<DashboardController> {
                       ),
                       child: Center(
                         child: Text(
-                          category,
+                          categoryName,
                           style: TextStyle(
                             color: isSelected ? Colors.white : const Color(0xFF444653),
                             fontWeight: FontWeight.bold,
@@ -284,7 +287,18 @@ class DashboardView extends GetView<DashboardController> {
                                         // Likes & Comments
                                         Row(
                                           children: [
-                                            const Icon(Icons.favorite, size: 18, color: Color(0xFF5F6473)),
+                                            InkWell(
+                                              onTap: () {
+                                                if (article.id != null) {
+                                                  controller.toggleLike(article.id!);
+                                                }
+                                              },
+                                              child: Icon(
+                                                (article.isLiked ?? false) ? Icons.favorite : Icons.favorite_border, 
+                                                size: 18, 
+                                                color: (article.isLiked ?? false) ? Colors.red : const Color(0xFF5F6473),
+                                              ),
+                                            ),
                                             const SizedBox(width: 4),
                                             Text(
                                               '${article.likesCount ?? 0}', 
@@ -336,12 +350,8 @@ class DashboardView extends GetView<DashboardController> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search)),
-              label: 'Explore',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.bookmark)),
-              label: 'Saved',
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
+              label: 'Add',
             ),
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),

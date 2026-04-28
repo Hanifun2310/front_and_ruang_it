@@ -72,11 +72,14 @@ class ApiProvider {
   // PUBLIC ROUTES
   // ===========================================================================
 
-  Future<List<ArticleModel>> getArticles({int page = 1, String? category}) async {
+  Future<List<ArticleModel>> getArticles({int page = 1, String? category, String? search}) async {
     try {
       Map<String, dynamic> queryParams = {'page': page};
-      if (category != null && category != 'Semua') {
+      if (category != null && category.isNotEmpty) {
         queryParams['category'] = category;
+      }
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
       }
       final response = await _dio.get('/articles', queryParameters: queryParams);
       if (response.statusCode == 200) {

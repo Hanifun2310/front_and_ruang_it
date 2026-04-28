@@ -8,8 +8,9 @@ class DashboardController extends GetxController {
 
   // Observables
   var articles = <ArticleModel>[].obs;
-  var categories = <String>['Semua', 'Tech', 'Laravel', 'Flutter', 'IoT'].obs;
-  var selectedCategory = 'Semua'.obs;
+  var categories = <CategoryModel>[].obs;
+  var selectedCategory = Rxn<CategoryModel>();
+  var searchQuery = ''.obs;
   
   // Pagination states
   var isLoading = false.obs;       
@@ -20,13 +21,35 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchCategories();
     fetchArticles();
   }
 
-  void changeCategory(String category) {
-    if (selectedCategory.value == category) return; // Jangan fetch ulang jika kategori sama
+  Future<void> fetchCategories() async {
+    try {
+      final response = await _apiProvider.getCategories();
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['data'] ?? response.data;
+        List<CategoryModel> fetchedCategories = data.map((e) => CategoryModel.fromJson(e)).toList();
+        categories.value = fetchedCategories;
+      }
+    } catch (e) {
+      // Abaikan jika gagal
+    }
+  }
+
+  void changeCategory(CategoryModel? category) {
+    if (selectedCategory.value?.id == category?.id) return; 
     
     selectedCategory.value = category;
+    currentPage = 1;
+    hasMoreData.value = true;
+    articles.clear();
+    fetchArticles();
+  }
+
+  void searchArticles(String query) {
+    searchQuery.value = query;
     currentPage = 1;
     hasMoreData.value = true;
     articles.clear();
@@ -46,7 +69,8 @@ class DashboardController extends GetxController {
       // Menggunakan ApiProvider yang sesungguhnya!
       List<ArticleModel> newArticles = await _apiProvider.getArticles(
         page: currentPage, 
-        category: selectedCategory.value,
+        category: selectedCategory.value?.id.toString(),
+        search: searchQuery.value,
       );
 
       if (newArticles.isEmpty) {
@@ -65,6 +89,35 @@ class DashboardController extends GetxController {
     } finally {
       isLoading.value = false;
       isFetchingMore.value = false;
+    }
+  }
+
+  Future<void> toggleLike(int articleId) async {
+    try {
+      final index = articles.indexWhere((a) => a.id == articleId);
+      if (index == -1) return;
+
+      final article = articles[index];
+      final isCurrentlyLiked = article.isLiked ?? false;
+      
+      // Optimistic update
+      article.isLiked = !isCurrentlyLiked;
+      article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+      
+      articles[index] = article; // trigger reactivity
+      
+      await _apiProvider.toggleLike(articleId);
+    } catch (e) {
+      final index = articles.indexWhere((a) => a.id == articleId);
+      if (index != -1) {
+        final article = articles[index];
+        final isCurrentlyLiked = article.isLiked ?? false;
+        // Revert
+        article.isLiked = !isCurrentlyLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+        articles[index] = article;
+      }
+      Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini');
     }
   }
 
