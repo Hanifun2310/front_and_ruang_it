@@ -122,4 +122,8 @@ class ProfileController extends GetxController {
       Get.snackbar('Error', 'Gagal menghapus artikel');
     }
   }
+
+  Future<void> logout() async {
+    await _authService.logout();
+  }
 }
