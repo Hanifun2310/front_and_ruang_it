@@ -20,6 +20,7 @@ class ProfileController extends GetxController {
   var profession = "".obs;
   var bio = "".obs;
   var name = "".obs;
+  var userId = 0.obs;
 
   // Articles & Tabs
   var userArticles = <ArticleModel>[].obs;
@@ -48,6 +49,7 @@ class ProfileController extends GetxController {
       bioController.text = user['bio'] ?? "";
       email.value = user['email'] ?? "";
       photoProfile.value = user['photo_profile'] ?? "";
+      userId.value = user['id'] ?? 0;
       
       // Update stats if available in user object
       articlesCount.value = user['articles_count'] ?? 0;
@@ -105,6 +107,19 @@ class ProfileController extends GetxController {
       Get.snackbar('Error', 'Gagal memperbarui profil');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteArticle(int id) async {
+    try {
+      final response = await _apiProvider.deleteArticle(id);
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        userArticles.removeWhere((article) => article.id == id);
+        articlesCount.value--;
+        Get.snackbar('Sukses', 'Artikel berhasil dihapus');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menghapus artikel');
     }
   }
 }

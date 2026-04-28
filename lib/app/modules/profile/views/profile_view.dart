@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/profile_controller.dart';
+import '../../../data/models/article_model.dart';
 import '../../../routes/app_routes.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -365,7 +366,7 @@ class ProfileView extends GetView<ProfileController> {
             itemCount: controller.userArticles.length,
             itemBuilder: (context, index) {
               final article = controller.userArticles[index];
-              return _buildArticleCard(article);
+              return _buildArticleCard(context, article);
             },
           );
         }),
@@ -374,95 +375,166 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  Widget _buildArticleCard(dynamic article) {
+  Widget _buildArticleCard(BuildContext context, ArticleModel article) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E7FF)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () => Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug),
-        borderRadius: BorderRadius.circular(16),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                bottomLeft: Radius.circular(16),
-              ),
-              child: Image.network(
-                article.imageUrl ?? 'https://via.placeholder.com/150',
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.grey.shade100,
-                  child: const Icon(Icons.image_not_supported, color: Colors.grey),
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E7FF)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-              ),
+              ],
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF2F3FF),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            article.category?.name?.toUpperCase() ?? "GENERAL",
-                            style: GoogleFonts.inter(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF092BA2),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "2 days ago", // Mock time for now
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            color: const Color(0xFF757685),
-                          ),
-                        ),
-                      ],
+            child: InkWell(
+              onTap: () => Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug),
+              borderRadius: BorderRadius.circular(16),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      article.title ?? "Untitled",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF131B2E),
-                        height: 1.3,
+                    child: Image.network(
+                      article.imageUrl ?? 'https://via.placeholder.com/150',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 100,
+                        height: 100,
+                        color: Colors.grey.shade100,
+                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF2F3FF),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  article.category?.name?.toUpperCase() ?? "GENERAL",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF092BA2),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "2 days ago", // Mock time for now
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  color: const Color(0xFF757685),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            article.title ?? "Untitled",
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF131B2E),
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          // Show menu only if user is author
+          if (article.user?.id == controller.userId.value)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, size: 20, color: Color(0xFF757685)),
+                padding: EdgeInsets.zero,
+                onSelected: (value) async {
+                  if (value == 'edit') {
+                    final result = await Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
+                    if (result == true) {
+                      controller.fetchUserArticles();
+                    }
+                  } else if (value == 'delete') {
+                    _showDeleteConfirmation(context, article);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit_outlined, size: 20),
+                        SizedBox(width: 8),
+                        Text('Edit'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Delete', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, ArticleModel article) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Hapus Artikel', style: GoogleFonts.manrope(fontWeight: FontWeight.bold)),
+        content: Text('Apakah Anda yakin ingin menghapus artikel "${article.title}"? Tindakan ini tidak dapat dibatalkan.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              controller.deleteArticle(article.id!);
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

@@ -18,6 +18,9 @@ import '../modules/profile/controllers/profile_controller.dart';
 import '../modules/article/views/article_create_view.dart';
 import '../modules/article/bindings/article_create_binding.dart';
 
+import '../modules/article/views/article_edit_view.dart';
+import '../modules/article/controllers/article_edit_controller.dart';
+
 class AppPages {
   AppPages._();
 
@@ -54,11 +57,18 @@ class AppPages {
     Get.lazyPut<ProfileController>(() => ProfileController());
   }),
 ),
-  GetPage(
-    name: Routes.ARTICLE_CREATE,
-    page: () => const ArticleCreateView(),
-    binding: ArticleCreateBinding(),
-  ),
+    GetPage(
+      name: Routes.ARTICLE_CREATE,
+      page: () => const ArticleCreateView(),
+      binding: ArticleCreateBinding(),
+    ),
+    GetPage(
+      name: Routes.ARTICLE_EDIT,
+      page: () => const ArticleEditView(),
+      binding: BindingsBuilder(() {
+        Get.put(ArticleEditController());
+      }),
+    ),
   ];
   
 }

@@ -168,4 +168,35 @@ class ApiProvider {
 
     return await _dio.post('/articles', data: FormData.fromMap(data));
   }
+
+  // FUNGSI UPDATE ARTICLE
+  Future<Response> updateArticle({
+    required int id,
+    required String title,
+    required String content,
+    required int categoryId,
+    String? imagePath,
+    List<int>? imageBytes,
+    String? fileName,
+  }) async {
+    Map<String, dynamic> data = {
+      'title': title,
+      'content': content,
+      'category_id': categoryId,
+      '_method': 'PUT', // Laravel membutuhkan ini jika mengirim FormData untuk Update
+    };
+
+    if (imageBytes != null && fileName != null) {
+      data['image'] = MultipartFile.fromBytes(imageBytes, filename: fileName);
+    } else if (imagePath != null && imagePath.isNotEmpty) {
+      data['image'] = await MultipartFile.fromFile(imagePath);
+    }
+
+    return await _dio.post('/articles/$id', data: FormData.fromMap(data));
+  }
+
+  // FUNGSI DELETE ARTICLE
+  Future<Response> deleteArticle(int id) async {
+    return await _dio.delete('/articles/$id');
+  }
 }
