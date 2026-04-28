@@ -144,4 +144,24 @@ class ApiProvider {
 
     return await _dio.post('/profile', data: FormData.fromMap(data));
   }
+
+  // FUNGSI CREATE ARTICLE
+  Future<Response> createArticle({
+    required String title,
+    required String content,
+    required int categoryId,
+    String? imagePath,
+  }) async {
+    Map<String, dynamic> data = {
+      'title': title,
+      'content': content,
+      'category_id': categoryId,
+    };
+
+    if (imagePath != null && imagePath.isNotEmpty) {
+      data['image'] = await MultipartFile.fromFile(imagePath);
+    }
+
+    return await _dio.post('/articles', data: FormData.fromMap(data));
+  }
 }

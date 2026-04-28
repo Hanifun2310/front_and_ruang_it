@@ -344,6 +344,13 @@ class DashboardView extends GetView<DashboardController> {
           selectedFontSize: 10,
           unselectedFontSize: 10,
           currentIndex: 0,
+          onTap: (index) {
+            if (index == 1) {
+              Get.toNamed(Routes.ARTICLE_CREATE);
+            } else if (index == 2) {
+              Get.toNamed(Routes.PROFILE);
+            }
+          },
           items: const [
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),

@@ -15,6 +15,9 @@ import '../modules/article/controllers/article_detail_controller.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/profile/controllers/profile_controller.dart';
 
+import '../modules/article/views/article_create_view.dart';
+import '../modules/article/bindings/article_create_binding.dart';
+
 class AppPages {
   AppPages._();
 
@@ -51,6 +54,11 @@ class AppPages {
     Get.lazyPut<ProfileController>(() => ProfileController());
   }),
 ),
+  GetPage(
+    name: Routes.ARTICLE_CREATE,
+    page: () => const ArticleCreateView(),
+    binding: ArticleCreateBinding(),
+  ),
   ];
   
 }
