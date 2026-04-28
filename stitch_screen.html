@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blog Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#131b2e",
+                        "secondary-fixed-dim": "#c1c6d7",
+                        "outline-variant": "#c5c5d6",
+                        "primary-fixed": "#dee1ff",
+                        "on-primary-fixed-variant": "#1e39ad",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eaedff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#414755",
+                        "surface-variant": "#dae2fd",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#bac3ff",
+                        "surface-container-highest": "#dae2fd",
+                        "outline": "#757685",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001159",
+                        "tertiary-container": "#435369",
+                        "surface-tint": "#3b53c6",
+                        "secondary-container": "#dde2f4",
+                        "background": "#faf8ff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "surface-container-low": "#f2f3ff",
+                        "primary": "#092ba2",
+                        "on-secondary-container": "#5f6473",
+                        "surface-container-high": "#e2e7ff",
+                        "surface-dim": "#d2d9f4",
+                        "primary-fixed-dim": "#bac3ff",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#b9c2ff",
+                        "primary-container": "#2d46b9",
+                        "secondary-fixed": "#dde2f4",
+                        "on-primary": "#ffffff",
+                        "surface": "#faf8ff",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "secondary": "#595e6d",
+                        "inverse-surface": "#283044",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#131b2e",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "surface-bright": "#faf8ff",
+                        "on-tertiary-container": "#b6c7e0",
+                        "on-surface-variant": "#444653",
+                        "tertiary": "#2c3c51",
+                        "on-secondary-fixed": "#161c28"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-sm": "0.5rem",
+                        "inner-padding": "1rem",
+                        "stack-gap-md": "1rem",
+                        "container-padding": "1.25rem",
+                        "stack-gap-lg": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "label-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                        "headline-lg": ["22px", {"lineHeight": "30px", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["15px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "label-bold": ["13px", {"lineHeight": "16px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased pb-24">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-5 py-3 sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#2D46B9] dark:text-blue-400">menu</span>
+<span class="font-['Manrope'] font-bold text-lg text-slate-900 dark:text-white text-xl font-black tracking-tight">TechFeed</span>
+</div>
+<div>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-slate-200" data-alt="Small circular avatar of a professional user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3s6aUqDqZhug8-pC0sZfO2QGoQKDxLmtcJE6J_gRYXRQg1B7UXEZMr_-nmns99W1Q59IOtxu4gtnq7aW6HeeogkxJUiQC_HWdQ1-hmSUnMi1GhN3HWcq-bFTLMzYc3VkgSqCQfUah0cGfYQtTdcD4eV2r0uj-5PC5ogJ7DflWiG30QYJj3oyKJUVWAO8l4HDteZIAQFmuDBBYJttaSGB-mdhh0mtHNTwLF8hE1G0xCpGpDpR5u6X_7FQlyHyh0DnPkw1h8ShZk2rF"/>
+</div>
+</header>
+<main class="max-w-3xl mx-auto w-full px-container-padding pt-stack-gap-md space-y-stack-gap-lg">
+<!-- Search Bar -->
+<div class="relative w-full group">
+<div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-full font-body-md text-body-md text-on-surface placeholder-secondary focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm" placeholder="Cari judul atau penulis..." type="text"/>
+</div>
+<!-- Category Chips -->
+<div class="flex overflow-x-auto no-scrollbar gap-stack-gap-sm pb-1">
+<button class="flex-shrink-0 px-4 py-2 bg-primary text-on-primary rounded-full font-label-bold text-label-bold">Semua</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-full font-label-bold text-label-bold border border-outline-variant hover:bg-surface-container transition-colors">AI</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-full font-label-bold text-label-bold border border-outline-variant hover:bg-surface-container transition-colors">Cybersecurity</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-full font-label-bold text-label-bold border border-outline-variant hover:bg-surface-container transition-colors">Web</button>
+</div>
+<!-- Article Feed -->
+<div class="space-y-stack-gap-lg">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="relative aspect-video w-full overflow-hidden">
+<img alt="AI representation" class="w-full h-full object-cover" data-alt="Abstract rendering of an artificial intelligence neural network with glowing blue nodes on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOPNpugyJGyQ4FQR82aZPYpal1l8ym9_9XFSLCjeiX-F53CL91Gm9xSQjVhzCdXiIuJ1b-pGQrQc_fhAWlNZpAdwF4hxTKOXlrBfClVEKb7auGhnpXDchxlRVAzWJHBc2TKTDJB-26iwqfWuSMayUFOSmBCBQ2SnwY4kv1yVIVy68Cvona83CSnBy_R1Zes8KJKqUmN5WsoRycZygG6IFD63dxezDoL6hD1ngmaOKzQjY-UyE1XwQ2A9Imbzj--zZxewx6hd5TfsL9"/>
+<span class="absolute top-3 left-3 px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-sm text-primary font-label-caps text-label-caps rounded-full shadow-sm">AI</span>
+</div>
+<div class="p-inner-padding flex flex-col gap-stack-gap-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2">Masa Depan AI: Ancaman atau Peluang bagi...</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Perkembangan kecerdasan buatan telah memicu perdebatan global. Apakah teknologi ini akan menggantikan manusia atau justru menjadi katalis inovasi baru di berbagai industri.</p>
+<div class="flex items-center justify-between mt-2 pt-3 border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<img alt="Siti Rahma" class="w-6 h-6 rounded-full object-cover" data-alt="Portrait of young professional woman smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvttZhTxhXNU-ou7IrmWVhM6wopUwImpNy7JU1trF6HZW6FmqaeFok9GD3qV24mu9_SjX7ypFdM44ufYl-SKLxSMQGN2Y3f9J9VDp_ooPd8Sx-ZlVy590lVwTpQ9zCILigQBpydTYn94IBA4EXT2uDRcD6PZX8vvfT0GxkwKFPF3v52GAqJNuR2XbTeS7F2CbcEdiALmljsGs1lsFNLEGCq4RocynaZJ8xW7yWu9R2oSGt6xKNfGd1LmJvsuosav32KtF28UJRFnGy"/>
+<span class="font-label-bold text-label-bold text-on-surface">Siti Rahma</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="font-body-sm text-[12px]">245</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="font-body-sm text-[12px]">42</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="relative aspect-video w-full overflow-hidden">
+<img alt="Cybersecurity lock" class="w-full h-full object-cover" data-alt="Digital representation of a glowing padlock on a computer screen indicating cybersecurity concepts" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfXX83tVQpaVgDC3DK9xyz8GOw6ATigPREN2SmwLW5y-XBKIKpa9j-zvGwk93QSef3H9z-1HptwLMA6cWrzH98jN9fyNYOZs6TO907kDXPHY55sH3o6OwbvhyT_q5QyfPrMw96tAU_87C3e4FgMaAOZiS59nKMDT4lainSKYLk254wmsX3w8CeGXwQHrzZUVVcc75vH5U4ZEfeboW_8JS1z5pmsp6ixlq5hhH0ihCyfnfpGYTV9Lt-TMa5hwki_PfheVLcRBZXM7QT"/>
+<span class="absolute top-3 left-3 px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-sm text-primary font-label-caps text-label-caps rounded-full shadow-sm">Cybersecurity</span>
+</div>
+<div class="p-inner-padding flex flex-col gap-stack-gap-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2">Tren Serangan Ransomware 2024</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Analisis mendalam mengenai evolusi taktik yang digunakan oleh kelompok ransomware. Bagaimana perusahaan dapat meningkatkan pertahanan mereka di lanskap ancaman saat ini.</p>
+<div class="flex items-center justify-between mt-2 pt-3 border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<img alt="Budi Santoso" class="w-6 h-6 rounded-full object-cover" data-alt="Portrait of a male professional in a business casual setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUgQUIefF3RYypSlnsJIlvj_5M12T264CT3B2La_VEn_UDIV209xGoXlH0tSk8ZhTdveJI6FJ5NDukbMT9uQkFcmaPgZvxJXnq61FgGtJVivC3Lgw-Ss3J9H_JzckKodJjq3CC0KX1qzL6IZQbPWowfc6N2FH148wKQoyf6ql8VWC0InPDUaaX-ocZxB-MfFid2AKRv2RXQsPwkyV9iiz192pcf2oorwDC-dM1OtMv4Nf3qpTAukxx438KMMozQ0SGiNZVDlAS3KEP"/>
+<span class="font-label-bold text-label-bold text-on-surface">Budi Santoso</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="font-body-sm text-[12px]">128</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="font-body-sm text-[12px]">15</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="relative aspect-video w-full overflow-hidden">
+<img alt="Web Dev Setup" class="w-full h-full object-cover" data-alt="Modern web development workstation with multiple monitors displaying lines of code" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4Z_ngk5yOpujsUtzGlaGCsCGAOiSpfyC24obFolkaeq3_6P8tvLsMUR3TT1VxNQHnCSAsFpRhwvgakfSjwStTA7kkv7qX9S7C6J0w7zafryDDevcmHPprECU6EHkHWr-k7XKQ_9B_mX2bEFLCtJvA6-WAHginNnaUeYDH0uGfMCjlWala6iPtRE6x1rU8fuXO665pq-VeN5yLsrOmvKfszqaXZQRksVimmnDQkISqxhRZGB8lcCo5yfE_C7SPwUEI7ncnXFA3VE2U"/>
+<span class="absolute top-3 left-3 px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-sm text-primary font-label-caps text-label-caps rounded-full shadow-sm">Web Dev</span>
+</div>
+<div class="p-inner-padding flex flex-col gap-stack-gap-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2">Migrasi ke Next.js 14: Panduan Lengkap</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Langkah demi langkah dalam mengadopsi fitur terbaru Next.js 14 untuk performa optimal. Pelajari best practices dan jebakan umum yang harus dihindari.</p>
+<div class="flex items-center justify-between mt-2 pt-3 border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<img alt="Andi Wijaya" class="w-6 h-6 rounded-full object-cover" data-alt="Portrait of a young software developer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo50O3jDcf5IA1HV3XEW5wwNSHHbC1iGiyOIh_d468SjP40_B6RwyIbOjrYf2GtdzcOGX3CMbMxJgo-2BmSi19-SHRNNUdu6ppov5cQaoFS7z7OYMWECVZLhyPsM2LeDz1OpuSiNVruqkaVYqWOOuepVNihi14f9bqZMqmmSfiZKt16aY3eTq6VGomZX6BBQDdKot2syQgVjDnRPqqPfiECcKJ_3gQLvtdrM5ZHDL1dUDcupuxVITOC5cXmi8PlLZR9f2WE-MRzrkg"/>
+<span class="font-label-bold text-label-bold text-on-surface">Andi Wijaya</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="font-body-sm text-[12px]">312</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="font-body-sm text-[12px]">64</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/90 dark:bg-slate-900/90 backdrop-blur-md md:hidden border-t border-slate-200 dark:border-slate-800">
+<div class="flex flex-col items-center justify-center text-[#2D46B9] dark:text-blue-400 font-bold hover:text-[#2D46B9] dark:hover:text-blue-300 active:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-['Manrope'] font-medium text-[10px]">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#2D46B9] dark:hover:text-blue-300 active:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Manrope'] font-medium text-[10px]">Explore</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#2D46B9] dark:hover:text-blue-300 active:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-['Manrope'] font-medium text-[10px]">Saved</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#2D46B9] dark:hover:text-blue-300 active:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Manrope'] font-medium text-[10px]">Profile</span>
+</div>
+</nav>
+</body></html>
