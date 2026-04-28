@@ -151,6 +151,8 @@ class ApiProvider {
     required String content,
     required int categoryId,
     String? imagePath,
+    List<int>? imageBytes,
+    String? fileName,
   }) async {
     Map<String, dynamic> data = {
       'title': title,
@@ -158,7 +160,9 @@ class ApiProvider {
       'category_id': categoryId,
     };
 
-    if (imagePath != null && imagePath.isNotEmpty) {
+    if (imageBytes != null && fileName != null) {
+      data['image'] = MultipartFile.fromBytes(imageBytes, filename: fileName);
+    } else if (imagePath != null && imagePath.isNotEmpty) {
       data['image'] = await MultipartFile.fromFile(imagePath);
     }
 

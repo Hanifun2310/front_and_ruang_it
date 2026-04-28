@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/profile_controller.dart';
+import '../../../routes/app_routes.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
@@ -8,59 +10,637 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Profil Saya"), centerTitle: true),
+      backgroundColor: const Color(0xFFFAF8FF),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Ruang IT',
+          style: GoogleFonts.manrope(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF131B2E),
+            letterSpacing: -0.5,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Color(0xFF131B2E)),
+            onPressed: () {},
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: const Color(0xFFE2E7FF), height: 1),
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            // Avatar Section
-            Obx(() => CircleAvatar(
-              radius: 50,
-              backgroundImage: controller.photoProfile.value.isNotEmpty
-                  ? NetworkImage('https://ruang-it.vibedev.my.id/storage/${controller.photoProfile.value}')
-                  : const NetworkImage('https://ui-avatars.com/api/?name=User'),
-            )),
-            const SizedBox(height: 24),
-            
-            // Field Email (Read Only - Sesuai Logika Laravel)
-            Obx(() => ListTile(
-              title: const Text("Email"),
-              subtitle: Text(controller.email.value),
-              leading: const Icon(Icons.email_outlined),
-            )),
-            const Divider(),
+            // --- PROFILE HEADER ---
+            _buildProfileHeader(context),
 
-            // Form Edit
-            TextField(
-              controller: controller.nameController,
-              decoration: const InputDecoration(labelText: "Nama Lengkap", prefixIcon: Icon(Icons.person_outline)),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller.professionController,
-              decoration: const InputDecoration(labelText: "Pekerjaan", prefixIcon: Icon(Icons.work_outline)),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller.bioController,
-              maxLines: 3,
-              decoration: const InputDecoration(labelText: "Bio Singkat", prefixIcon: Icon(Icons.info_outline), border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: 32),
+            // --- STATS GRID ---
+            _buildStatsGrid(),
 
-            Obx(() => SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: controller.isLoading.value ? null : controller.updateProfile,
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16), backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
-                child: controller.isLoading.value 
-                  ? const CircularProgressIndicator(color: Colors.white) 
-                  : const Text("Simpan Perubahan", style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            )),
+            // --- TABS & ARTICLES ---
+            _buildArticlesSection(),
           ],
         ),
       ),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildProfileHeader(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Obx(() => Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFE2E7FF), width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: controller.photoProfile.value.isNotEmpty
+                      ? Image.network(
+                          'https://ruang-it.vibedev.my.id/storage/${controller.photoProfile.value}',
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Image.network('https://ui-avatars.com/api/?name=${controller.name.value}'),
+                        )
+                      : Image.network('https://ui-avatars.com/api/?name=${controller.name.value}'),
+                ),
+              )),
+          const SizedBox(height: 16),
+          Obx(() => Text(
+                controller.name.value,
+                style: GoogleFonts.manrope(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF131B2E),
+                ),
+              )),
+          const SizedBox(height: 4),
+          Obx(() => Text(
+                controller.profession.value.isNotEmpty ? controller.profession.value : "Tech Enthusiast",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF092BA2),
+                ),
+              )),
+          const SizedBox(height: 12),
+          Obx(() => Container(
+                constraints: const BoxConstraints(maxWidth: 300),
+                child: Text(
+                  controller.bio.value.isNotEmpty ? controller.bio.value : "No bio yet.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xFF444653),
+                    height: 1.5,
+                  ),
+                ),
+              )),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => _showEditProfileSheet(context),
+            icon: const Icon(Icons.edit, size: 18),
+            label: const Text("EDIT PROFILE"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF092BA2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Left Card: Articles
+            Expanded(
+              flex: 1,
+              child: _buildArticlesCard(),
+            ),
+            const SizedBox(width: 12),
+            // Right Column: Likes & Comments
+            Expanded(
+              flex: 1,
+              child: Column(
+                children: [
+                  _buildHorizontalStatCard(
+                    "LIKES", 
+                    controller.likesCount, 
+                    Icons.favorite, 
+                    const Color(0xFFFFEFE2), // Light Orange/Brown circle
+                    const Color(0xFF8B4513), // Brown heart
+                  ),
+                  const SizedBox(height: 12),
+                  _buildHorizontalStatCard(
+                    "COMMENTS", 
+                    controller.commentsCount, 
+                    Icons.chat_bubble_rounded, 
+                    const Color(0xFFEEF2FF), // Light Blue circle
+                    const Color(0xFF4B5563), // Grey bubble
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArticlesCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E7FF)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: Color(0xFFEEF2FF),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.article_rounded, color: Color(0xFF092BA2), size: 28),
+          ),
+          const SizedBox(height: 20),
+          Obx(() => Text(
+                "${controller.articlesCount.value}",
+                style: GoogleFonts.manrope(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF131B2E),
+                ),
+              )),
+          Text(
+            "ARTICLES",
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF444653),
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHorizontalStatCard(
+    String label, 
+    RxInt count, 
+    IconData icon, 
+    Color iconBg, 
+    Color iconColor
+  ) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE2E7FF)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: iconBg,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF757685),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Obx(() => Text(
+                  count.value > 999 ? "${(count.value / 1000).toStringAsFixed(1)}k" : "${count.value}",
+                  style: GoogleFonts.manrope(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF131B2E),
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArticlesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "RECENT ARTICLES",
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF092BA2),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                height: 2,
+                width: 40,
+                color: const Color(0xFF092BA2),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Obx(() {
+          if (controller.isArticlesLoading.value) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (controller.userArticles.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48.0),
+                child: Column(
+                  children: [
+                    Icon(Icons.article_outlined, size: 48, color: Colors.grey.shade300),
+                    const SizedBox(height: 16),
+                    Text(
+                      "No articles yet",
+                      style: GoogleFonts.inter(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: controller.userArticles.length,
+            itemBuilder: (context, index) {
+              final article = controller.userArticles[index];
+              return _buildArticleCard(article);
+            },
+          );
+        }),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+
+  Widget _buildArticleCard(dynamic article) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E7FF)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug),
+        borderRadius: BorderRadius.circular(16),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
+              child: Image.network(
+                article.imageUrl ?? 'https://via.placeholder.com/150',
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.grey.shade100,
+                  child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF2F3FF),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            article.category?.name?.toUpperCase() ?? "GENERAL",
+                            style: GoogleFonts.inter(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF092BA2),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "2 days ago", // Mock time for now
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: const Color(0xFF757685),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      article.title ?? "Untitled",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF131B2E),
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return Container(
+      height: 80,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFE2E7FF))),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.home_outlined, 'Home', false, () => Get.offAllNamed(Routes.DASHBOARD)),
+          _buildNavItem(Icons.add_circle_outline, 'Add', false, () => Get.offNamed(Routes.ARTICLE_CREATE)),
+          _buildNavItem(Icons.person, 'Profile', true, () {}),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, bool isActive, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
+            size: 24,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+              color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditProfileSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          left: 24,
+          right: 24,
+          top: 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Edit Profil",
+              style: GoogleFonts.manrope(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF131B2E),
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildTextField(
+              controller: controller.nameController,
+              label: "Nama Lengkap",
+              icon: Icons.person_outline,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              controller: controller.professionController,
+              label: "Pekerjaan / Bidang",
+              icon: Icons.work_outline,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              controller: controller.bioController,
+              label: "Bio Singkat",
+              icon: Icons.info_outline,
+              maxLines: 3,
+            ),
+            const SizedBox(height: 32),
+            Obx(() => SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () async {
+                            await controller.updateProfile();
+                            Get.back();
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF092BA2),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    child: controller.isLoading.value
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : const Text("Simpan Perubahan", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF444653),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          style: GoogleFonts.inter(fontSize: 14),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 20, color: const Color(0xFF757685)),
+            filled: true,
+            fillColor: const Color(0xFFFAF8FF),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE2E7FF)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE2E7FF)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF092BA2)),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

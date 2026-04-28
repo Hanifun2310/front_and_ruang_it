@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/foundation.dart';
 import '../controllers/article_create_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -140,10 +141,15 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                 child: controller.selectedImage.value != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.file(
-                        File(controller.selectedImage.value!.path),
-                        fit: BoxFit.cover,
-                      ),
+                      child: kIsWeb 
+                        ? Image.network(
+                            controller.selectedImage.value!.path,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.file(
+                            File(controller.selectedImage.value!.path),
+                            fit: BoxFit.cover,
+                          ),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -195,88 +201,42 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Kategori Utama',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF444653),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Obx(() => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFC5C5D6)),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: controller.selectedCategoryId.value == 0 ? null : controller.selectedCategoryId.value,
-                            hint: Text('Pilih Kategori...', style: GoogleFonts.inter(fontSize: 13)),
-                            isExpanded: true,
-                            items: controller.categories.map((cat) {
-                              return DropdownMenuItem<int>(
-                                value: cat['id'],
-                                child: Text(cat['name'], style: GoogleFonts.inter(fontSize: 13)),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) controller.selectedCategoryId.value = val;
-                            },
-                          ),
-                        ),
-                      )),
-                    ],
+                Text(
+                  'Kategori Utama',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF444653),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tag (Opsional)',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF444653),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: controller.tagController,
-                        style: GoogleFonts.inter(fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText: 'Contoh: Python, React...',
-                          hintStyle: GoogleFonts.inter(color: const Color(0xFFC5C5D6)),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Color(0xFFC5C5D6)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Color(0xFFC5C5D6)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Color(0xFF092BA2)),
-                          ),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 8),
+                Obx(() => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFC5C5D6)),
                   ),
-                ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      value: controller.selectedCategoryId.value == 0 ? null : controller.selectedCategoryId.value,
+                      hint: Text('Pilih Kategori...', style: GoogleFonts.inter(fontSize: 13)),
+                      isExpanded: true,
+                      items: controller.categories.map((cat) {
+                        return DropdownMenuItem<int>(
+                          value: cat['id'],
+                          child: Text(cat['name'], style: GoogleFonts.inter(fontSize: 13)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) controller.selectedCategoryId.value = val;
+                      },
+                    ),
+                  ),
+                )),
               ],
             ),
             const SizedBox(height: 24),

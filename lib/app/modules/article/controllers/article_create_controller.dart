@@ -8,7 +8,6 @@ class ArticleCreateController extends GetxController {
   
   final titleController = TextEditingController();
   final contentController = TextEditingController();
-  final tagController = TextEditingController();
   
   final Rx<XFile?> selectedImage = Rx<XFile?>(null);
   final RxInt selectedCategoryId = 0.obs;
@@ -48,11 +47,20 @@ class ArticleCreateController extends GetxController {
 
     isLoading.value = true;
     try {
+      List<int>? imageBytes;
+      String? fileName;
+      
+      if (selectedImage.value != null) {
+        imageBytes = await selectedImage.value!.readAsBytes();
+        fileName = selectedImage.value!.name;
+      }
+
       final response = await _apiProvider.createArticle(
         title: titleController.text,
         content: contentController.text,
         categoryId: selectedCategoryId.value,
-        imagePath: selectedImage.value?.path,
+        imageBytes: imageBytes,
+        fileName: fileName,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -72,7 +80,6 @@ class ArticleCreateController extends GetxController {
   void onClose() {
     titleController.dispose();
     contentController.dispose();
-    tagController.dispose();
     super.onClose();
   }
 }

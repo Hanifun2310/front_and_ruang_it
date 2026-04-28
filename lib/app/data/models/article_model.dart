@@ -64,18 +64,38 @@ class UserModel {
   String? email;
   String? role;
   String? photoProfile;
+  String? profession;
+  String? bio;
 
-  UserModel({this.id, this.name, this.email, this.role, this.photoProfile});
+  UserModel({
+    this.id,
+    this.name,
+    this.email,
+    this.role,
+    this.photoProfile,
+    this.profession,
+    this.bio,
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         id: json['id'],
-        name: json['name']?? 'User',
+        name: json['name'] ?? 'User',
         email: json['email'],
         role: json['role'],
-        photoProfile: json['photo_profile']?? json['profile_photo'],
+        photoProfile: json['photo_profile'] ?? json['profile_photo'],
+        profession: json['profession'],
+        bio: json['bio'],
       );
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'email': email, 'role': role, 'photo_profile': photoProfile};
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'email': email,
+        'role': role,
+        'photo_profile': photoProfile,
+        'profession': profession,
+        'bio': bio,
+      };
 }
 
 class CategoryModel {
