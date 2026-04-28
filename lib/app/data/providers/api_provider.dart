@@ -72,11 +72,14 @@ class ApiProvider {
   // PUBLIC ROUTES
   // ===========================================================================
 
-  Future<List<ArticleModel>> getArticles({int page = 1, String? category}) async {
+  Future<List<ArticleModel>> getArticles({int page = 1, String? category, String? search}) async {
     try {
       Map<String, dynamic> queryParams = {'page': page};
-      if (category != null && category != 'Semua') {
+      if (category != null && category.isNotEmpty) {
         queryParams['category'] = category;
+      }
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
       }
       final response = await _dio.get('/articles', queryParameters: queryParams);
       if (response.statusCode == 200) {
@@ -140,5 +143,60 @@ class ApiProvider {
     }
 
     return await _dio.post('/profile', data: FormData.fromMap(data));
+  }
+
+  // FUNGSI CREATE ARTICLE
+  Future<Response> createArticle({
+    required String title,
+    required String content,
+    required int categoryId,
+    String? imagePath,
+    List<int>? imageBytes,
+    String? fileName,
+  }) async {
+    Map<String, dynamic> data = {
+      'title': title,
+      'content': content,
+      'category_id': categoryId,
+    };
+
+    if (imageBytes != null && fileName != null) {
+      data['image'] = MultipartFile.fromBytes(imageBytes, filename: fileName);
+    } else if (imagePath != null && imagePath.isNotEmpty) {
+      data['image'] = await MultipartFile.fromFile(imagePath);
+    }
+
+    return await _dio.post('/articles', data: FormData.fromMap(data));
+  }
+
+  // FUNGSI UPDATE ARTICLE
+  Future<Response> updateArticle({
+    required int id,
+    required String title,
+    required String content,
+    required int categoryId,
+    String? imagePath,
+    List<int>? imageBytes,
+    String? fileName,
+  }) async {
+    Map<String, dynamic> data = {
+      'title': title,
+      'content': content,
+      'category_id': categoryId,
+      '_method': 'PUT', // Laravel membutuhkan ini jika mengirim FormData untuk Update
+    };
+
+    if (imageBytes != null && fileName != null) {
+      data['image'] = MultipartFile.fromBytes(imageBytes, filename: fileName);
+    } else if (imagePath != null && imagePath.isNotEmpty) {
+      data['image'] = await MultipartFile.fromFile(imagePath);
+    }
+
+    return await _dio.post('/articles/$id', data: FormData.fromMap(data));
+  }
+
+  // FUNGSI DELETE ARTICLE
+  Future<Response> deleteArticle(int id) async {
+    return await _dio.delete('/articles/$id');
   }
 }

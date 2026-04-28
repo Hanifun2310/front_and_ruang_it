@@ -1,0 +1,37 @@
+﻿Analyzing front_and_ruang_it...
+
+  error - test\widget_test.dart:16:35 - The name 'MyApp' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type
+warning - lib\app\modules\auth\views\register_view.dart:4:8 - Unused import: '../../../routes/app_routes.dart'. Try removing the import directive. - unused_import
+warning - lib\app\modules\dashboard\views\dashboard_view.dart:4:8 - Unused import: '../../../data/services/auth_service.dart'. Try removing the import directive. - unused_import
+   info - lib\app\modules\article\controllers\article_detail_controller.dart:51:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\article\views\article_detail_view.dart:7:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\app\modules\article\views\article_detail_view.dart:94:48 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\app\modules\article\views\article_detail_view.dart:175:51 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\app\modules\auth\controllers\auth_controller.dart:42:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\auth\controllers\auth_controller.dart:43:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\auth\controllers\auth_controller.dart:44:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\auth\controllers\auth_controller.dart:64:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\auth\controllers\auth_controller.dart:73:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\auth\controllers\auth_controller.dart:127:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\app\modules\auth\views\login_view.dart:7:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\app\modules\auth\views\register_view.dart:7:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\app\modules\dashboard\views\dashboard_view.dart:8:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\app\modules\dashboard\views\dashboard_view.dart:70:41 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\app\modules\dashboard\views\dashboard_view.dart:170:49 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\app\modules\dashboard\views\dashboard_view.dart:210:59 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\app\modules\dashboard\views\dashboard_view.dart:272:75 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
+   info - lib\app\modules\dashboard\views\dashboard_view.dart:323:31 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\app\modules\profile\views\profile_view.dart:6:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\app\routes\app_pages.dart:22:16 - The constant name 'INITIAL' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:5:16 - The constant name 'DASHBOARD' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:6:16 - The constant name 'LOGIN' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:7:16 - The constant name 'REGISTER' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:8:16 - The constant name 'ARTICLE_DETAIL' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:9:16 - The constant name 'PROFILE' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:14:16 - The constant name 'DASHBOARD' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:15:16 - The constant name 'LOGIN' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:16:16 - The constant name 'REGISTER' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:17:16 - The constant name 'ARTICLE_DETAIL' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\app\routes\app_routes.dart:18:16 - The constant name 'PROFILE' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+
+33 issues found.
