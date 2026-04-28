@@ -77,23 +77,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             const SizedBox(height: 16),
             Row(
               children: [
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    side: const BorderSide(color: Color(0xFF757685)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  ),
-                  child: Text(
-                    'Simpan Draf',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF131B2E),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value ? null : () => controller.publishArticle(),
                   style: ElevatedButton.styleFrom(
