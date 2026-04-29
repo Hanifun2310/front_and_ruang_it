@@ -4,7 +4,7 @@ import '../../../data/services/auth_service.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -27,6 +27,8 @@ class ProfileController extends GetxController {
   // Image Picking
   final ImagePicker _picker = ImagePicker();
   var selectedImagePath = "".obs;
+  var selectedImageBytes = <int>[].obs;
+  var selectedFileName = "".obs;
 
   // Articles & Tabs
   var userArticles = <ArticleModel>[].obs;
@@ -98,7 +100,9 @@ class ProfileController extends GetxController {
         name: nameController.text,
         profession: professionController.text,
         bio: bioController.text,
-        imagePath: selectedImagePath.value.isNotEmpty ? selectedImagePath.value : null,
+        imagePath: !kIsWeb && selectedImagePath.value.isNotEmpty ? selectedImagePath.value : null,
+        imageBytes: kIsWeb && selectedImageBytes.isNotEmpty ? selectedImageBytes.toList() : null,
+        fileName: kIsWeb ? selectedFileName.value : null,
       );
 
       if (response.statusCode == 200) {
@@ -108,6 +112,8 @@ class ProfileController extends GetxController {
         // Refresh local observable state
         loadUserData();
         selectedImagePath.value = ""; // Reset after success
+        selectedImageBytes.clear();
+        selectedFileName.value = "";
         
         Get.snackbar('Sukses', 'Profil berhasil diperbarui');
       }
@@ -123,6 +129,10 @@ class ProfileController extends GetxController {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         selectedImagePath.value = image.path;
+        if (kIsWeb) {
+          selectedImageBytes.assignAll(await image.readAsBytes());
+          selectedFileName.value = image.name;
+        }
       }
     } catch (e) {
       Get.snackbar('Error', 'Gagal memilih gambar');

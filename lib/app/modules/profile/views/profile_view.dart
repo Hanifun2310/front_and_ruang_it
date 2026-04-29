@@ -5,6 +5,7 @@ import '../controllers/profile_controller.dart';
 import '../../../data/models/article_model.dart';
 import '../../../routes/app_routes.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
@@ -706,10 +707,15 @@ class ProfileView extends GetView<ProfileController> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(50),
                         child: controller.selectedImagePath.value.isNotEmpty
-                            ? Image.file(
-                                File(controller.selectedImagePath.value),
-                                fit: BoxFit.cover,
-                              )
+                            ? (kIsWeb
+                                ? Image.network(
+                                    controller.selectedImagePath.value,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(controller.selectedImagePath.value),
+                                    fit: BoxFit.cover,
+                                  ))
                             : Image.network(
                                 controller.photoProfile.value,
                                 fit: BoxFit.cover,

@@ -129,6 +129,8 @@ class ApiProvider {
     required String profession,
     required String bio,
     String? imagePath, // Path file gambar di HP jika user upload foto
+    List<int>? imageBytes,
+    String? fileName,
   }) async {
     Map<String, dynamic> data = {
       'name': name,
@@ -138,7 +140,9 @@ class ApiProvider {
     };
 
     // Jika user memilih gambar, masukkan ke FormData
-    if (imagePath != null && imagePath.isNotEmpty) {
+    if (imageBytes != null && fileName != null) {
+      data['photo_profile'] = MultipartFile.fromBytes(imageBytes, filename: fileName);
+    } else if (imagePath != null && imagePath.isNotEmpty) {
       data['photo_profile'] = await MultipartFile.fromFile(imagePath);
     }
 
