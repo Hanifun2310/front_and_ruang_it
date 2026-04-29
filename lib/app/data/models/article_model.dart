@@ -25,10 +25,20 @@ class ArticleModel {
   });
 
   static String formatImageUrl(String? path) {
-    if (path == null || path.isEmpty)
+    if (path == null || path.isEmpty) {
       return 'https://via.placeholder.com/600x400';
+    }
     if (path.startsWith('http')) return path;
-    return 'https://ruang-it.vibedev.my.id/storage/$path';
+
+    // Remove leading slash if exists
+    String cleanPath = path.startsWith('/') ? path.substring(1) : path;
+
+    // Avoid double 'storage/' if the backend already provides it
+    if (cleanPath.startsWith('storage/')) {
+      return 'https://ruang-it.vibedev.my.id/$cleanPath';
+    }
+
+    return 'https://ruang-it.vibedev.my.id/storage/$cleanPath';
   }
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {

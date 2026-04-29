@@ -12,7 +12,7 @@ class ProfileController extends GetxController {
 
   var isLoading = false.obs;
   var isArticlesLoading = false.obs;
-  
+
   // Controllers sesuai field di Laravel
   final nameController = TextEditingController();
   final professionController = TextEditingController();
@@ -23,7 +23,7 @@ class ProfileController extends GetxController {
   var bio = "".obs;
   var name = "".obs;
   var userId = 0.obs;
-  
+
   // Image Picking
   final ImagePicker _picker = ImagePicker();
   var selectedImagePath = "".obs;
@@ -47,22 +47,26 @@ class ProfileController extends GetxController {
   }
 
   void loadUserData() {
-    final user = _authService.currentUser;
-    if (user != null) {
-      name.value = user['name'] ?? "User";
-      nameController.text = user['name'] ?? "";
-      profession.value = user['profession'] ?? "";
-      professionController.text = user['profession'] ?? "";
-      bio.value = user['bio'] ?? "";
-      bioController.text = user['bio'] ?? "";
-      email.value = user['email'] ?? "";
-      photoProfile.value = ArticleModel.formatImageUrl(user['photo_profile'] ?? user['profile_photo']);
-      userId.value = user['id'] ?? 0;
-      
-      // Update stats if available in user object
-      articlesCount.value = user['articles_count'] ?? 0;
-      likesCount.value = user['likes_count'] ?? 0;
-      commentsCount.value = user['comments_count'] ?? 0;
+    final userData = _authService.currentUser;
+    if (userData != null) {
+      // Use UserModel for consistent parsing and image formatting
+      final user = UserModel.fromJson(userData);
+
+      name.value = user.name ?? "User";
+      nameController.text = user.name ?? "";
+      profession.value = user.profession ?? "";
+      professionController.text = user.profession ?? "";
+      bio.value = user.bio ?? "";
+      bioController.text = user.bio ?? "";
+      email.value = user.email ?? "";
+      photoProfile.value =
+          user.photoProfile ?? ArticleModel.formatImageUrl(null);
+      userId.value = user.id ?? 0;
+
+      // Update stats if available in raw user object
+      articlesCount.value = userData['articles_count'] ?? 0;
+      likesCount.value = userData['likes_count'] ?? 0;
+      commentsCount.value = userData['comments_count'] ?? 0;
     }
   }
 
@@ -74,14 +78,16 @@ class ProfileController extends GetxController {
       // For now, let's just get the first page of all articles as a placeholder
       // if we don't have a specific endpoint.
       final articles = await _apiProvider.getArticles(page: 1);
-      
+
       // Filter articles by user name if we have it
       if (name.value.isNotEmpty) {
-         userArticles.value = articles.where((a) => a.user?.name == name.value).toList();
+        userArticles.value = articles
+            .where((a) => a.user?.name == name.value)
+            .toList();
       } else {
         userArticles.value = articles;
       }
-      
+
       // Update count if it was 0
       if (articlesCount.value == 0) {
         articlesCount.value = userArticles.length;
@@ -100,24 +106,52 @@ class ProfileController extends GetxController {
         name: nameController.text,
         profession: professionController.text,
         bio: bioController.text,
-        imagePath: !kIsWeb && selectedImagePath.value.isNotEmpty ? selectedImagePath.value : null,
-        imageBytes: kIsWeb && selectedImageBytes.isNotEmpty ? selectedImageBytes.toList() : null,
-        fileName: kIsWeb ? selectedFileName.value : null,
+        // Tetap kirim path untuk mobile jika ada, tapi utamakan bytes jika tersedia di ApiProvider
+        imagePath: !kIsWeb && selectedImagePath.value.isNotEmpty
+            ? selectedImagePath.value
+            : null,
+        imageBytes: selectedImageBytes.isNotEmpty
+            ? selectedImageBytes.toList()
+            : null,
+        fileName: selectedFileName.value.isNotEmpty
+            ? selectedFileName.value
+            : null,
       );
 
       if (response.statusCode == 200) {
-        Map<String, dynamic> updatedUser = response.data['data'];
-        await _authService.box.write('user', updatedUser);
-        
-        // Refresh local observable state
-        loadUserData();
-        selectedImagePath.value = ""; // Reset after success
-        selectedImageBytes.clear();
-        selectedFileName.value = "";
-        
-        Get.snackbar('Sukses', 'Profil berhasil diperbarui');
+        print('UPDATE PROFILE RESPONSE: ${response.data}');
+
+        // Ambil data user, tangani jika dibungkus 'data', 'user', atau tidak
+        final dynamic responseData =
+            response.data['data'] ?? response.data['user'] ?? response.data;
+
+        if (responseData is Map<String, dynamic>) {
+          // Merge data lama dengan data baru agar stats tidak hilang jika API tidak mengirimnya kembali
+          final Map<String, dynamic> oldData = Map<String, dynamic>.from(
+            _authService.currentUser ?? {},
+          );
+          final Map<String, dynamic> newData = Map<String, dynamic>.from(
+            responseData,
+          );
+
+          // Gabungkan: newData akan menimpa oldData
+          final mergedData = {...oldData, ...newData};
+
+          await _authService.box.write('user', mergedData);
+
+          // Refresh local observable state
+          loadUserData();
+
+          // Reset selection
+          selectedImagePath.value = "";
+          selectedImageBytes.clear();
+          selectedFileName.value = "";
+
+          Get.snackbar('Sukses', 'Profil berhasil diperbarui');
+        }
       }
     } catch (e) {
+      print('Error update profile: $e');
       Get.snackbar('Error', 'Gagal memperbarui profil');
     } finally {
       isLoading.value = false;
@@ -129,10 +163,9 @@ class ProfileController extends GetxController {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         selectedImagePath.value = image.path;
-        if (kIsWeb) {
-          selectedImageBytes.assignAll(await image.readAsBytes());
-          selectedFileName.value = image.name;
-        }
+        // Baca bytes untuk semua platform agar konsisten dengan logic Article
+        selectedImageBytes.assignAll(await image.readAsBytes());
+        selectedFileName.value = image.name;
       }
     } catch (e) {
       Get.snackbar('Error', 'Gagal memilih gambar');

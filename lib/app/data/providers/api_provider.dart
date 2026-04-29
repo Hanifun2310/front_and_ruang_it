@@ -128,7 +128,7 @@ class ApiProvider {
     required String name,
     required String profession,
     required String bio,
-    String? imagePath, // Path file gambar di HP jika user upload foto
+    String? imagePath,
     List<int>? imageBytes,
     String? fileName,
   }) async {
@@ -136,14 +136,21 @@ class ApiProvider {
       'name': name,
       'profession': profession,
       'bio': bio,
-      '_method': 'PUT', // Laravel membutuhkan ini jika mengirim FormData untuk Update
+      '_method': 'PUT',
     };
 
-    // Jika user memilih gambar, masukkan ke FormData
     if (imageBytes != null && fileName != null) {
-      data['photo_profile'] = MultipartFile.fromBytes(imageBytes, filename: fileName);
+      final file = MultipartFile.fromBytes(
+        imageBytes,
+        filename: fileName,
+      );
+      data['photo_profile'] = file;
+      data['profile_photo'] = file;
+      data['image'] = file;
     } else if (imagePath != null && imagePath.isNotEmpty) {
       data['photo_profile'] = await MultipartFile.fromFile(imagePath);
+      data['profile_photo'] = await MultipartFile.fromFile(imagePath);
+      data['image'] = await MultipartFile.fromFile(imagePath);
     }
 
     return await _dio.post('/profile', data: FormData.fromMap(data));

@@ -25,12 +25,14 @@ class ArticleEditController extends GetxController {
     
     // Pre-fill data
     titleController.text = article.title ?? "";
-    contentController.text = article.content ?? "";
+    contentController.text = (article.content ?? "").replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
     selectedCategoryId.value = article.category?.id ?? 0;
     currentImageUrl.value = article.imageUrl ?? "";
 
     fetchCategories();
   }
+
+  // Remove _stripHtmlTags function as we use regex directly for simplicity
 
   Future<void> fetchCategories() async {
     try {
