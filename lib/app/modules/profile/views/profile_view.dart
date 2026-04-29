@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../controllers/profile_controller.dart';
 import '../../../data/models/article_model.dart';
 import '../../../routes/app_routes.dart';
+import 'dart:io';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
@@ -485,14 +486,6 @@ class ProfileView extends GetView<ProfileController> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "2 days ago", // Mock time for now
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  color: const Color(0xFF757685),
-                                ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -696,6 +689,60 @@ class ProfileView extends GetView<ProfileController> {
                 color: const Color(0xFF131B2E),
               ),
             ),
+            const SizedBox(height: 24),
+            
+            // Edit Photo Section
+            Center(
+              child: Stack(
+                children: [
+                  Obx(
+                    () => Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFFE2E7FF), width: 4),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: controller.selectedImagePath.value.isNotEmpty
+                            ? Image.file(
+                                File(controller.selectedImagePath.value),
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                controller.photoProfile.value,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Image.network(
+                                  'https://ui-avatars.com/api/?name=${controller.name.value}',
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () => controller.pickImage(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF092BA2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
             const SizedBox(height: 24),
             _buildTextField(
               controller: controller.nameController,

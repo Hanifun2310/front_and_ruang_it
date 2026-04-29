@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -21,6 +23,10 @@ class ProfileController extends GetxController {
   var bio = "".obs;
   var name = "".obs;
   var userId = 0.obs;
+  
+  // Image Picking
+  final ImagePicker _picker = ImagePicker();
+  var selectedImagePath = "".obs;
 
   // Articles & Tabs
   var userArticles = <ArticleModel>[].obs;
@@ -92,6 +98,7 @@ class ProfileController extends GetxController {
         name: nameController.text,
         profession: professionController.text,
         bio: bioController.text,
+        imagePath: selectedImagePath.value.isNotEmpty ? selectedImagePath.value : null,
       );
 
       if (response.statusCode == 200) {
@@ -100,6 +107,7 @@ class ProfileController extends GetxController {
         
         // Refresh local observable state
         loadUserData();
+        selectedImagePath.value = ""; // Reset after success
         
         Get.snackbar('Sukses', 'Profil berhasil diperbarui');
       }
@@ -107,6 +115,17 @@ class ProfileController extends GetxController {
       Get.snackbar('Error', 'Gagal memperbarui profil');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        selectedImagePath.value = image.path;
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memilih gambar');
     }
   }
 
