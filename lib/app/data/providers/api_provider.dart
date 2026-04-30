@@ -109,7 +109,7 @@ class ApiProvider {
   // PROTECTED ROUTES (Membutuhkan Token)
   // ===========================================================================
 
-  Future<Response> toggleLike(int articleId) async {
+  Future<Response> toggleLike(int articleId) as
     return await _dio.post('/articles/$articleId/like');
   }
 
@@ -140,13 +140,18 @@ class ApiProvider {
     };
 
     if (imageBytes != null && fileName != null) {
-      final file = MultipartFile.fromBytes(
+      data['photo_profile'] = MultipartFile.fromBytes(
         imageBytes,
         filename: fileName,
       );
-      data['photo_profile'] = file;
-      data['profile_photo'] = file;
-      data['image'] = file;
+      data['profile_photo'] = MultipartFile.fromBytes(
+        imageBytes,
+        filename: fileName,
+      );
+      data['image'] = MultipartFile.fromBytes(
+        imageBytes,
+        filename: fileName,
+      );
     } else if (imagePath != null && imagePath.isNotEmpty) {
       data['photo_profile'] = await MultipartFile.fromFile(imagePath);
       data['profile_photo'] = await MultipartFile.fromFile(imagePath);
