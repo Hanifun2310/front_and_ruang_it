@@ -109,9 +109,10 @@ class ApiProvider {
   // PROTECTED ROUTES (Membutuhkan Token)
   // ===========================================================================
 
-  Future<Response> toggleLike(int articleId) as
-    return await _dio.post('/articles/$articleId/like');
-  }
+  Future<Response> toggleLike(int articleId) async {
+  return await _dio.post('/articles/$articleId/like');
+}
+
 
   Future<Response> postComment(int articleId, String content) async {
     return await _dio.post('/articles/$articleId/comments', data: {
