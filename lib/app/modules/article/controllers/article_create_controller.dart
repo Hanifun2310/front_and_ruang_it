@@ -1,13 +1,16 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/providers/api_provider.dart';
 
 class ArticleCreateController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   
   final titleController = TextEditingController();
-  final contentController = TextEditingController();
+  // Menggunakan QuillController sebagai pengganti TextEditingController
+  final QuillController quillController = QuillController.basic();
   
   final Rx<XFile?> selectedImage = Rx<XFile?>(null);
   final RxInt selectedCategoryId = 0.obs;
@@ -27,7 +30,7 @@ class ArticleCreateController extends GetxController {
         categories.value = response.data['data'] ?? response.data;
       }
     } catch (e) {
-      print('Error fetching categories: $e');
+      // Error fetching categories
     }
   }
 
@@ -40,7 +43,8 @@ class ArticleCreateController extends GetxController {
   }
 
   Future<void> publishArticle() async {
-    if (titleController.text.isEmpty || contentController.text.isEmpty || selectedCategoryId.value == 0) {
+    // Memeriksa apakah dokumen quill kosong
+    if (titleController.text.isEmpty || quillController.document.isEmpty() || selectedCategoryId.value == 0) {
       Get.snackbar('Error', 'Judul, konten, dan kategori harus diisi');
       return;
     }
@@ -55,9 +59,12 @@ class ArticleCreateController extends GetxController {
         fileName = selectedImage.value!.name;
       }
 
+      // MENGUBAH KONTEN QUILL MENJADI JSON STRING UNTUK DIKIRIM KE API/LARAVEL
+      final contentJsonData = jsonEncode(quillController.document.toDelta().toJson());
+
       final response = await _apiProvider.createArticle(
         title: titleController.text,
-        content: contentController.text,
+        content: contentJsonData, // Mengirim JSON Delta
         categoryId: selectedCategoryId.value,
         imageBytes: imageBytes,
         fileName: fileName,
@@ -79,7 +86,7 @@ class ArticleCreateController extends GetxController {
   @override
   void onClose() {
     titleController.dispose();
-    contentController.dispose();
+    quillController.dispose();
     super.onClose();
   }
 }

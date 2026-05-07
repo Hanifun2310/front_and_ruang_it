@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 
@@ -9,7 +11,7 @@ class ArticleEditController extends GetxController {
   
   late ArticleModel article;
   final titleController = TextEditingController();
-  final contentController = TextEditingController();
+  late QuillController quillController;
   
   final Rx<XFile?> selectedImage = Rx<XFile?>(null);
   final RxInt selectedCategoryId = 0.obs;
@@ -20,19 +22,34 @@ class ArticleEditController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print("Initializing ArticleEditController with arguments: ${Get.arguments}");
     article = Get.arguments as ArticleModel;
     
-    // Pre-fill data
     titleController.text = article.title ?? "";
-    contentController.text = (article.content ?? "").replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
     selectedCategoryId.value = article.category?.id ?? 0;
     currentImageUrl.value = article.imageUrl ?? "";
+
+    // Logika Pintar untuk membaca konten (JSON Delta atau Plain Text Lama)
+    _initQuillController(article.content ?? "");
 
     fetchCategories();
   }
 
-  // Remove _stripHtmlTags function as we use regex directly for simplicity
+  void _initQuillController(String content) {
+    try {
+      // Coba parse sebagai JSON Delta (Artikel baru yang dibuat dengan Quill)
+      final deltaJson = jsonDecode(content);
+      quillController = QuillController(
+        document: Document.fromJson(deltaJson),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    } catch (e) {
+      // Jika gagal di-parse, berarti ini artikel lama (Plain Text/Markdown)
+      quillController = QuillController(
+        document: Document()..insert(0, content),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    }
+  }
 
   Future<void> fetchCategories() async {
     try {
@@ -54,7 +71,7 @@ class ArticleEditController extends GetxController {
   }
 
   Future<void> updateArticle() async {
-    if (titleController.text.isEmpty || contentController.text.isEmpty || selectedCategoryId.value == 0) {
+    if (titleController.text.isEmpty || quillController.document.isEmpty() || selectedCategoryId.value == 0) {
       Get.snackbar('Error', 'Judul, konten, dan kategori harus diisi');
       return;
     }
@@ -69,17 +86,19 @@ class ArticleEditController extends GetxController {
         fileName = selectedImage.value!.name;
       }
 
+      final contentJsonData = jsonEncode(quillController.document.toDelta().toJson());
+
       final response = await _apiProvider.updateArticle(
         id: article.id!,
         title: titleController.text,
-        content: contentController.text,
+        content: contentJsonData,
         categoryId: selectedCategoryId.value,
         imageBytes: imageBytes,
         fileName: fileName,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.back(result: true); // Return true to indicate success
+        Get.back(result: true);
         Get.snackbar('Sukses', 'Artikel berhasil diperbarui');
       } else {
         Get.snackbar('Gagal', 'Gagal memperbarui artikel: ${response.statusMessage}');
@@ -94,7 +113,7 @@ class ArticleEditController extends GetxController {
   @override
   void onClose() {
     titleController.dispose();
-    contentController.dispose();
+    quillController.dispose();
     super.onClose();
   }
 }

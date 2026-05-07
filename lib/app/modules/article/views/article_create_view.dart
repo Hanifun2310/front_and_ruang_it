@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
 import '../controllers/article_create_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -75,6 +76,8 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
               ],
             ),
             const SizedBox(height: 16),
+            
+            // Tombol Terbitkan
             Row(
               children: [
                 Obx(() => ElevatedButton(
@@ -118,7 +121,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   border: Border.all(
                     color: const Color(0xFFC5C5D6),
                     width: 2,
-                    style: BorderStyle.solid, // Flutter doesn't natively support dashed borders easily, using solid for now
+                    style: BorderStyle.solid, 
                   ),
                 ),
                 child: controller.selectedImage.value != null
@@ -160,7 +163,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
-            // Form Fields
+            // Form Title (Judul)
             TextField(
               controller: controller.titleController,
               style: GoogleFonts.manrope(
@@ -184,6 +187,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
+            // Dropdown Kategori
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -224,7 +228,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
-            // Content Area
+            // Area Quill Editor
             Text(
               'Isi Konten',
               style: GoogleFonts.inter(
@@ -242,54 +246,56 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
               ),
               child: Column(
                 children: [
-                  // Toolbar Mockup
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF2F3FF),
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-                      border: Border(bottom: BorderSide(color: Color(0xFFC5C5D6))),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_bold, size: 20, color: Color(0xFF444653)),
-                        SizedBox(width: 12),
-                        Icon(Icons.format_italic, size: 20, color: Color(0xFF444653)),
-                        SizedBox(width: 12),
-                        Icon(Icons.format_underlined, size: 20, color: Color(0xFF444653)),
-                        SizedBox(width: 12),
-                        Container(width: 1, height: 20, color: Color(0xFFC5C5D6)),
-                        SizedBox(width: 12),
-                        Text('H2', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF444653))),
-                        SizedBox(width: 12),
-                        Icon(Icons.format_list_bulleted, size: 20, color: Color(0xFF444653)),
-                        SizedBox(width: 12),
-                        Icon(Icons.link, size: 20, color: Color(0xFF444653)),
-                        SizedBox(width: 12),
-                        Icon(Icons.image, size: 20, color: Color(0xFF444653)),
-                      ],
+                  // Toolbar bawaan Quill
+                  QuillToolbar.simple(
+                    configurations: QuillSimpleToolbarConfigurations(
+                      controller: controller.quillController,
+                      showFontFamily: false,
+                      showFontSize: false,
+                      showSubscript: false,
+                      showSuperscript: false,
+                      showColorButton: false,
+                      showBackgroundColorButton: false,
+                      showSearchButton: false,
+                      showInlineCode: false,
+                      showCodeBlock: false,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF2F3FF),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12)),
+                      ),
                     ),
                   ),
-                  TextField(
-                    controller: controller.contentController,
-                    maxLines: 15,
-                    minLines: 10,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      color: const Color(0xFF131B2E),
-                      height: 1.5,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Mulai menulis intisari teknologi Anda di sini...',
-                      hintStyle: GoogleFonts.inter(color: const Color(0xFFC5C5D6)),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                  const Divider(height: 1, color: Color(0xFFC5C5D6)),
+                  // Area mengetik Quill
+                  Container(
+                    height: 400, // Diperbesar agar nyaman mengetik panjang
+                    padding: const EdgeInsets.all(16),
+                    child: QuillEditor.basic(
+                      configurations: QuillEditorConfigurations(
+                        controller: controller.quillController,
+                        placeholder: 'Mulai menulis intisari teknologi Anda di sini...',
+                        scrollable: true,
+                        customStyles: DefaultStyles(
+                          paragraph: DefaultTextBlockStyle(
+                            GoogleFonts.inter(
+                              fontSize: 15,
+                              color: const Color(0xFF131B2E),
+                              height: 1.5,
+                            ),
+                            const VerticalSpacing(0, 0),
+                            const VerticalSpacing(0, 0),
+                            null,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 100), // Extra space for bottom nav
+            const SizedBox(height: 100), // Extra space untuk bottom nav
           ],
         ),
       ),
@@ -311,6 +317,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
     );
   }
 
+  // Widget _toolbarButton yang lama sudah saya hapus karena tidak dipakai lagi
+
+  // Navigasi Bawah tetap dipertahankan
   Widget _buildNavItem(IconData icon, String label, bool isActive, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
