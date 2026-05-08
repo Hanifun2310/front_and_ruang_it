@@ -32,8 +32,8 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFF131B2E)),
-            onPressed: () {},
+            icon: const Icon(Icons.dark_mode, color: Color(0xFF131B2E)),
+            onPressed: () {}, // placeholder for dark/light toggle
           ),
         ],
         bottom: PreferredSize(

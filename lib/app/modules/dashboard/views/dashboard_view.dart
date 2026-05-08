@@ -34,14 +34,10 @@ class DashboardView extends GetView<DashboardController> {
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: const NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuB3s6aUqDqZhug8-pC0sZfO2QGoQKDxLmtcJE6J_gRYXRQg1B7UXEZMr_-nmns99W1Q59IOtxu4gtnq7aW6HeeogkxJUiQC_HWdQ1-hmSUnMi1GhN3HWcq-bFTLMzYc3VkgSqCQfUah0cGfYQtTdcD4eV2r0uj-5PC5ogJ7DflWiG30QYJj3oyKJUVWAO8l4HDteZIAQFmuDBBYJttaSGB-mdhh0mtHNTwLF8hE1G0xCpGpDpR5u6X_7FQlyHyh0DnPkw1h8ShZk2rF'),
-            ),
-          )
+          IconButton(
+            icon: const Icon(Icons.dark_mode, color: Color(0xFF131B2E)),
+            onPressed: () {}, // placeholder for dark/light toggle
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
