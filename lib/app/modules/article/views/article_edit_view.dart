@@ -232,10 +232,16 @@ class ArticleEditView extends GetView<ArticleEditController> {
               child: Column(
                 children: [
                   // Quill Toolbar
-                  QuillToolbar.simple(
+                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
                       multiRowsDisplay: false,
+                      buttonOptions: const QuillSimpleToolbarButtonOptions(
+                        base: QuillToolbarBaseButtonOptions(
+                          iconSize: 22,
+                        ),
+                      ),
+                      toolbarSectionSpacing: 14,
                       showFontFamily: false,
                       showFontSize: false,
                       showSubscript: false,

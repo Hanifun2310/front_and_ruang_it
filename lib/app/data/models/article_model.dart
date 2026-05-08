@@ -59,7 +59,7 @@ class ArticleModel {
       imageUrl: formatImageUrl(json['image_url'] ?? json['image']),
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
-      isLiked: json['is_liked'] ?? false,
+      isLiked: json['is_liked'] == true || json['is_liked'] == 1 || json['is_liked'] == '1',
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'])

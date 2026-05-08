@@ -5,6 +5,7 @@ import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -233,7 +234,6 @@ class ProfileController extends GetxController {
     if (isLiked) {
       // If liked, check if it's already in the likedArticles list
       if (!likedArticles.any((a) => a.id == articleId)) {
-        // Find the article in userArticles manually to avoid dependency errors
         ArticleModel? existsInAll;
         for (var a in userArticles) {
           if (a.id == articleId) {
@@ -242,9 +242,55 @@ class ProfileController extends GetxController {
           }
         }
         
-        if (existsInAll != null) {
-          likedArticles.add(existsInAll);
+        if (existsInAll == null && Get.isRegistered<DashboardController>()) {
+          try {
+            final dashboardArticles = Get.find<DashboardController>().articles;
+            for (var a in dashboardArticles) {
+              if (a.id == articleId) {
+                existsInAll = a;
+                break;
+              }
+            }
+          } catch (e) {
+            // ignore
+          }
         }
+        
+        if (existsInAll == null && Get.isRegistered<dynamic>(tag: 'ArticleDetailController')) {
+          try {
+            final detailArticle = Get.find<dynamic>(tag: 'ArticleDetailController').article.value;
+            if (detailArticle.id == articleId) {
+              existsInAll = detailArticle;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (existsInAll == null) {
+          // Placeholder that gets updated asynchronously
+          existsInAll = ArticleModel(
+            id: articleId,
+            isLiked: true,
+            title: "Article #$articleId",
+            likesCount: 1,
+            commentsCount: 0,
+          );
+          
+          _apiProvider.getArticles().then((articles) {
+            final fetched = articles.firstWhereOrNull((a) => a.id == articleId);
+            if (fetched != null) {
+              final idx = likedArticles.indexWhere((a) => a.id == articleId);
+              if (idx != -1) {
+                fetched.isLiked = true;
+                likedArticles[idx] = fetched;
+                likedArticles.refresh();
+              }
+            }
+          }).catchError((_) {});
+        }
+        
+        likedArticles.add(existsInAll);
       }
     } else {
       likedArticles.removeWhere((a) => a.id == articleId);
