@@ -73,25 +73,43 @@ class ProfileController extends GetxController {
   Future<void> fetchUserArticles() async {
     isArticlesLoading.value = true;
     try {
-      // Assuming getArticles with user's name as search might work as a fallback
-      // or if there's no specific my-articles endpoint.
-      // For now, let's just get the first page of all articles as a placeholder
-      // if we don't have a specific endpoint.
-      final articles = await _apiProvider.getArticles(page: 1);
+      List<ArticleModel> allFetchedArticles = [];
+      int currentPage = 1;
+
+      // Fetch all pages to ensure we get all articles for the user
+      while (true) {
+        final articles = await _apiProvider.getArticles(page: currentPage);
+        if (articles.isEmpty) break;
+        
+        allFetchedArticles.addAll(articles);
+        
+        // Safety limit to prevent infinite loops
+        if (currentPage >= 15) break; 
+        
+        currentPage++;
+      }
 
       // Filter articles by user name if we have it
       if (name.value.isNotEmpty) {
-        userArticles.value = articles
+        userArticles.value = allFetchedArticles
             .where((a) => a.user?.name == name.value)
             .toList();
       } else {
-        userArticles.value = articles;
+        userArticles.value = allFetchedArticles;
       }
 
-      // Update count if it was 0
-      if (articlesCount.value == 0) {
-        articlesCount.value = userArticles.length;
+      // Calculate actual likes, comments, and article count from the articles
+      int totalLikes = 0;
+      int totalComments = 0;
+      for (var article in userArticles) {
+        totalLikes += article.likesCount ?? 0;
+        totalComments += article.commentsCount ?? 0;
       }
+      
+      likesCount.value = totalLikes;
+      commentsCount.value = totalComments;
+      articlesCount.value = userArticles.length;
+      
     } catch (e) {
       print('Error fetching user articles: $e');
     } finally {

@@ -213,6 +213,7 @@ class ProfileView extends GetView<ProfileController> {
                     Icons.chat_bubble_rounded,
                     const Color(0xFFEEF2FF), // Light Blue circle
                     const Color(0xFF4B5563), // Grey bubble
+                    fontSize: 8.5,
                   ),
                 ],
               ),
@@ -283,8 +284,9 @@ class ProfileView extends GetView<ProfileController> {
     RxInt count,
     IconData icon,
     Color iconBg,
-    Color iconColor,
-  ) {
+    Color iconColor, {
+    double fontSize = 10,
+  }) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -316,7 +318,7 @@ class ProfileView extends GetView<ProfileController> {
                   Text(
                     label,
                     style: GoogleFonts.inter(
-                      fontSize: 10,
+                      fontSize: fontSize,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF757685),
                       letterSpacing: 0.5,
@@ -353,7 +355,7 @@ class ProfileView extends GetView<ProfileController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "RECENT ARTICLES",
+                "ALL ARTICLES",
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
