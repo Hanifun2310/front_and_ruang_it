@@ -6,6 +6,7 @@ import '../../../data/models/article_model.dart';
 import '../../../routes/app_routes.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import '../../../data/services/theme_service.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
@@ -13,9 +14,9 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF8FF),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -23,14 +24,17 @@ class ProfileView extends GetView<ProfileController> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF131B2E),
+            color: context.theme.appBarTheme.foregroundColor,
             letterSpacing: -0.5,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.dark_mode, color: Color(0xFF131B2E)),
-            onPressed: () {}, // placeholder for dark/light toggle
+            icon: Icon(
+              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+            ),
+            onPressed: () => Get.find<ThemeService>().switchTheme(),
           ),
         ],
         bottom: PreferredSize(
@@ -60,9 +64,9 @@ class ProfileView extends GetView<ProfileController> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
         ),
@@ -110,7 +114,7 @@ class ProfileView extends GetView<ProfileController> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF131B2E),
+                color: context.theme.textTheme.bodyLarge?.color,
               ),
             ),
           ),
@@ -138,7 +142,7 @@ class ProfileView extends GetView<ProfileController> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: const Color(0xFF444653),
+                  color: Get.isDarkMode ? Colors.grey.shade400 : const Color(0xFF444653),
                   height: 1.5,
                 ),
               ),
@@ -228,9 +232,9 @@ class ProfileView extends GetView<ProfileController> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E7FF)),
+        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFE2E7FF)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -821,7 +825,6 @@ class ProfileView extends GetView<ProfileController> {
                       ? null
                       : () async {
                           await controller.updateProfile();
-                          Get.back();
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF092BA2),

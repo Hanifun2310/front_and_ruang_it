@@ -42,7 +42,7 @@ class LoginView extends GetView<AuthController> {
                   "Selamat datang kembali!\nSilakan login untuk melanjutkan.",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.slate.shade500,
+                    color: const Color(0xFF64748B),
                     fontSize: 16,
                     height: 1.5,
                   ),
@@ -50,50 +50,82 @@ class LoginView extends GetView<AuthController> {
                 const SizedBox(height: 48),
 
                 // --- Email Input ---
+                const Text(
+                  "Email Address",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 TextField(
                   controller: controller.emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    hintText: "Email Address",
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.blueAccent),
+                    hintText: "Enter your email",
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
                     ),
                     filled: true,
-                    fillColor: Colors.slate.shade50,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // --- Password Input ---
+                const Text(
+                  "Password",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Obx(() => TextField(
                   controller: controller.passwordController,
                   obscureText: controller.isPasswordHidden.value,
                   decoration: InputDecoration(
-                    hintText: "Password",
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.blueAccent),
+                    hintText: "Enter your password",
                     suffixIcon: IconButton(
                       icon: Icon(
                         controller.isPasswordHidden.value
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.slate.shade400,
+                        color: const Color(0xFF94A3B8),
                       ),
                       onPressed: controller.togglePasswordVisibility,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
                     ),
                     filled: true,
-                    fillColor: Colors.slate.shade50,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   ),
                 )),
                 const SizedBox(height: 32),
-
+                
                 // --- Login Button ---
                 Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value ? null : controller.login,
@@ -124,7 +156,7 @@ class LoginView extends GetView<AuthController> {
                   children: [
                     Text(
                       "Belum punya akun?",
-                      style: TextStyle(color: Colors.slate.shade600),
+                      style: TextStyle(color: const Color(0xFF475569)),
                     ),
                     TextButton(
                       onPressed: () => Get.toNamed(Routes.REGISTER),

@@ -13,9 +13,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF8FF),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFF131B2E)),
@@ -26,13 +26,13 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
           style: GoogleFonts.kulimPark(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF131B2E),
+            color: context.theme.appBarTheme.foregroundColor,
             letterSpacing: -0.5,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.dark_mode, color: Color(0xFF131B2E)),
+            icon: Icon(Icons.dark_mode, color: context.theme.appBarTheme.foregroundColor),
             onPressed: () {}, // placeholder for dark/light toggle
           ),
         ],
@@ -59,7 +59,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         style: GoogleFonts.kulimPark(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF131B2E),
+                          color: context.theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -67,7 +67,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         'Bagikan wawasan teknologi Anda kepada komunitas.',
                         style: GoogleFonts.kulimPark(
                           fontSize: 13,
-                          color: const Color(0xFF444653),
+                          color: Get.isDarkMode ? Colors.white60 : const Color(0xFF444653),
                         ),
                       ),
                     ],
@@ -116,10 +116,10 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFC5C5D6),
+                    color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6),
                     width: 2,
                     style: BorderStyle.solid, 
                   ),
@@ -146,7 +146,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                           'Klik untuk unggah atau seret file',
                           style: GoogleFonts.kulimPark(
                             fontSize: 15,
-                            color: const Color(0xFF131B2E),
+                            color: context.theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -169,7 +169,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
               style: GoogleFonts.kulimPark(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF131B2E),
+                color: context.theme.textTheme.bodyLarge?.color,
               ),
               decoration: InputDecoration(
                 hintText: 'Judul Artikel...',
@@ -203,9 +203,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                 Obx(() => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFC5C5D6)),
+                    border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
@@ -240,9 +240,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFC5C5D6)),
+                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
               ),
               child: Column(
                 children: [
@@ -273,9 +273,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       showDirection: false,
                       showUndo: false,
                       showRedo: false,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF2F3FF),
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
+                        borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12)),
                       ),
@@ -295,7 +295,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                           paragraph: DefaultTextBlockStyle(
                             GoogleFonts.kulimPark(
                               fontSize: 15,
-                              color: const Color(0xFF131B2E),
+                              color: context.theme.textTheme.bodyMedium?.color,
                               height: 1.5,
                             ),
                             const VerticalSpacing(0, 0),
@@ -315,9 +315,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
       ),
       bottomNavigationBar: Container(
         height: 80,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE2E7FF))),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+          border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF))),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../routes/app_routes.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import '../../../data/services/theme_service.dart';
+
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
 
@@ -17,25 +19,28 @@ class DashboardView extends GetView<DashboardController> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF8FF),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Ruang IT', 
           style: TextStyle(
             fontWeight: FontWeight.w900, 
             fontSize: 20, 
-            color: Color(0xFF0F172A),
+            color: context.theme.appBarTheme.foregroundColor,
             letterSpacing: -0.5,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.dark_mode, color: Color(0xFF131B2E)),
-            onPressed: () {}, // placeholder for dark/light toggle
+            icon: Icon(
+              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+            ),
+            onPressed: () => Get.find<ThemeService>().switchTheme(),
           ),
         ],
         bottom: PreferredSize(
@@ -53,9 +58,9 @@ class DashboardView extends GetView<DashboardController> {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: const Color(0xFFC5C5D6)),
+                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.02),
@@ -101,17 +106,23 @@ class DashboardView extends GetView<DashboardController> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF092BA2) : const Color(0xFFF2F3FF),
+                        color: isSelected 
+                            ? const Color(0xFF092BA2) 
+                            : (Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF2F3FF)),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? Colors.transparent : const Color(0xFFC5C5D6),
+                          color: isSelected 
+                              ? Colors.transparent 
+                              : (Get.isDarkMode ? Colors.white10 : const Color(0xFFC5C5D6)),
                         ),
                       ),
                       child: Center(
                         child: Text(
                           categoryName,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : const Color(0xFF444653),
+                            color: isSelected 
+                                ? Colors.white 
+                                : (Get.isDarkMode ? Colors.white70 : const Color(0xFF444653)),
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -159,9 +170,9 @@ class DashboardView extends GetView<DashboardController> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFC5C5D6)),
+                        border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFC5C5D6)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.02),
@@ -229,10 +240,10 @@ class DashboardView extends GetView<DashboardController> {
                                 children: [
                                   Text(
                                     article.title ?? 'Tanpa Judul',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18, 
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF131B2E),
+                                      color: context.theme.textTheme.bodyLarge?.color,
                                       height: 1.4,
                                     ),
                                     maxLines: 2,
@@ -250,8 +261,8 @@ class DashboardView extends GetView<DashboardController> {
                                       }
                                       return null;
                                     },
-                                    textStyle: const TextStyle(
-                                      color: Color(0xFF444653), 
+                                    textStyle: TextStyle(
+                                      color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653), 
                                       fontSize: 13,
                                       height: 1.5,
                                     ),
@@ -335,8 +346,8 @@ class DashboardView extends GetView<DashboardController> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
-          border: const Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+          color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+          border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E8F0))),
         ),
         child: BottomNavigationBar(
           backgroundColor: Colors.transparent,

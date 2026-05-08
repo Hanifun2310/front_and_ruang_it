@@ -171,11 +171,18 @@ class ProfileController extends GetxController {
           selectedFileName.value = "";
 
           Get.snackbar('Sukses', 'Profil berhasil diperbarui');
+          
+          // AUTO CLOSE BOTTOM SHEET ON SUCCESS
+          if (Get.isBottomSheetOpen ?? false) {
+            Get.back();
+          } else if (Get.isDialogOpen ?? false) {
+            Get.back();
+          }
         }
       }
     } catch (e) {
       print('Error update profile: $e');
-      Get.snackbar('Error', 'Gagal memperbarui profil');
+      Get.snackbar('Error', 'Gagal memperbarui profil. Pastikan semua data valid.');
     } finally {
       isLoading.value = false;
     }

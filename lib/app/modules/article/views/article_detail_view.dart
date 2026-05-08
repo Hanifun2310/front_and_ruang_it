@@ -11,9 +11,16 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("Detail Artikel", style: TextStyle(fontSize: 18)),
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
+        title: Text(
+          "Detail Artikel", 
+          style: TextStyle(
+            fontSize: 18,
+            color: context.theme.appBarTheme.foregroundColor,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Obx(() {
@@ -114,7 +121,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     const Divider(
                       height: 40,
                       thickness: 1,
-                      color: Color(0xFFEEEEEE),
+                      color: Color(0xFFE2E8F0),
                     ),
 
                     // --- ISI KONTEN HTML/QUILL ---
@@ -143,10 +150,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     else
                       HtmlWidget(
                         art.content ?? '<p>Konten tidak tersedia.</p>',
-                        textStyle: const TextStyle(
+                        textStyle: TextStyle(
                           fontSize: 16,
                           height: 1.6,
-                          color: Colors.black87,
+                          color: context.theme.textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                     const SizedBox(height: 40),
@@ -181,7 +188,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                         return Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
+                            color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.grey.shade50,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -237,7 +244,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -276,7 +283,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.grey.shade100,
                 ),
               ),
             ),

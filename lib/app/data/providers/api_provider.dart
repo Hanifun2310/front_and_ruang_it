@@ -141,24 +141,18 @@ class ApiProvider {
     };
 
     if (imageBytes != null && fileName != null) {
-      data['photo_profile'] = MultipartFile.fromBytes(
+      final multipartFile = MultipartFile.fromBytes(
         imageBytes,
         filename: fileName,
       );
-      data['profile_photo'] = MultipartFile.fromBytes(
-        imageBytes,
-        filename: fileName,
-      );
-      data['image'] = MultipartFile.fromBytes(
-        imageBytes,
-        filename: fileName,
-      );
+      data['photo_profile'] = multipartFile;
+      data['image'] = multipartFile; // Backup key
     } else if (imagePath != null && imagePath.isNotEmpty) {
       data['photo_profile'] = await MultipartFile.fromFile(imagePath);
-      data['profile_photo'] = await MultipartFile.fromFile(imagePath);
-      data['image'] = await MultipartFile.fromFile(imagePath);
+      data['image'] = await MultipartFile.fromFile(imagePath); // Backup key
     }
 
+    // Gunakan POST dengan _method=PUT untuk multipart/form-data update di Laravel
     return await _dio.post('/profile', data: FormData.fromMap(data));
   }
 
