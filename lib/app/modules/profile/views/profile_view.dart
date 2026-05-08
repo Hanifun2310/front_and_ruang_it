@@ -354,17 +354,55 @@ class ProfileView extends GetView<ProfileController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "ALL ARTICLES",
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF092BA2),
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(height: 2, width: 40, color: const Color(0xFF092BA2)),
+              Obx(() => Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => controller.selectedTab.value = 0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "ALL ARTICLES",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: controller.selectedTab.value == 0 ? const Color(0xFF092BA2) : Colors.grey,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (controller.selectedTab.value == 0)
+                          Container(height: 2, width: 40, color: const Color(0xFF092BA2))
+                        else
+                          const SizedBox(height: 2),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  GestureDetector(
+                    onTap: () => controller.selectedTab.value = 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "LIKED ARTICLES",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: controller.selectedTab.value == 1 ? const Color(0xFF092BA2) : Colors.grey,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (controller.selectedTab.value == 1)
+                          Container(height: 2, width: 40, color: const Color(0xFF092BA2))
+                        else
+                          const SizedBox(height: 2),
+                      ],
+                    ),
+                  ),
+                ],
+              )),
             ],
           ),
         ),
@@ -379,7 +417,11 @@ class ProfileView extends GetView<ProfileController> {
             );
           }
 
-          if (controller.userArticles.isEmpty) {
+          final currentArticles = controller.selectedTab.value == 0 
+              ? controller.userArticles 
+              : controller.likedArticles;
+
+          if (currentArticles.isEmpty) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(48.0),
@@ -392,7 +434,7 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      "No articles yet",
+                      controller.selectedTab.value == 0 ? "No articles yet" : "No liked articles",
                       style: GoogleFonts.inter(color: Colors.grey),
                     ),
                   ],
@@ -405,9 +447,9 @@ class ProfileView extends GetView<ProfileController> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: controller.userArticles.length,
+            itemCount: currentArticles.length,
             itemBuilder: (context, index) {
-              final article = controller.userArticles[index];
+              final article = currentArticles[index];
               return _buildArticleCard(context, article);
             },
           );

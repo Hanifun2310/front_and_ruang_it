@@ -244,17 +244,21 @@ class DashboardView extends GetView<DashboardController> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 8),
-                                  SizedBox(
-                                    height: 40,
-                                    child: ClipRect(
-                                      child: HtmlWidget(
-                                        article.content ?? 'Tidak ada ringkasan...',
-                                        textStyle: const TextStyle(
-                                          color: Color(0xFF444653), 
-                                          fontSize: 13,
-                                          height: 1.5,
-                                        ),
-                                      ),
+                                  HtmlWidget(
+                                    '<div class="truncate">${article.content ?? 'Tidak ada ringkasan...'}</div>',
+                                    customStylesBuilder: (element) {
+                                      if (element.classes.contains('truncate')) {
+                                        return {
+                                          'max-lines': '2',
+                                          'text-overflow': 'ellipsis',
+                                        };
+                                      }
+                                      return null;
+                                    },
+                                    textStyle: const TextStyle(
+                                      color: Color(0xFF444653), 
+                                      fontSize: 13,
+                                      height: 1.5,
                                     ),
                                   ),
                                   const SizedBox(height: 16),

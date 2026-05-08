@@ -32,6 +32,7 @@ class ProfileController extends GetxController {
 
   // Articles & Tabs
   var userArticles = <ArticleModel>[].obs;
+  var likedArticles = <ArticleModel>[].obs;
   var selectedTab = 0.obs;
 
   // Stats (Mocked or from User data)
@@ -97,6 +98,10 @@ class ProfileController extends GetxController {
       } else {
         userArticles.value = allFetchedArticles;
       }
+      
+      likedArticles.value = allFetchedArticles
+          .where((a) => a.isLiked == true)
+          .toList();
 
       // Calculate actual likes, comments, and article count from the articles
       int totalLikes = 0;
