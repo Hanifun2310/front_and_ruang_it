@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../routes/app_routes.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
 
@@ -243,15 +244,18 @@ class DashboardView extends GetView<DashboardController> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
-                                    (article.content ?? 'Tidak ada ringkasan...').replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim(),
-                                    style: const TextStyle(
-                                      color: Color(0xFF444653), 
-                                      fontSize: 13,
-                                      height: 1.5,
+                                  SizedBox(
+                                    height: 40,
+                                    child: ClipRect(
+                                      child: HtmlWidget(
+                                        article.content ?? 'Tidak ada ringkasan...',
+                                        textStyle: const TextStyle(
+                                          color: Color(0xFF444653), 
+                                          fontSize: 13,
+                                          height: 1.5,
+                                        ),
+                                      ),
                                     ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 16),
                                   

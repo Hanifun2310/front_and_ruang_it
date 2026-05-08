@@ -213,7 +213,7 @@ class ProfileView extends GetView<ProfileController> {
                     Icons.chat_bubble_rounded,
                     const Color(0xFFEEF2FF), // Light Blue circle
                     const Color(0xFF4B5563), // Grey bubble
-                    fontSize: 8.5,
+                    fontSize: 6.5,
                   ),
                 ],
               ),

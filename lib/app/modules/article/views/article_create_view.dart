@@ -250,12 +250,29 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
-                      multiRowsDisplay: true, // Merapikan icon agar membungkus jika layar sempit
+                      multiRowsDisplay: true,
                       showFontFamily: false,
                       showFontSize: false,
                       showSubscript: false,
                       showSuperscript: false,
                       showSearchButton: false,
+                      showInlineCode: false,
+                      showColorButton: false,
+                      showBackgroundColorButton: false,
+                      showClearFormat: false,
+                      showAlignmentButtons: false,
+                      showLeftAlignment: false,
+                      showCenterAlignment: false,
+                      showRightAlignment: false,
+                      showJustifyAlignment: false,
+                      showHeaderStyle: false,
+                      showListCheck: false,
+                      showCodeBlock: false,
+                      showQuote: false,
+                      showIndent: false,
+                      showDirection: false,
+                      showUndo: false,
+                      showRedo: false,
                       decoration: const BoxDecoration(
                         color: Color(0xFFF2F3FF),
                         borderRadius: BorderRadius.only(
