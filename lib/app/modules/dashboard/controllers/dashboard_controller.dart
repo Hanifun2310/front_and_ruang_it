@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class DashboardController extends GetxController {
   // Inisialisasi ApiProvider
@@ -107,6 +108,15 @@ class DashboardController extends GetxController {
       articles[index] = article; // trigger reactivity
       
       await _apiProvider.toggleLike(articleId);
+
+      // SYNC: Update ProfileController if registered
+      try {
+        if (Get.isRegistered<ProfileController>()) {
+          Get.find<ProfileController>().updateArticleLikeState(articleId, !isCurrentlyLiked);
+        }
+      } catch (e) {
+        // Ignore sync errors
+      }
     } catch (e) {
       final index = articles.indexWhere((a) => a.id == articleId);
       if (index != -1) {
@@ -118,6 +128,19 @@ class DashboardController extends GetxController {
         articles[index] = article;
       }
       Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini');
+    }
+  }
+  
+  // Sync method for other controllers to update state
+  void updateArticleLikeState(int articleId, bool isLiked) {
+    final index = articles.indexWhere((a) => a.id == articleId);
+    if (index != -1) {
+      final article = articles[index];
+      if (article.isLiked != isLiked) {
+        article.isLiked = isLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
+        articles[index] = article;
+      }
     }
   }
 

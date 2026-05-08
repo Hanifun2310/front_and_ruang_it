@@ -250,22 +250,15 @@ class DashboardView extends GetView<DashboardController> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 8),
-                                  HtmlWidget(
-                                    '<div class="truncate">${article.content ?? 'Tidak ada ringkasan...'}</div>',
-                                    customStylesBuilder: (element) {
-                                      if (element.classes.contains('truncate')) {
-                                        return {
-                                          'max-lines': '2',
-                                          'text-overflow': 'ellipsis',
-                                        };
-                                      }
-                                      return null;
-                                    },
-                                    textStyle: TextStyle(
+                                  Text(
+                                    article.snippet,
+                                    style: TextStyle(
                                       color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653), 
                                       fontSize: 13,
                                       height: 1.5,
                                     ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 16),
                                   

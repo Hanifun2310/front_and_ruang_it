@@ -215,6 +215,41 @@ class ProfileController extends GetxController {
     }
   }
 
+  // Sync method for other controllers to update state
+  void updateArticleLikeState(int articleId, bool isLiked) {
+    // Sync user articles
+    final userIndex = userArticles.indexWhere((a) => a.id == articleId);
+    if (userIndex != -1) {
+      final article = userArticles[userIndex];
+      if (article.isLiked != isLiked) {
+        article.isLiked = isLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
+        userArticles[userIndex] = article;
+      }
+    }
+
+    // Sync liked articles (add or remove)
+    if (isLiked) {
+      // If liked, check if it's already in the likedArticles list
+      if (!likedArticles.any((a) => a.id == articleId)) {
+        // Find the article in userArticles manually to avoid dependency errors
+        ArticleModel? existsInAll;
+        for (var a in userArticles) {
+          if (a.id == articleId) {
+            existsInAll = a;
+            break;
+          }
+        }
+        
+        if (existsInAll != null) {
+          likedArticles.add(existsInAll);
+        }
+      }
+    } else {
+      likedArticles.removeWhere((a) => a.id == articleId);
+    }
+  }
+
   Future<void> logout() async {
     await _authService.logout();
   }

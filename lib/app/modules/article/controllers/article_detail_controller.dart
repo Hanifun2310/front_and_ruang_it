@@ -5,6 +5,8 @@ import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class ArticleDetailController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -80,6 +82,24 @@ class ArticleDetailController extends GetxController {
               ? (val.likesCount! - 1) 
               : (val.likesCount! + 1);
         });
+
+        // SYNC: Update DashboardController if registered
+        try {
+          if (Get.isRegistered<DashboardController>()) {
+            Get.find<DashboardController>().updateArticleLikeState(
+              article.value.id!, 
+              !currentStatus
+            );
+          }
+          if (Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().updateArticleLikeState(
+              article.value.id!, 
+              !currentStatus
+            );
+          }
+        } catch (e) {
+          // Ignore sync errors
+        }
       }
     } catch (e) {
       Get.snackbar('Oops', 'Gagal memberikan Like');

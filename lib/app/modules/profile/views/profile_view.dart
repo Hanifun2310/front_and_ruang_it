@@ -39,7 +39,7 @@ class ProfileView extends GetView<ProfileController> {
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: const Color(0xFFE2E7FF), height: 1),
+          child: Container(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF), height: 1),
         ),
       ),
       body: SingleChildScrollView(
@@ -50,6 +50,8 @@ class ProfileView extends GetView<ProfileController> {
 
             // --- STATS GRID ---
             _buildStatsGrid(),
+
+            const SizedBox(height: 32), // Perlebar jarak ke section bawah
 
             // --- TABS & ARTICLES ---
             _buildArticlesSection(),
@@ -127,7 +129,7 @@ class ProfileView extends GetView<ProfileController> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF092BA2),
+                color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
               ),
             ),
           ),
@@ -295,9 +297,9 @@ class ProfileView extends GetView<ProfileController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE2E7FF)),
+          border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.02),
@@ -359,6 +361,7 @@ class ProfileView extends GetView<ProfileController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Obx(() => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Buat jarak space evenly
                 children: [
                   GestureDetector(
                     onTap: () => controller.selectedTab.value = 0,
@@ -382,7 +385,7 @@ class ProfileView extends GetView<ProfileController> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 24),
+                  // Hapus SizedBox(width: 24) karena sudah pakai spaceEvenly
                   GestureDetector(
                     onTap: () => controller.selectedTab.value = 1,
                     child: Column(
@@ -470,9 +473,9 @@ class ProfileView extends GetView<ProfileController> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E7FF)),
+              border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.02),
@@ -522,7 +525,7 @@ class ProfileView extends GetView<ProfileController> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF2F3FF),
+                                  color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -531,7 +534,7 @@ class ProfileView extends GetView<ProfileController> {
                                   style: GoogleFonts.kulimPark(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
-                                    color: const Color(0xFF092BA2),
+                                    color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
                                   ),
                                 ),
                               ),
@@ -545,7 +548,7 @@ class ProfileView extends GetView<ProfileController> {
                             style: GoogleFonts.kulimPark(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF131B2E),
+                              color: context.theme.textTheme.bodyLarge?.color,
                               height: 1.3,
                             ),
                           ),

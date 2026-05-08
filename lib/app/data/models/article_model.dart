@@ -11,6 +11,15 @@ class ArticleModel {
   UserModel? user;
   CategoryModel? category;
 
+  String get snippet {
+    if (content == null || content!.isEmpty) return "";
+    // Simple HTML strip
+    String plainText = content!.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
+    plainText = plainText.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (plainText.length <= 100) return plainText;
+    return '${plainText.substring(0, 100)}...';
+  }
+
   ArticleModel({
     this.id,
     this.title,

@@ -53,6 +53,7 @@ class AuthController extends GetxController {
         if (token != null && token.isNotEmpty) {
           await _authService.saveSession(token, user);
           Get.snackbar('Sukses', 'Login berhasil!');
+          FocusManager.instance.primaryFocus?.unfocus();
           Get.offAllNamed(Routes.DASHBOARD); 
         } else {
           // Jika login sukses 200 tapi token tidak ada di JSON
@@ -72,14 +73,15 @@ class AuthController extends GetxController {
       // 4. PENANGKAP SILENT ERROR
       print("ERROR SISTEM/CODE: $e");
       Get.snackbar(
-        'Terjadi Kesalahan Sistem', 
-        e.toString(), 
+        'Terjadi Kesalahan', 
+        'Terjadi kesalahan sistem, silakan coba lagi nanti.', 
         backgroundColor: Colors.amber, 
         colorText: Colors.black,
-        duration: const Duration(seconds: 5),
       );
     } finally {
-      isLoading.value = false;
+      if (!isClosed) {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -116,6 +118,7 @@ Future<void> register() async {
           Get.snackbar('Sukses', 'Akun berhasil dibuat dan otomatis masuk!');
           
           // 3. LANGSUNG ARAHKAN KE PROFILE
+          FocusManager.instance.primaryFocus?.unfocus();
           Get.offAllNamed(Routes.PROFILE); 
         } else {
           // Jika Laravel tidak mengirim token, terpaksa diarahkan ke Login saja
@@ -127,8 +130,13 @@ Future<void> register() async {
       print("ERROR REGISTRASI: ${e.response?.data}");
       String message = e.response?.data['message'] ?? 'Gagal registrasi.';
       Get.snackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white);
+    } catch (e) {
+      print("ERROR SISTEM REGIS: $e");
+      Get.snackbar('Terjadi Kesalahan', 'Gagal memproses pendaftaran.');
     } finally {
-      isLoading.value = false;
+      if (!isClosed) {
+        isLoading.value = false;
+      }
     }
   }
 
