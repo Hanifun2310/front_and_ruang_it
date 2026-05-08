@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/article_detail_controller.dart';
 
 class ArticleDetailView extends GetView<ArticleDetailController> {
@@ -115,15 +117,38 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                       color: Color(0xFFEEEEEE),
                     ),
 
-                    // --- ISI KONTEN HTML ---
-                    HtmlWidget(
-                      art.content ?? '<p>Konten tidak tersedia.</p>',
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        height: 1.6,
-                        color: Colors.black87,
+                    // --- ISI KONTEN HTML/QUILL ---
+                    if (controller.quillController != null)
+                      QuillEditor.basic(
+                        configurations: QuillEditorConfigurations(
+                          controller: controller.quillController!,
+                          readOnly: true,
+                          autoFocus: false,
+                          expands: false,
+                          padding: EdgeInsets.zero,
+                          customStyles: DefaultStyles(
+                            paragraph: DefaultTextBlockStyle(
+                              GoogleFonts.inter(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                height: 1.6,
+                              ),
+                              const VerticalSpacing(0, 0),
+                              const VerticalSpacing(0, 0),
+                              null,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      HtmlWidget(
+                        art.content ?? '<p>Konten tidak tersedia.</p>',
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          color: Colors.black87,
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 40),
 
                     const Text(

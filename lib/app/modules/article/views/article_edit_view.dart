@@ -230,15 +230,12 @@ class ArticleEditView extends GetView<ArticleEditController> {
                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
+                      multiRowsDisplay: true, // Merapikan icon
                       showFontFamily: false,
                       showFontSize: false,
                       showSubscript: false,
                       showSuperscript: false,
-                      showColorButton: false,
-                      showBackgroundColorButton: false,
                       showSearchButton: false,
-                      showInlineCode: false,
-                      showCodeBlock: false,
                       decoration: const BoxDecoration(
                         color: Color(0xFFF2F3FF),
                         borderRadius: BorderRadius.only(

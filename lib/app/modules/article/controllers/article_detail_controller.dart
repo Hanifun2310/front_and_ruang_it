@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
@@ -16,6 +18,7 @@ class ArticleDetailController extends GetxController {
   var isLiking = false.obs;
 
   final commentController = TextEditingController();
+  QuillController? quillController;
 
   @override
   void onInit() {
@@ -28,6 +31,16 @@ class ArticleDetailController extends GetxController {
       isLoading.value = true;
       // 1. Ambil Detail Artikel
       article.value = await _apiProvider.getArticleDetail(identifier);
+      
+      try {
+        final deltaJson = jsonDecode(article.value.content ?? "");
+        quillController = QuillController(
+          document: Document.fromJson(deltaJson),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      } catch (e) {
+        quillController = null;
+      }
       
       // 2. Ambil Komentar
       if (article.value.id != null) {
