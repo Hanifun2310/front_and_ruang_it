@@ -128,7 +128,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                           padding: EdgeInsets.zero,
                           customStyles: DefaultStyles(
                             paragraph: DefaultTextBlockStyle(
-                              GoogleFonts.inter(
+                              GoogleFonts.kulimPark(
                                 fontSize: 16,
                                 color: Colors.black87,
                                 height: 1.6,

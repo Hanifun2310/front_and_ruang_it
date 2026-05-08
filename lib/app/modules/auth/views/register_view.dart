@@ -14,133 +14,169 @@ class RegisterView extends GetView<AuthController> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Get.back(), // Tombol kembali ke Login
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B)),
+          onPressed: () => Get.back(),
         ),
       ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- Header ---
+                // --- Logo ---
+                Center(
+                  child: Image.asset(
+                    'assets/images/newlogo.png',
+                    height: 80,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 const Text(
-                  "Buat Akun", 
-                  textAlign: TextAlign.center, 
+                  "Buat Akun",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32, 
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -1.0,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                    color: Color(0xFF1E293B),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Bergabunglah dengan Ruang IT dan\nmulai bagikan artikel Anda.", 
-                  textAlign: TextAlign.center, 
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  "Bergabunglah dengan Ruang IT dan\nmulai bagikan artikel Anda.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 16,
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 40),
 
-                // --- Form Nama Lengkap ---
+                // --- Full Name ---
                 TextField(
                   controller: controller.nameController,
-                  keyboardType: TextInputType.name,
                   decoration: InputDecoration(
-                    labelText: "Nama Lengkap",
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    hintText: "Nama Lengkap",
+                    prefixIcon: const Icon(Icons.person_outline, color: Colors.blueAccent),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // --- Form Email ---
+                // --- Email ---
                 TextField(
                   controller: controller.emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: "Email Address",
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    hintText: "Email Address",
+                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.blueAccent),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // --- Form Pekerjaan / Profession (TAMBAHAN BARU) ---
+                // --- Profession ---
                 TextField(
                   controller: controller.professionController,
-                  keyboardType: TextInputType.text,
                   decoration: InputDecoration(
-                    labelText: "Pekerjaan (Contoh: Mahasiswa, Developer)",
-                    prefixIcon: const Icon(Icons.work_outline),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    hintText: "Pekerjaan (Contoh: Mahasiswa, Developer)",
+                    prefixIcon: const Icon(Icons.work_outline, color: Colors.blueAccent),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // --- Form Password ---
+                // --- Password ---
                 Obx(() => TextField(
                   controller: controller.passwordController,
                   obscureText: controller.isPasswordHidden.value,
                   decoration: InputDecoration(
-                    labelText: "Password",
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    hintText: "Password",
+                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.blueAccent),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        controller.isPasswordHidden.value 
-                          ? Icons.visibility_off 
-                          : Icons.visibility
+                        controller.isPasswordHidden.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey.shade400,
                       ),
                       onPressed: controller.togglePasswordVisibility,
                     ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                 )),
-                const SizedBox(height: 16),
+                const SizedBox(height: 32),
 
-                // --- Tombol Register ---
+                // --- Register Button ---
                 Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value ? null : controller.register,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: controller.isLoading.value
                       ? const SizedBox(
-                          height: 24, 
-                          width: 24, 
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5)
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                         )
                       : const Text(
-                          "Daftar Sekarang", 
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          "Daftar Sekarang",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                 )),
 
-                // --- Tombol Pindah ke Login ---
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Sudah punya akun?", style: TextStyle(color: Colors.grey.shade600)),
+                    Text(
+                      "Sudah punya akun?",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
                     TextButton(
-                      onPressed: () => Get.back(), // Kembali ke halaman Login
-                      child: const Text("Login di sini", style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () => Get.back(),
+                      child: const Text(
+                        "Login di sini",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
                     )
                   ],
                 )

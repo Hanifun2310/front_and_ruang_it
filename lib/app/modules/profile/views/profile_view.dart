@@ -20,7 +20,7 @@ class ProfileView extends GetView<ProfileController> {
         centerTitle: true,
         title: Text(
           'Ruang IT',
-          style: GoogleFonts.manrope(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF131B2E),
@@ -107,7 +107,7 @@ class ProfileView extends GetView<ProfileController> {
           Obx(
             () => Text(
               controller.name.value,
-              style: GoogleFonts.manrope(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF131B2E),
@@ -120,7 +120,7 @@ class ProfileView extends GetView<ProfileController> {
               controller.profession.value.isNotEmpty
                   ? controller.profession.value
                   : "Tech Enthusiast",
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF092BA2),
@@ -136,7 +136,7 @@ class ProfileView extends GetView<ProfileController> {
                     ? controller.bio.value
                     : "No bio yet.",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 14,
                   color: const Color(0xFF444653),
                   height: 1.5,
@@ -165,7 +165,7 @@ class ProfileView extends GetView<ProfileController> {
             icon: const Icon(Icons.logout, size: 18, color: Colors.redAccent),
             label: Text(
               "LOGOUT",
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: Colors.redAccent,
@@ -258,7 +258,7 @@ class ProfileView extends GetView<ProfileController> {
           Obx(
             () => Text(
               "${controller.articlesCount.value}",
-              style: GoogleFonts.manrope(
+              style: GoogleFonts.kulimPark(
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF131B2E),
@@ -267,7 +267,7 @@ class ProfileView extends GetView<ProfileController> {
           ),
           Text(
             "ARTICLES",
-            style: GoogleFonts.inter(
+            style: GoogleFonts.kulimPark(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF444653),
@@ -317,7 +317,7 @@ class ProfileView extends GetView<ProfileController> {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.kulimPark(
                       fontSize: fontSize,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF757685),
@@ -332,7 +332,7 @@ class ProfileView extends GetView<ProfileController> {
                 count.value > 999
                     ? "${(count.value / 1000).toStringAsFixed(1)}k"
                     : "${count.value}",
-                style: GoogleFonts.manrope(
+                style: GoogleFonts.kulimPark(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: const Color(0xFF131B2E),
@@ -363,7 +363,7 @@ class ProfileView extends GetView<ProfileController> {
                       children: [
                         Text(
                           "ALL ARTICLES",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.kulimPark(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: controller.selectedTab.value == 0 ? const Color(0xFF092BA2) : Colors.grey,
@@ -386,7 +386,7 @@ class ProfileView extends GetView<ProfileController> {
                       children: [
                         Text(
                           "LIKED ARTICLES",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.kulimPark(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: controller.selectedTab.value == 1 ? const Color(0xFF092BA2) : Colors.grey,
@@ -435,7 +435,7 @@ class ProfileView extends GetView<ProfileController> {
                     const SizedBox(height: 16),
                     Text(
                       controller.selectedTab.value == 0 ? "No articles yet" : "No liked articles",
-                      style: GoogleFonts.inter(color: Colors.grey),
+                      style: GoogleFonts.kulimPark(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -524,7 +524,7 @@ class ProfileView extends GetView<ProfileController> {
                                 child: Text(
                                   article.category?.name?.toUpperCase() ??
                                       "GENERAL",
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.kulimPark(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
                                     color: const Color(0xFF092BA2),
@@ -538,7 +538,7 @@ class ProfileView extends GetView<ProfileController> {
                             article.title ?? "Untitled",
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.manrope(
+                            style: GoogleFonts.kulimPark(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF131B2E),
@@ -613,7 +613,7 @@ class ProfileView extends GetView<ProfileController> {
       builder: (context) => AlertDialog(
         title: Text(
           'Hapus Artikel',
-          style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+          style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
         ),
         content: Text(
           'Apakah Anda yakin ingin menghapus artikel "${article.title}"? Tindakan ini tidak dapat dibatalkan.',
@@ -679,7 +679,7 @@ class ProfileView extends GetView<ProfileController> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.manrope(
+            style: GoogleFonts.kulimPark(
               fontSize: 11,
               fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
               color: isActive
@@ -728,7 +728,7 @@ class ProfileView extends GetView<ProfileController> {
             const SizedBox(height: 24),
             Text(
               "Edit Profil",
-              style: GoogleFonts.manrope(
+              style: GoogleFonts.kulimPark(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF131B2E),
@@ -865,7 +865,7 @@ class ProfileView extends GetView<ProfileController> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.kulimPark(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF444653),
@@ -875,7 +875,7 @@ class ProfileView extends GetView<ProfileController> {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: GoogleFonts.inter(fontSize: 14),
+          style: GoogleFonts.kulimPark(fontSize: 14),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 20, color: const Color(0xFF757685)),
             filled: true,
@@ -909,21 +909,21 @@ class ProfileView extends GetView<ProfileController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Logout',
-          style: GoogleFonts.manrope(
+          style: GoogleFonts.kulimPark(
             fontWeight: FontWeight.w800,
             color: const Color(0xFF131B2E),
           ),
         ),
         content: Text(
           'Apakah Anda yakin ingin keluar dari akun Anda?',
-          style: GoogleFonts.inter(color: const Color(0xFF444653)),
+          style: GoogleFonts.kulimPark(color: const Color(0xFF444653)),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               'Batal',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.kulimPark(
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF757685),
               ),
@@ -944,7 +944,7 @@ class ProfileView extends GetView<ProfileController> {
             ),
             child: Text(
               'Logout',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+              style: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
             ),
           ),
         ],

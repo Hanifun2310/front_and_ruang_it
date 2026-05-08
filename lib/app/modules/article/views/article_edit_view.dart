@@ -22,7 +22,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
         ),
         title: Text(
           'Ruang IT',
-          style: GoogleFonts.manrope(
+          style: GoogleFonts.kulimPark(
             fontSize: 20,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF131B2E),
@@ -51,7 +51,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
               children: [
                 Text(
                   'Edit Artikel',
-                  style: GoogleFonts.manrope(
+                  style: GoogleFonts.kulimPark(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF131B2E),
@@ -60,7 +60,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                 const SizedBox(height: 4),
                 Text(
                   'Perbarui wawasan teknologi Anda.',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.kulimPark(
                     fontSize: 13,
                     color: const Color(0xFF444653),
                   ),
@@ -94,7 +94,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                           children: [
                             Text(
                               'Simpan Perubahan',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.kulimPark(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -140,14 +140,14 @@ class ArticleEditView extends GetView<ArticleEditController> {
             // Title Field
             TextField(
               controller: controller.titleController,
-              style: GoogleFonts.manrope(
+              style: GoogleFonts.kulimPark(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF131B2E),
               ),
               decoration: InputDecoration(
                 hintText: 'Judul Artikel...',
-                hintStyle: GoogleFonts.manrope(
+                hintStyle: GoogleFonts.kulimPark(
                   color: const Color(0xFFC5C5D6),
                 ),
                 enabledBorder: const UnderlineInputBorder(
@@ -167,7 +167,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
               children: [
                 Text(
                   'Kategori Utama',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.kulimPark(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF444653),
@@ -187,13 +187,13 @@ class ArticleEditView extends GetView<ArticleEditController> {
                               ? null
                               : controller.selectedCategoryId.value,
                           hint: Text('Pilih Kategori...',
-                              style: GoogleFonts.inter(fontSize: 13)),
+                              style: GoogleFonts.kulimPark(fontSize: 13)),
                           isExpanded: true,
                           items: controller.categories.map((cat) {
                             return DropdownMenuItem<int>(
                               value: cat['id'],
                               child: Text(cat['name'],
-                                  style: GoogleFonts.inter(fontSize: 13)),
+                                  style: GoogleFonts.kulimPark(fontSize: 13)),
                             );
                           }).toList(),
                           onChanged: (val) {
@@ -211,7 +211,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
             // Quill Content Area
             Text(
               'Isi Konten',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.kulimPark(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF444653),
@@ -278,7 +278,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                         padding: EdgeInsets.zero,
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
-                            GoogleFonts.inter(
+                            GoogleFonts.kulimPark(
                               fontSize: 15,
                               color: const Color(0xFF131B2E),
                               height: 1.5,
@@ -335,7 +335,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
           const SizedBox(height: 12),
           Text(
             'Klik untuk ganti cover artikel',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.kulimPark(
               fontSize: 15,
               color: const Color(0xFF131B2E),
             ),

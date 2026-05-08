@@ -29,7 +29,6 @@ class DashboardView extends GetView<DashboardController> {
             fontWeight: FontWeight.w900, 
             fontSize: 20, 
             color: Color(0xFF0F172A),
-            fontFamily: 'Manrope',
             letterSpacing: -0.5,
           ),
         ),

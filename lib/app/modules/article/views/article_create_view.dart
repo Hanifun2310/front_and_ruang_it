@@ -23,7 +23,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         ),
         title: Text(
           'Ruang IT',
-          style: GoogleFonts.manrope(
+          style: GoogleFonts.kulimPark(
             fontSize: 20,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF131B2E),
@@ -56,7 +56,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                     children: [
                       Text(
                         'Tulis Artikel Baru',
-                        style: GoogleFonts.manrope(
+                        style: GoogleFonts.kulimPark(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF131B2E),
@@ -65,7 +65,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       const SizedBox(height: 4),
                       Text(
                         'Bagikan wawasan teknologi Anda kepada komunitas.',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.kulimPark(
                           fontSize: 13,
                           color: const Color(0xFF444653),
                         ),
@@ -95,7 +95,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         children: [
                           Text(
                             'Terbitkan',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.kulimPark(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -144,7 +144,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         const SizedBox(height: 12),
                         Text(
                           'Klik untuk unggah atau seret file',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.kulimPark(
                             fontSize: 15,
                             color: const Color(0xFF131B2E),
                           ),
@@ -152,7 +152,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         const SizedBox(height: 4),
                         Text(
                           'Rekomendasi ukuran: 1200 x 630 px (Max 2MB)',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.kulimPark(
                             fontSize: 13,
                             color: const Color(0xFF444653),
                           ),
@@ -166,14 +166,14 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             // Form Title (Judul)
             TextField(
               controller: controller.titleController,
-              style: GoogleFonts.manrope(
+              style: GoogleFonts.kulimPark(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF131B2E),
               ),
               decoration: InputDecoration(
                 hintText: 'Judul Artikel...',
-                hintStyle: GoogleFonts.manrope(
+                hintStyle: GoogleFonts.kulimPark(
                   color: const Color(0xFFC5C5D6),
                 ),
                 enabledBorder: const UnderlineInputBorder(
@@ -193,7 +193,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
               children: [
                 Text(
                   'Kategori Utama',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.kulimPark(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF444653),
@@ -210,12 +210,12 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
                       value: controller.selectedCategoryId.value == 0 ? null : controller.selectedCategoryId.value,
-                      hint: Text('Pilih Kategori...', style: GoogleFonts.inter(fontSize: 13)),
+                      hint: Text('Pilih Kategori...', style: GoogleFonts.kulimPark(fontSize: 13)),
                       isExpanded: true,
                       items: controller.categories.map((cat) {
                         return DropdownMenuItem<int>(
                           value: cat['id'],
-                          child: Text(cat['name'], style: GoogleFonts.inter(fontSize: 13)),
+                          child: Text(cat['name'], style: GoogleFonts.kulimPark(fontSize: 13)),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -231,7 +231,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             // Area Quill Editor
             Text(
               'Isi Konten',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.kulimPark(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF444653),
@@ -293,7 +293,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         scrollable: true,
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
-                            GoogleFonts.inter(
+                            GoogleFonts.kulimPark(
                               fontSize: 15,
                               color: const Color(0xFF131B2E),
                               height: 1.5,
@@ -348,7 +348,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.manrope(
+            style: GoogleFonts.kulimPark(
               fontSize: 11,
               fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
               color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
