@@ -225,6 +225,7 @@ class ProfileController extends GetxController {
         article.isLiked = isLiked;
         article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
         userArticles[userIndex] = article;
+        userArticles.refresh();
       }
     }
 
@@ -248,6 +249,7 @@ class ProfileController extends GetxController {
     } else {
       likedArticles.removeWhere((a) => a.id == articleId);
     }
+    likedArticles.refresh();
   }
 
   Future<void> logout() async {

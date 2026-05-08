@@ -137,7 +137,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                             paragraph: DefaultTextBlockStyle(
                               GoogleFonts.kulimPark(
                                 fontSize: 16,
-                                color: Colors.black87,
+                                color: Get.isDarkMode ? Colors.white : Colors.black87,
                                 height: 1.6,
                               ),
                               const VerticalSpacing(0, 0),
@@ -217,8 +217,16 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      comment.content ?? '',
-                                      style: const TextStyle(fontSize: 14),
+                                      comment.isHidden == true
+                                          ? 'Komentar ini telah disembunyikan oleh moderator'
+                                          : (comment.content ?? ''),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: comment.isHidden == true ? FontStyle.italic : FontStyle.normal,
+                                        color: comment.isHidden == true 
+                                            ? Colors.grey 
+                                            : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -260,10 +268,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               onPressed: controller.toggleLike,
               icon: Icon(
                 controller.article.value.isLiked == true
-                    ? Icons.thumb_up_rounded
-                    : Icons.thumb_up_outlined,
+                    ? Icons.favorite
+                    : Icons.favorite_border,
                 color: controller.article.value.isLiked == true
-                    ? Colors.blue
+                    ? Colors.red
                     : Colors.grey,
               ),
             ),

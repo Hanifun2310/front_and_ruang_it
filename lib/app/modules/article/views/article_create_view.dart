@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
 import '../controllers/article_create_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../../data/services/theme_service.dart';
 
 class ArticleCreateView extends GetView<ArticleCreateController> {
   const ArticleCreateView({super.key});
@@ -18,7 +19,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         backgroundColor: context.theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF131B2E)),
+          icon: Icon(Icons.arrow_back, color: context.theme.appBarTheme.foregroundColor),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -32,8 +33,11 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.dark_mode, color: context.theme.appBarTheme.foregroundColor),
-            onPressed: () {}, // placeholder for dark/light toggle
+            icon: Icon(
+              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: context.theme.appBarTheme.foregroundColor,
+            ),
+            onPressed: () => Get.find<ThemeService>().switchTheme(),
           ),
         ],
         bottom: PreferredSize(
@@ -209,13 +213,14 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
+                      dropdownColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                       value: controller.selectedCategoryId.value == 0 ? null : controller.selectedCategoryId.value,
-                      hint: Text('Pilih Kategori...', style: GoogleFonts.kulimPark(fontSize: 13)),
+                      hint: Text('Pilih Kategori...', style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653))),
                       isExpanded: true,
                       items: controller.categories.map((cat) {
                         return DropdownMenuItem<int>(
                           value: cat['id'],
-                          child: Text(cat['name'], style: GoogleFonts.kulimPark(fontSize: 13)),
+                          child: Text(cat['name'], style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E))),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -250,7 +255,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
-                      multiRowsDisplay: true,
+                      multiRowsDisplay: false,
                       showFontFamily: false,
                       showFontSize: false,
                       showSubscript: false,
@@ -314,47 +319,46 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         ),
       ),
       bottomNavigationBar: Container(
-        height: 80,
         decoration: BoxDecoration(
           color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
           border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF))),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home_outlined, 'Home', false, () => Get.offAllNamed(Routes.DASHBOARD)),
-            _buildNavItem(Icons.add_circle, 'Add', true, () {}),
-            _buildNavItem(Icons.person_outline, 'Profile', false, () => Get.offNamed(Routes.PROFILE)),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
+          unselectedItemColor: const Color(0xFF757685),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
+          unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
+          currentIndex: 1,
+          onTap: (index) {
+            if (index == 0) {
+              Get.offAllNamed(Routes.DASHBOARD);
+            } else if (index == 2) {
+              Get.offNamed(Routes.PROFILE);
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
+              label: 'Add',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
+              label: 'Profile',
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Widget _toolbarButton yang lama sudah saya hapus karena tidak dipakai lagi
-
-  // Navigasi Bawah tetap dipertahankan
-  Widget _buildNavItem(IconData icon, String label, bool isActive, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
-            size: 24,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.kulimPark(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-              color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -4,6 +4,7 @@ import '../controllers/dashboard_controller.dart';
 import '../../../routes/app_routes.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../../../data/services/theme_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
@@ -27,7 +28,7 @@ class DashboardView extends GetView<DashboardController> {
         centerTitle: true,
         title: Text(
           'Ruang IT', 
-          style: TextStyle(
+          style: GoogleFonts.kulimPark(
             fontWeight: FontWeight.w900, 
             fontSize: 20, 
             color: context.theme.appBarTheme.foregroundColor,
@@ -72,12 +73,13 @@ class DashboardView extends GetView<DashboardController> {
               child: TextField(
                 textInputAction: TextInputAction.search,
                 onSubmitted: (value) => controller.searchArticles(value),
-                decoration: const InputDecoration(
+                style: GoogleFonts.kulimPark(fontSize: 15, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E)),
+                decoration: InputDecoration(
                   hintText: 'Cari judul atau penulis...',
-                  hintStyle: TextStyle(color: Color(0xFF757685), fontSize: 15),
-                  prefixIcon: Icon(Icons.search, color: Color(0xFF757685)),
+                  hintStyle: GoogleFonts.kulimPark(color: const Color(0xFF757685), fontSize: 15),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF757685)),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
             ),
@@ -119,7 +121,7 @@ class DashboardView extends GetView<DashboardController> {
                       child: Center(
                         child: Text(
                           categoryName,
-                          style: TextStyle(
+                          style: GoogleFonts.kulimPark(
                             color: isSelected 
                                 ? Colors.white 
                                 : (Get.isDarkMode ? Colors.white70 : const Color(0xFF444653)),
@@ -144,7 +146,7 @@ class DashboardView extends GetView<DashboardController> {
               }
 
               if (controller.articles.isEmpty) {
-                return const Center(child: Text("Belum ada artikel di kategori ini."));
+                return Center(child: Text("Belum ada artikel di kategori ini.", style: GoogleFonts.kulimPark()));
               }
 
               return RefreshIndicator(
@@ -220,8 +222,8 @@ class DashboardView extends GetView<DashboardController> {
                                     ),
                                     child: Text(
                                       categoryName,
-                                      style: const TextStyle(
-                                        color: Color(0xFF092BA2),
+                                      style: GoogleFonts.kulimPark(
+                                        color: const Color(0xFF092BA2),
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,
@@ -240,9 +242,9 @@ class DashboardView extends GetView<DashboardController> {
                                 children: [
                                   Text(
                                     article.title ?? 'Tanpa Judul',
-                                    style: TextStyle(
+                                    style: GoogleFonts.kulimPark(
                                       fontSize: 18, 
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w700,
                                       color: context.theme.textTheme.bodyLarge?.color,
                                       height: 1.4,
                                     ),
@@ -252,7 +254,7 @@ class DashboardView extends GetView<DashboardController> {
                                   const SizedBox(height: 8),
                                   Text(
                                     article.snippet,
-                                    style: TextStyle(
+                                    style: GoogleFonts.kulimPark(
                                       color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653), 
                                       fontSize: 13,
                                       height: 1.5,
@@ -283,10 +285,10 @@ class DashboardView extends GetView<DashboardController> {
                                             const SizedBox(width: 8),
                                             Text(
                                               article.user?.name ?? 'Admin',
-                                              style: const TextStyle(
+                                              style: GoogleFonts.kulimPark(
                                                 fontSize: 13, 
                                                 fontWeight: FontWeight.w600, 
-                                                color: Color(0xFF131B2E),
+                                                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                                               ),
                                             ),
                                           ],
@@ -309,14 +311,14 @@ class DashboardView extends GetView<DashboardController> {
                                             const SizedBox(width: 4),
                                             Text(
                                               '${article.likesCount ?? 0}', 
-                                              style: const TextStyle(fontSize: 12, color: Color(0xFF5F6473)),
+                                              style: GoogleFonts.kulimPark(fontSize: 12, color: const Color(0xFF5F6473)),
                                             ),
                                             const SizedBox(width: 16),
                                             const Icon(Icons.chat_bubble, size: 18, color: Color(0xFF5F6473)),
                                             const SizedBox(width: 4),
                                             Text(
                                               '${article.commentsCount ?? 0}', 
-                                              style: const TextStyle(fontSize: 12, color: Color(0xFF5F6473)),
+                                              style: GoogleFonts.kulimPark(fontSize: 12, color: const Color(0xFF5F6473)),
                                             ),
                                           ],
                                         )
@@ -346,29 +348,34 @@ class DashboardView extends GetView<DashboardController> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF2D46B9),
-          unselectedItemColor: const Color(0xFF94A3B8),
-          selectedFontSize: 10,
-          unselectedFontSize: 10,
+          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
+          unselectedItemColor: const Color(0xFF757685),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
+          unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
           currentIndex: 0,
           onTap: (index) {
             if (index == 1) {
-              Get.toNamed(Routes.ARTICLE_CREATE);
+              Get.offNamed(Routes.ARTICLE_CREATE);
             } else if (index == 2) {
-              Get.toNamed(Routes.PROFILE);
+              Get.offNamed(Routes.PROFILE);
             }
           },
           items: const [
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
               label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
               label: 'Add',
             ),
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
               label: 'Profile',
             ),
           ],

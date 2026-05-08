@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import Quill
 import '../controllers/article_edit_controller.dart';
+import '../../../data/services/theme_service.dart';
 
 class ArticleEditView extends GetView<ArticleEditController> {
   const ArticleEditView({super.key});
@@ -12,12 +13,12 @@ class ArticleEditView extends GetView<ArticleEditController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF8FF),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF131B2E)),
+          icon: Icon(Icons.arrow_back, color: context.theme.appBarTheme.foregroundColor),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -25,14 +26,17 @@ class ArticleEditView extends GetView<ArticleEditController> {
           style: GoogleFonts.kulimPark(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF131B2E),
+            color: context.theme.appBarTheme.foregroundColor,
             letterSpacing: -0.5,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.dark_mode, color: Color(0xFF131B2E)),
-            onPressed: () {}, // placeholder for dark/light toggle
+            icon: Icon(
+              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: context.theme.appBarTheme.foregroundColor,
+            ),
+            onPressed: () => Get.find<ThemeService>().switchTheme(),
           ),
         ],
         bottom: PreferredSize(
@@ -54,7 +58,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                   style: GoogleFonts.kulimPark(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF131B2E),
+                    color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -62,7 +66,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                   'Perbarui wawasan teknologi Anda.',
                   style: GoogleFonts.kulimPark(
                     fontSize: 13,
-                    color: const Color(0xFF444653),
+                    color: Get.isDarkMode ? Colors.white60 : const Color(0xFF444653),
                   ),
                 ),
               ],
@@ -143,7 +147,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
               style: GoogleFonts.kulimPark(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF131B2E),
+                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
               ),
               decoration: InputDecoration(
                 hintText: 'Judul Artikel...',
@@ -170,30 +174,31 @@ class ArticleEditView extends GetView<ArticleEditController> {
                   style: GoogleFonts.kulimPark(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF444653),
+                    color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Obx(() => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFC5C5D6)),
+                        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
+                          dropdownColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                           value: controller.selectedCategoryId.value == 0
                               ? null
                               : controller.selectedCategoryId.value,
                           hint: Text('Pilih Kategori...',
-                              style: GoogleFonts.kulimPark(fontSize: 13)),
+                              style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653))),
                           isExpanded: true,
                           items: controller.categories.map((cat) {
                             return DropdownMenuItem<int>(
                               value: cat['id'],
                               child: Text(cat['name'],
-                                  style: GoogleFonts.kulimPark(fontSize: 13)),
+                                  style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E))),
                             );
                           }).toList(),
                           onChanged: (val) {
@@ -214,15 +219,15 @@ class ArticleEditView extends GetView<ArticleEditController> {
               style: GoogleFonts.kulimPark(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF444653),
+                color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
               ),
             ),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFC5C5D6)),
+                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
               ),
               child: Column(
                 children: [
@@ -230,7 +235,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
-                      multiRowsDisplay: true,
+                      multiRowsDisplay: false,
                       showFontFamily: false,
                       showFontSize: false,
                       showSubscript: false,
@@ -253,9 +258,9 @@ class ArticleEditView extends GetView<ArticleEditController> {
                       showDirection: false,
                       showUndo: false,
                       showRedo: false,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF2F3FF),
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(12),
                           topRight: Radius.circular(12),
                         ),
@@ -280,7 +285,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                           paragraph: DefaultTextBlockStyle(
                             GoogleFonts.kulimPark(
                               fontSize: 15,
-                              color: const Color(0xFF131B2E),
+                              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                               height: 1.5,
                             ),
                             const VerticalSpacing(0, 0),
@@ -307,9 +312,9 @@ class ArticleEditView extends GetView<ArticleEditController> {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFC5C5D6), width: 2),
+        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6), width: 2),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
@@ -324,9 +329,9 @@ class ArticleEditView extends GetView<ArticleEditController> {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFC5C5D6), width: 2),
+        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6), width: 2),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -337,7 +342,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
             'Klik untuk ganti cover artikel',
             style: GoogleFonts.kulimPark(
               fontSize: 15,
-              color: const Color(0xFF131B2E),
+              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
             ),
           ),
         ],

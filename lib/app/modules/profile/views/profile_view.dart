@@ -267,7 +267,7 @@ class ProfileView extends GetView<ProfileController> {
               style: GoogleFonts.kulimPark(
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF131B2E),
+                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
               ),
             ),
           ),
@@ -276,7 +276,7 @@ class ProfileView extends GetView<ProfileController> {
             style: GoogleFonts.kulimPark(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF444653),
+              color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
               letterSpacing: 1,
             ),
           ),
@@ -341,7 +341,7 @@ class ProfileView extends GetView<ProfileController> {
                 style: GoogleFonts.kulimPark(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: const Color(0xFF131B2E),
+                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                 ),
               ),
             ),
@@ -366,20 +366,20 @@ class ProfileView extends GetView<ProfileController> {
                   GestureDetector(
                     onTap: () => controller.selectedTab.value = 0,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           "ALL ARTICLES",
                           style: GoogleFonts.kulimPark(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: controller.selectedTab.value == 0 ? const Color(0xFF092BA2) : Colors.grey,
+                            color: controller.selectedTab.value == 0 ? (Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2)) : Colors.grey,
                             letterSpacing: 1.2,
                           ),
                         ),
                         const SizedBox(height: 8),
                         if (controller.selectedTab.value == 0)
-                          Container(height: 2, width: 40, color: const Color(0xFF092BA2))
+                          Container(height: 2, width: 40, color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2))
                         else
                           const SizedBox(height: 2),
                       ],
@@ -389,20 +389,20 @@ class ProfileView extends GetView<ProfileController> {
                   GestureDetector(
                     onTap: () => controller.selectedTab.value = 1,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           "LIKED ARTICLES",
                           style: GoogleFonts.kulimPark(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: controller.selectedTab.value == 1 ? const Color(0xFF092BA2) : Colors.grey,
+                            color: controller.selectedTab.value == 1 ? (Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2)) : Colors.grey,
                             letterSpacing: 1.2,
                           ),
                         ),
                         const SizedBox(height: 8),
                         if (controller.selectedTab.value == 1)
-                          Container(height: 2, width: 40, color: const Color(0xFF092BA2))
+                          Container(height: 2, width: 40, color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2))
                         else
                           const SizedBox(height: 2),
                       ],
@@ -641,58 +641,43 @@ class ProfileView extends GetView<ProfileController> {
 
   Widget _buildBottomNav() {
     return Container(
-      height: 80,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E7FF))),
+      decoration: BoxDecoration(
+        color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+        border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF))),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(
-            Icons.home_outlined,
-            'Home',
-            false,
-            () => Get.offAllNamed(Routes.DASHBOARD),
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
+        unselectedItemColor: const Color(0xFF757685),
+        selectedFontSize: 11,
+        unselectedFontSize: 11,
+        selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
+        unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
+        currentIndex: 2,
+        onTap: (index) {
+          if (index == 0) {
+            Get.offAllNamed(Routes.DASHBOARD);
+          } else if (index == 1) {
+            Get.offNamed(Routes.ARTICLE_CREATE);
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
+            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+            label: 'Home',
           ),
-          _buildNavItem(
-            Icons.add_circle_outline,
-            'Add',
-            false,
-            () => Get.offNamed(Routes.ARTICLE_CREATE),
+          BottomNavigationBarItem(
+            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
+            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
+            label: 'Add',
           ),
-          _buildNavItem(Icons.person, 'Profile', true, () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    IconData icon,
-    String label,
-    bool isActive,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
-            size: 24,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.kulimPark(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-              color: isActive
-                  ? const Color(0xFF092BA2)
-                  : const Color(0xFF757685),
-            ),
+          BottomNavigationBarItem(
+            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
+            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
+            label: 'Profile',
           ),
         ],
       ),
@@ -705,9 +690,9 @@ class ProfileView extends GetView<ProfileController> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
@@ -738,7 +723,7 @@ class ProfileView extends GetView<ProfileController> {
               style: GoogleFonts.kulimPark(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF131B2E),
+                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
               ),
             ),
             const SizedBox(height: 24),
@@ -753,7 +738,7 @@ class ProfileView extends GetView<ProfileController> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFE2E7FF), width: 4),
+                        border: Border.all(color: Get.isDarkMode ? Colors.white24 : const Color(0xFFE2E7FF), width: 4),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(50),
@@ -874,33 +859,33 @@ class ProfileView extends GetView<ProfileController> {
           style: GoogleFonts.kulimPark(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF444653),
+            color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
           ),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: GoogleFonts.kulimPark(fontSize: 14),
+          style: GoogleFonts.kulimPark(fontSize: 14, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E)),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 20, color: const Color(0xFF757685)),
             filled: true,
-            fillColor: const Color(0xFFFAF8FF),
+            fillColor: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFFAF8FF),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE2E7FF)),
+              borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : const Color(0xFFE2E7FF)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE2E7FF)),
+              borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : const Color(0xFFE2E7FF)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF092BA2)),
+              borderSide: BorderSide(color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2)),
             ),
           ),
         ),
@@ -917,12 +902,12 @@ class ProfileView extends GetView<ProfileController> {
           'Logout',
           style: GoogleFonts.kulimPark(
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF131B2E),
+            color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
           ),
         ),
         content: Text(
           'Apakah Anda yakin ingin keluar dari akun Anda?',
-          style: GoogleFonts.kulimPark(color: const Color(0xFF444653)),
+          style: GoogleFonts.kulimPark(color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653)),
         ),
         actions: [
           TextButton(

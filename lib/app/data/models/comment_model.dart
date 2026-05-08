@@ -7,8 +7,17 @@ class CommentModel {
   int? articleId;
   String? createdAt;
   UserModel? user;
+  bool? isHidden;
 
-  CommentModel({this.id, this.content, this.userId, this.articleId, this.createdAt, this.user});
+  CommentModel({
+    this.id,
+    this.content,
+    this.userId,
+    this.articleId,
+    this.createdAt,
+    this.user,
+    this.isHidden,
+  });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return CommentModel(
@@ -18,6 +27,10 @@ class CommentModel {
       articleId: json['article_id'],
       createdAt: json['created_at'],
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
+      isHidden: json['is_hidden'] == true ||
+          json['is_hidden'] == 1 ||
+          json['status'] == 'hidden' ||
+          json['status'] == 'inactive',
     );
   }
 }

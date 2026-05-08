@@ -106,6 +106,7 @@ class DashboardController extends GetxController {
       article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
       
       articles[index] = article; // trigger reactivity
+      articles.refresh();
       
       await _apiProvider.toggleLike(articleId);
 
@@ -126,6 +127,7 @@ class DashboardController extends GetxController {
         article.isLiked = !isCurrentlyLiked;
         article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
         articles[index] = article;
+        articles.refresh();
       }
       Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini');
     }
@@ -140,6 +142,7 @@ class DashboardController extends GetxController {
         article.isLiked = isLiked;
         article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
         articles[index] = article;
+        articles.refresh();
       }
     }
   }
