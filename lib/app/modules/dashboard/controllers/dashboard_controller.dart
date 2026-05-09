@@ -152,4 +152,26 @@ class DashboardController extends GetxController {
       fetchArticles();
     }
   }
+
+  Future<void> deleteArticle(int id) async {
+    try {
+      final response = await _apiProvider.deleteArticle(id);
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        articles.removeWhere((article) => article.id == id);
+        Get.snackbar('Sukses', 'Artikel berhasil dihapus');
+        
+        // SYNC: Update ProfileController if registered
+        try {
+          if (Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().userArticles.removeWhere((article) => article.id == id);
+            Get.find<ProfileController>().articlesCount.value--;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menghapus artikel');
+    }
+  }
 }

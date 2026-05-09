@@ -4,7 +4,7 @@ import '../controllers/category_detail_controller.dart';
 import '../../../routes/app_routes.dart';
 
 class CategoryDetailView extends GetView<CategoryDetailController> {
-  const CategoryDetailView({Key? key}) : super(key: key);
+  const CategoryDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                     children: [
                       Expanded(
                         child: Text(
-                          controller.category.name ?? 'Category',
+                          controller.category.name,
                           style: const TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w500,

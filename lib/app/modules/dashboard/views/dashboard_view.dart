@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../routes/app_routes.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../../../data/services/theme_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../data/services/auth_service.dart';
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
@@ -26,14 +26,10 @@ class DashboardView extends GetView<DashboardController> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          'Ruang IT', 
-          style: GoogleFonts.kulimPark(
-            fontWeight: FontWeight.w900, 
-            fontSize: 20, 
-            color: context.theme.appBarTheme.foregroundColor,
-            letterSpacing: -0.5,
-          ),
+        title: Image.asset(
+          'assets/images/newlogo.png',
+          height: 36,
+          fit: BoxFit.contain,
         ),
         actions: [
           IconButton(
@@ -168,6 +164,9 @@ class DashboardView extends GetView<DashboardController> {
                     final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
                     final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
                     final String categoryName = article.category?.name ?? 'Umum';
+                    final authService = Get.find<AuthService>();
+                    final currentUserId = authService.currentUser?['id'];
+                    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 24),
@@ -231,6 +230,28 @@ class DashboardView extends GetView<DashboardController> {
                                     ),
                                   ),
                                 ),
+                                if (isAuthor)
+                                  Positioned(
+                                    top: 12,
+                                    right: 12,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showArticleOptions(context, article);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(alpha: 0.5),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.more_vert,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                             
@@ -380,6 +401,118 @@ class DashboardView extends GetView<DashboardController> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showArticleOptions(BuildContext context, dynamic article) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Opsi Artikel',
+              style: GoogleFonts.kulimPark(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.blueAccent),
+              title: Text(
+                'Edit Artikel',
+                style: GoogleFonts.kulimPark(
+                  fontWeight: FontWeight.w600,
+                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                ),
+              ),
+              onTap: () {
+                Get.back(); // close bottom sheet
+                Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.redAccent),
+              title: Text(
+                'Hapus Artikel',
+                style: GoogleFonts.kulimPark(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.redAccent,
+                ),
+              ),
+              onTap: () {
+                Get.back(); // close bottom sheet
+                _showDeleteConfirmation(article.id);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(int? id) {
+    if (id == null) return;
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Hapus Artikel',
+          style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus artikel ini secara permanen?',
+          style: GoogleFonts.kulimPark(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.kulimPark(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.deleteArticle(id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(
+              'Hapus',
+              style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }

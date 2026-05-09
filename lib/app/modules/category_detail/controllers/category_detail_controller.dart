@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../../../data/models/category_model.dart';
-import '../../../data/models/article_model.dart';
+import '../../../data/models/article_model.dart' hide CategoryModel;
 import '../../../data/providers/api_provider.dart';
 
 class CategoryDetailController extends GetxController {
@@ -36,7 +36,7 @@ class CategoryDetailController extends GetxController {
       // Filter dynamically: get articles belonging to this specific author
       authorArticles.value = response.where((a) => a.user?.id == author!.id).toList();
     } catch (e) {
-      print("Failed to fetch author articles: $e");
+      Get.log("Failed to fetch author articles: $e");
     } finally {
       isLoading.value = false;
     }

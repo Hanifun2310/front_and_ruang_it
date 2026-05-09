@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/topic_recommendation_controller.dart';
+import '../../../routes/app_routes.dart';
 
 class TopicRecommendationView extends GetView<TopicRecommendationController> {
-  const TopicRecommendationView({Key? key}) : super(key: key);
+  const TopicRecommendationView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +84,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  category.name ?? 'Unknown',
+                                  category.name,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../../data/models/category_model.dart';
-import '../../../data/models/article_model.dart';
+import '../../../data/models/article_model.dart' hide CategoryModel;
 import '../../../data/providers/api_provider.dart';
 import '../../../routes/app_routes.dart';
 
@@ -40,7 +40,7 @@ class TopicRecommendationController extends GetxController {
   void _assignRandomColors() {
     final random = Random();
     for (var category in selectedCategories) {
-      backgroundColors[category.id!] = _palette[random.nextInt(_palette.length)];
+      backgroundColors[category.id] = _palette[random.nextInt(_palette.length)];
     }
   }
 
@@ -68,11 +68,11 @@ class TopicRecommendationController extends GetxController {
           if (authorCounts.isNotEmpty) {
             // Find author with max count
             int topUserId = authorCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-            categoryTopAuthors[category.id!] = authorDetails[topUserId];
+            categoryTopAuthors[category.id] = authorDetails[topUserId];
           }
         }
       } catch (e) {
-        print("Failed to fetch articles for category ${category.name}: $e");
+        Get.log("Failed to fetch articles for category ${category.name}: $e");
       }
     }
     
