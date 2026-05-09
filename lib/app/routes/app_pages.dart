@@ -33,6 +33,8 @@ import '../modules/author_profile/bindings/author_profile_binding.dart';
 import '../modules/author_profile/views/author_profile_view.dart';
 import '../modules/explore/views/explore_view.dart';
 import '../modules/explore/bindings/explore_binding.dart';
+import '../modules/search/views/search_view.dart';
+import '../modules/search/bindings/search_binding.dart';
 
 class AppPages {
   AppPages._();
@@ -106,6 +108,11 @@ class AppPages {
       name: Routes.EXPLORE,
       page: () => const ExploreView(),
       binding: ExploreBinding(),
+    ),
+    GetPage(
+      name: Routes.SEARCH,
+      page: () => const SearchView(),
+      binding: SearchBinding(),
     ),
   ];
   

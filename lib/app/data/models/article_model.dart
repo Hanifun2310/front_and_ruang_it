@@ -7,6 +7,17 @@ class ArticleModel {
   int? likesCount;
   int? commentsCount;
   bool? isLiked;
+  DateTime? createdAt;
+
+  String get formattedDate {
+    if (createdAt == null) return '';
+    final months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    return '${createdAt!.day} ${months[createdAt!.month - 1]} ${createdAt!.year}';
+  }
+
   // Relasi
   UserModel? user;
   CategoryModel? category;
@@ -29,6 +40,7 @@ class ArticleModel {
     this.likesCount,
     this.commentsCount,
     this.isLiked,
+    this.createdAt,
     this.user,
     this.category,
   });
@@ -60,6 +72,7 @@ class ArticleModel {
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
       isLiked: json['is_liked'] == true || json['is_liked'] == 1 || json['is_liked'] == '1',
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'])

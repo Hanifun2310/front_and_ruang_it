@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../controllers/explore_controller.dart';
+import '../controllers/search_controller.dart';
 import '../../../routes/app_routes.dart';
-import '../../../data/services/auth_service.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import '../../../data/services/auth_service.dart';
 
-class ExploreView extends GetView<ExploreController> {
-  const ExploreView({super.key});
+class SearchView extends GetView<ArticleSearchController> {
+  const SearchView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController textController = TextEditingController();
+    
+    // Sync text controller with observable query (for history selection)
+    ever(controller.searchQuery, (String query) {
+      if (textController.text != query) {
+        textController.text = query;
+      }
+    });
+
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -51,69 +60,61 @@ class ExploreView extends GetView<ExploreController> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 16),
-
-          // Categories filter
-          SizedBox(
-            height: 40,
-            child: Obx(() => ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: controller.categories.length,
-              itemBuilder: (context, index) {
-                final category = controller.categories[index];
-                final isSelected = controller.selectedCategory.value?.id == category.id;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(category.name ?? ''),
-                    selected: isSelected,
-                    onSelected: (selected) => controller.filterByCategory(category),
-                    backgroundColor: Colors.white,
-                    selectedColor: Colors.grey.shade200,
-                    checkmarkColor: Colors.blueAccent,
-                    labelStyle: GoogleFonts.inter(
-                      color: isSelected ? Colors.blueAccent : (Get.isDarkMode ? Colors.black87 : Colors.black87),
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: isSelected ? Colors.blueAccent : Colors.black, width: 1),
-                    ),
-                    side: BorderSide.none,
-                  ),
-                );
-              },
-            )),
+          // Search Input
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: textController,
+              onChanged: controller.onSearchChanged,
+              autofocus: true,
+              style: GoogleFonts.inter(
+                color: Get.isDarkMode ? Colors.white : Colors.black87,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Cari artikel, penulis, atau kategori...',
+                hintStyle: GoogleFonts.inter(color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Colors.grey),
+                        onPressed: () {
+                          textController.clear();
+                          controller.onSearchChanged('');
+                        },
+                      )
+                    : const SizedBox()),
+                filled: true,
+                fillColor: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              ),
+            ),
           ),
 
-          const SizedBox(height: 16),
-
-          // Article List
+          // Search Results or History
           Expanded(
             child: Obx(() {
+              if (controller.searchQuery.value.isEmpty) {
+                return _buildHistorySection();
+              }
+
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
 
               if (controller.articles.isEmpty) {
-                return Center(
-                  child: Text(
-                    'Tidak ada artikel ditemukan',
-                    style: GoogleFonts.inter(color: Colors.grey),
-                  ),
-                );
+                return _buildNoResults();
               }
 
-              return RefreshIndicator(
-                onRefresh: () => controller.fetchArticles(),
-                child: ListView.builder(
-                  itemCount: controller.articles.length,
-                  itemBuilder: (context, index) {
-                    final article = controller.articles[index];
-                    return _buildArticleCard(context, article);
-                  },
-                ),
+              return ListView.builder(
+                itemCount: controller.articles.length,
+                itemBuilder: (context, index) {
+                  final article = controller.articles[index];
+                  return _buildArticleCard(context, article);
+                },
               );
             }),
           ),
@@ -123,14 +124,96 @@ class ExploreView extends GetView<ExploreController> {
     );
   }
 
+  Widget _buildHistorySection() {
+    if (controller.searchHistory.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search, size: 64, color: Colors.grey.shade300),
+            const SizedBox(height: 16),
+            Text(
+              'Cari sesuatu yang menarik...',
+              style: GoogleFonts.inter(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Riwayat Pencarian',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              TextButton(
+                onPressed: controller.clearAllHistory,
+                child: Text(
+                  'Hapus Semua',
+                  style: GoogleFonts.inter(color: Colors.blueAccent),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: controller.searchHistory.length,
+            itemBuilder: (context, index) {
+              final query = controller.searchHistory[index];
+              return ListTile(
+                leading: const Icon(Icons.history, color: Colors.grey),
+                title: Text(
+                  query,
+                  style: GoogleFonts.inter(
+                    color: Get.isDarkMode ? Colors.white70 : Colors.black87,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+                  onPressed: () => controller.removeFromHistory(query),
+                ),
+                onTap: () => controller.selectHistory(query),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoResults() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Text(
+            'Tidak ada artikel ditemukan',
+            style: GoogleFonts.inter(color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildArticleCard(BuildContext context, dynamic article) {
     final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
     final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
     final String categoryName = article.category?.name ?? 'Umum';
-    final authService = Get.find<AuthService>();
-    final currentUserId = authService.currentUser?['id'];
-    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
-
+    
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
@@ -235,26 +318,23 @@ class ExploreView extends GetView<ExploreController> {
                 ),
                 Row(
                   children: [
-                    InkWell(
-                      onTap: () => controller.toggleLike(article.id!),
-                      child: Row(
-                        children: [
-                          Icon(
-                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
-                            size: 20,
-                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                    Row(
+                      children: [
+                        Icon(
+                          (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                          size: 20,
+                          color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${article.likesCount ?? 0}',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${article.likesCount ?? 0}',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 20),
                     Row(
@@ -363,14 +443,14 @@ class ExploreView extends GetView<ExploreController> {
         unselectedFontSize: 11,
         selectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
         unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
-        currentIndex: 1,
+        currentIndex: 2,
         onTap: (index) {
           if (index == 0) {
             Get.offNamed(Routes.DASHBOARD);
           } else if (index == 1) {
-            // Already here
+            Get.offNamed(Routes.EXPLORE);
           } else if (index == 2) {
-            Get.offNamed(Routes.SEARCH);
+            // Already here
           } else if (index == 3) {
             Get.offNamed(Routes.PROFILE);
           }

@@ -13,6 +13,7 @@ abstract class Routes {
   static const CATEGORY_DETAIL = _Paths.CATEGORY_DETAIL;
   static const AUTHOR_PROFILE = _Paths.AUTHOR_PROFILE;
   static const EXPLORE = _Paths.EXPLORE;
+  static const SEARCH = _Paths.SEARCH;
 }
 
 abstract class _Paths {
@@ -29,4 +30,5 @@ abstract class _Paths {
   static const CATEGORY_DETAIL = '/category-detail';
   static const AUTHOR_PROFILE = '/author-profile';
   static const EXPLORE = '/explore';
+  static const SEARCH = '/search';
 }

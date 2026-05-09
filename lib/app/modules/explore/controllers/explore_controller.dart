@@ -9,7 +9,6 @@ class ExploreController extends GetxController {
   var categories = <CategoryModel>[].obs;
   var selectedCategory = Rxn<CategoryModel>();
   var isLoading = false.obs;
-  var searchQuery = ''.obs;
 
   @override
   void onInit() {
@@ -35,7 +34,6 @@ class ExploreController extends GetxController {
     try {
       final fetchedArticles = await _apiProvider.getArticles(
         category: selectedCategory.value?.id.toString(),
-        search: searchQuery.value,
       );
       articles.value = fetchedArticles;
     } catch (e) {
@@ -54,10 +52,6 @@ class ExploreController extends GetxController {
     fetchArticles();
   }
 
-  void search(String query) {
-    searchQuery.value = query;
-    fetchArticles();
-  }
 
   Future<void> toggleLike(int articleId) async {
     try {

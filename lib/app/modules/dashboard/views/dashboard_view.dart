@@ -136,7 +136,7 @@ class DashboardView extends GetView<DashboardController> {
             if (index == 1) {
               Get.offNamed(Routes.EXPLORE);
             } else if (index == 2) {
-              Get.snackbar('Coming Soon', 'Fitur Search sedang dalam pengembangan');
+              Get.offNamed(Routes.SEARCH);
             } else if (index == 3) {
               Get.offNamed(Routes.PROFILE);
             }
@@ -312,8 +312,15 @@ class DashboardView extends GetView<DashboardController> {
             
             // Article Meta & Actions
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text(
+                  article.formattedDate,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade600,
+                  ),
+                ),
                 Row(
                   children: [
                     InkWell(
@@ -345,7 +352,7 @@ class DashboardView extends GetView<DashboardController> {
                     Row(
                       children: [
                         Icon(
-                          Icons.chat_bubble_outline,
+                          Icons.mode_comment_outlined,
                           size: 20,
                           color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
                         ),

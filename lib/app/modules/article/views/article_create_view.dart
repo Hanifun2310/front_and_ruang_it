@@ -346,7 +346,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             } else if (index == 1) {
               Get.offNamed(Routes.EXPLORE);
             } else if (index == 2) {
-              Get.snackbar('Coming Soon', 'Fitur Search sedang dalam pengembangan');
+              Get.offNamed(Routes.SEARCH);
             } else if (index == 3) {
               Get.offNamed(Routes.PROFILE);
             }
