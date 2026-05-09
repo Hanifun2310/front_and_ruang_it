@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/dashboard_controller.dart';
+import '../../../data/services/auth_service.dart';
+import '../../../data/services/theme_service.dart';
 import '../../../routes/app_routes.dart';
 
 class DashboardView extends GetView<DashboardController> {
@@ -17,31 +20,25 @@ class DashboardView extends GetView<DashboardController> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF8FF),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Ruang IT', 
-          style: TextStyle(
-            fontWeight: FontWeight.w900, 
-            fontSize: 20, 
-            color: Color(0xFF0F172A),
-            fontFamily: 'Manrope',
-            letterSpacing: -0.5,
-          ),
+        title: Image.asset(
+          'assets/images/newlogo.png',
+          height: 36,
+          fit: BoxFit.contain,
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: const NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuB3s6aUqDqZhug8-pC0sZfO2QGoQKDxLmtcJE6J_gRYXRQg1B7UXEZMr_-nmns99W1Q59IOtxu4gtnq7aW6HeeogkxJUiQC_HWdQ1-hmSUnMi1GhN3HWcq-bFTLMzYc3VkgSqCQfUah0cGfYQtTdcD4eV2r0uj-5PC5ogJ7DflWiG30QYJj3oyKJUVWAO8l4HDteZIAQFmuDBBYJttaSGB-mdhh0mtHNTwLF8hE1G0xCpGpDpR5u6X_7FQlyHyh0DnPkw1h8ShZk2rF'),
+          IconButton(
+            icon: Icon(
+              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
             ),
-          )
+            onPressed: () => Get.find<ThemeService>().switchTheme(),
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
@@ -58,9 +55,9 @@ class DashboardView extends GetView<DashboardController> {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: const Color(0xFFC5C5D6)),
+                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.02),
@@ -72,12 +69,13 @@ class DashboardView extends GetView<DashboardController> {
               child: TextField(
                 textInputAction: TextInputAction.search,
                 onSubmitted: (value) => controller.searchArticles(value),
-                decoration: const InputDecoration(
+                style: GoogleFonts.kulimPark(fontSize: 15, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E)),
+                decoration: InputDecoration(
                   hintText: 'Cari judul atau penulis...',
-                  hintStyle: TextStyle(color: Color(0xFF757685), fontSize: 15),
-                  prefixIcon: Icon(Icons.search, color: Color(0xFF757685)),
+                  hintStyle: GoogleFonts.kulimPark(color: const Color(0xFF757685), fontSize: 15),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF757685)),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
             ),
@@ -106,17 +104,23 @@ class DashboardView extends GetView<DashboardController> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF092BA2) : const Color(0xFFF2F3FF),
+                        color: isSelected 
+                            ? const Color(0xFF092BA2) 
+                            : (Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF2F3FF)),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? Colors.transparent : const Color(0xFFC5C5D6),
+                          color: isSelected 
+                              ? Colors.transparent 
+                              : (Get.isDarkMode ? Colors.white10 : const Color(0xFFC5C5D6)),
                         ),
                       ),
                       child: Center(
                         child: Text(
                           categoryName,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : const Color(0xFF444653),
+                          style: GoogleFonts.kulimPark(
+                            color: isSelected 
+                                ? Colors.white 
+                                : (Get.isDarkMode ? Colors.white70 : const Color(0xFF444653)),
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -138,7 +142,7 @@ class DashboardView extends GetView<DashboardController> {
               }
 
               if (controller.articles.isEmpty) {
-                return const Center(child: Text("Belum ada artikel di kategori ini."));
+                return Center(child: Text("Belum ada artikel di kategori ini.", style: GoogleFonts.kulimPark()));
               }
 
               return RefreshIndicator(
@@ -160,13 +164,16 @@ class DashboardView extends GetView<DashboardController> {
                     final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
                     final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
                     final String categoryName = article.category?.name ?? 'Umum';
+                    final authService = Get.find<AuthService>();
+                    final currentUserId = authService.currentUser?['id'];
+                    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFC5C5D6)),
+                        border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFC5C5D6)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.02),
@@ -214,8 +221,8 @@ class DashboardView extends GetView<DashboardController> {
                                     ),
                                     child: Text(
                                       categoryName,
-                                      style: const TextStyle(
-                                        color: Color(0xFF092BA2),
+                                      style: GoogleFonts.kulimPark(
+                                        color: const Color(0xFF092BA2),
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,
@@ -223,6 +230,28 @@ class DashboardView extends GetView<DashboardController> {
                                     ),
                                   ),
                                 ),
+                                if (isAuthor)
+                                  Positioned(
+                                    top: 12,
+                                    right: 12,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showArticleOptions(context, article);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(alpha: 0.5),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.more_vert,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                             
@@ -234,10 +263,10 @@ class DashboardView extends GetView<DashboardController> {
                                 children: [
                                   Text(
                                     article.title ?? 'Tanpa Judul',
-                                    style: const TextStyle(
+                                    style: GoogleFonts.kulimPark(
                                       fontSize: 18, 
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF131B2E),
+                                      fontWeight: FontWeight.w700,
+                                      color: context.theme.textTheme.bodyLarge?.color,
                                       height: 1.4,
                                     ),
                                     maxLines: 2,
@@ -248,12 +277,12 @@ class DashboardView extends GetView<DashboardController> {
                                   // --- PERUBAHAN ADA DI BARIS INI ---
                                   Text(
                                     controller.getSnippetText(article.content),
-                                    style: const TextStyle(
-                                      color: Color(0xFF444653), 
+                                    style: GoogleFonts.kulimPark(
+                                      color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
                                       fontSize: 13,
                                       height: 1.5,
                                     ),
-                                    maxLines: 2,
+                                    maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   // ----------------------------------
@@ -281,10 +310,10 @@ class DashboardView extends GetView<DashboardController> {
                                             const SizedBox(width: 8),
                                             Text(
                                               article.user?.name ?? 'Admin',
-                                              style: const TextStyle(
+                                              style: GoogleFonts.kulimPark(
                                                 fontSize: 13, 
                                                 fontWeight: FontWeight.w600, 
-                                                color: Color(0xFF131B2E),
+                                                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                                               ),
                                             ),
                                           ],
@@ -307,14 +336,14 @@ class DashboardView extends GetView<DashboardController> {
                                             const SizedBox(width: 4),
                                             Text(
                                               '${article.likesCount ?? 0}', 
-                                              style: const TextStyle(fontSize: 12, color: Color(0xFF5F6473)),
+                                              style: GoogleFonts.kulimPark(fontSize: 12, color: const Color(0xFF5F6473)),
                                             ),
                                             const SizedBox(width: 16),
                                             const Icon(Icons.chat_bubble, size: 18, color: Color(0xFF5F6473)),
                                             const SizedBox(width: 4),
                                             Text(
                                               '${article.commentsCount ?? 0}', 
-                                              style: const TextStyle(fontSize: 12, color: Color(0xFF5F6473)),
+                                              style: GoogleFonts.kulimPark(fontSize: 12, color: const Color(0xFF5F6473)),
                                             ),
                                           ],
                                         )
@@ -337,40 +366,157 @@ class DashboardView extends GetView<DashboardController> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
-          border: const Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+          color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+          border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E8F0))),
         ),
         child: BottomNavigationBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF2D46B9),
-          unselectedItemColor: const Color(0xFF94A3B8),
-          selectedFontSize: 10,
-          unselectedFontSize: 10,
+          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
+          unselectedItemColor: const Color(0xFF757685),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
+          unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
           currentIndex: 0,
           onTap: (index) {
             if (index == 1) {
-              Get.toNamed(Routes.ARTICLE_CREATE);
+              Get.offNamed(Routes.ARTICLE_CREATE);
             } else if (index == 2) {
-              Get.toNamed(Routes.PROFILE);
+              Get.offNamed(Routes.PROFILE);
             }
           },
           items: const [
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
-              label: 'Home',
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+              label: 'Beranda',
             ),
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
-              label: 'Add',
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
+              label: 'Tambah',
             ),
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
-              label: 'Profile',
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
+              label: 'Profil',
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showArticleOptions(BuildContext context, dynamic article) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Opsi Artikel',
+              style: GoogleFonts.kulimPark(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.blueAccent),
+              title: Text(
+                'Edit Artikel',
+                style: GoogleFonts.kulimPark(
+                  fontWeight: FontWeight.w600,
+                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                ),
+              ),
+              onTap: () {
+                Get.back(); // close bottom sheet
+                Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.redAccent),
+              title: Text(
+                'Hapus Artikel',
+                style: GoogleFonts.kulimPark(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.redAccent,
+                ),
+              ),
+              onTap: () {
+                Get.back(); // close bottom sheet
+                _showDeleteConfirmation(article.id);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(int? id) {
+    if (id == null) return;
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Hapus Artikel',
+          style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus artikel ini secara permanen?',
+          style: GoogleFonts.kulimPark(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.kulimPark(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.deleteArticle(id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(
+              'Hapus',
+              style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }

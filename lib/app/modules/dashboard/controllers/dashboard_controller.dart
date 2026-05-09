@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class DashboardController extends GetxController {
   // Inisialisasi ApiProvider
@@ -107,8 +108,18 @@ class DashboardController extends GetxController {
       article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
       
       articles[index] = article; // trigger reactivity
+      articles.refresh();
       
       await _apiProvider.toggleLike(articleId);
+
+      // SYNC: Update ProfileController if registered
+      try {
+        if (Get.isRegistered<ProfileController>()) {
+          Get.find<ProfileController>().updateArticleLikeState(articleId, !isCurrentlyLiked);
+        }
+      } catch (e) {
+        // Ignore sync errors
+      }
     } catch (e) {
       final index = articles.indexWhere((a) => a.id == articleId);
       if (index != -1) {
@@ -118,8 +129,23 @@ class DashboardController extends GetxController {
         article.isLiked = !isCurrentlyLiked;
         article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
         articles[index] = article;
+        articles.refresh();
       }
       Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini');
+    }
+  }
+  
+  // Sync method for other controllers to update state
+  void updateArticleLikeState(int articleId, bool isLiked) {
+    final index = articles.indexWhere((a) => a.id == articleId);
+    if (index != -1) {
+      final article = articles[index];
+      if (article.isLiked != isLiked) {
+        article.isLiked = isLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
+        articles[index] = article;
+        articles.refresh();
+      }
     }
   }
 
@@ -146,6 +172,28 @@ class DashboardController extends GetxController {
     } catch (e) {
       // Jika error, bersihkan sebisa mungkin
       return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
+    }
+  }
+
+  Future<void> deleteArticle(int id) async {
+    try {
+      final response = await _apiProvider.deleteArticle(id);
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        articles.removeWhere((article) => article.id == id);
+        Get.snackbar('Sukses', 'Artikel berhasil dihapus');
+        
+        // SYNC: Update ProfileController if registered
+        try {
+          if (Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().userArticles.removeWhere((article) => article.id == id);
+            Get.find<ProfileController>().articlesCount.value--;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menghapus artikel');
     }
   }
 }

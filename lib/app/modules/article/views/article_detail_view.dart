@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // Import Quill pengganti HTML
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/article_detail_controller.dart';
 
 class ArticleDetailView extends GetView<ArticleDetailController> {
@@ -9,9 +11,16 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("Detail Artikel", style: TextStyle(fontSize: 18)),
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
+        title: Text(
+          "Detail Artikel", 
+          style: TextStyle(
+            fontSize: 18,
+            color: context.theme.appBarTheme.foregroundColor,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Obx(() {
@@ -112,25 +121,25 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     const Divider(
                       height: 40,
                       thickness: 1,
-                      color: Color(0xFFEEEEEE),
+                      color: Color(0xFFE2E8F0),
                     ),
 
-                    // --- ISI KONTEN QUILL ---
+                    // --- ISI KONTEN HTML/QUILL ---
                     if (controller.quillController != null)
                       QuillEditor.basic(
                         configurations: QuillEditorConfigurations(
                           controller: controller.quillController!,
-                          readOnly: true, // Hanya baca
-                          showCursor: false, // Hilangkan kursor
+                          readOnly: true,
+                          showCursor: false,
                           autoFocus: false,
                           expands: false,
                           padding: EdgeInsets.zero,
                           customStyles: DefaultStyles(
                             paragraph: DefaultTextBlockStyle(
-                              const TextStyle(
-                                fontSize: 16, // Mengikuti desain lama HtmlWidget
+                              GoogleFonts.kulimPark(
+                                fontSize: 16,
+                                color: Get.isDarkMode ? Colors.white : Colors.black87,
                                 height: 1.6,
-                                color: Colors.black87,
                               ),
                               const VerticalSpacing(0, 0),
                               const VerticalSpacing(0, 0),
@@ -140,11 +149,14 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                         ),
                       )
                     else
-                      const Text(
-                        'Konten tidak tersedia.',
-                        style: TextStyle(fontSize: 16, color: Colors.black87),
+                      HtmlWidget(
+                        art.content ?? '<p>Konten tidak tersedia.</p>',
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          color: context.theme.textTheme.bodyLarge?.color ?? Colors.black87,
+                        ),
                       ),
-                    
                     const SizedBox(height: 40),
 
                     const Text(
@@ -177,7 +189,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                         return Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
+                            color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.grey.shade50,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -206,8 +218,16 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      comment.content ?? '',
-                                      style: const TextStyle(fontSize: 14),
+                                      comment.isHidden == true
+                                          ? 'Komentar ini telah disembunyikan oleh moderator'
+                                          : (comment.content ?? ''),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: comment.isHidden == true ? FontStyle.italic : FontStyle.normal,
+                                        color: comment.isHidden == true 
+                                            ? Colors.grey 
+                                            : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -233,7 +253,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -249,10 +269,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               onPressed: controller.toggleLike,
               icon: Icon(
                 controller.article.value.isLiked == true
-                    ? Icons.thumb_up_rounded
-                    : Icons.thumb_up_outlined,
+                    ? Icons.favorite
+                    : Icons.favorite_border,
                 color: controller.article.value.isLiked == true
-                    ? Colors.blue
+                    ? Colors.red
                     : Colors.grey,
               ),
             ),
@@ -272,7 +292,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.grey.shade100,
                 ),
               ),
             ),

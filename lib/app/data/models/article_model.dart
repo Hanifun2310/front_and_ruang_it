@@ -11,6 +11,15 @@ class ArticleModel {
   UserModel? user;
   CategoryModel? category;
 
+  String get snippet {
+    if (content == null || content!.isEmpty) return "";
+    // Simple HTML strip
+    String plainText = content!.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
+    plainText = plainText.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (plainText.length <= 100) return plainText;
+    return '${plainText.substring(0, 100)}...';
+  }
+
   ArticleModel({
     this.id,
     this.title,
@@ -50,7 +59,7 @@ class ArticleModel {
       imageUrl: formatImageUrl(json['image_url'] ?? json['image']),
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
-      isLiked: json['is_liked'] ?? false,
+      isLiked: json['is_liked'] == true || json['is_liked'] == 1 || json['is_liked'] == '1',
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'])

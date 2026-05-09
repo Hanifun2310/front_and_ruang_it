@@ -5,6 +5,7 @@ import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -32,6 +33,7 @@ class ProfileController extends GetxController {
 
   // Articles & Tabs
   var userArticles = <ArticleModel>[].obs;
+  var likedArticles = <ArticleModel>[].obs;
   var selectedTab = 0.obs;
 
   // Stats (Mocked or from User data)
@@ -73,25 +75,47 @@ class ProfileController extends GetxController {
   Future<void> fetchUserArticles() async {
     isArticlesLoading.value = true;
     try {
-      // Assuming getArticles with user's name as search might work as a fallback
-      // or if there's no specific my-articles endpoint.
-      // For now, let's just get the first page of all articles as a placeholder
-      // if we don't have a specific endpoint.
-      final articles = await _apiProvider.getArticles(page: 1);
+      List<ArticleModel> allFetchedArticles = [];
+      int currentPage = 1;
+
+      // Fetch all pages to ensure we get all articles for the user
+      while (true) {
+        final articles = await _apiProvider.getArticles(page: currentPage);
+        if (articles.isEmpty) break;
+        
+        allFetchedArticles.addAll(articles);
+        
+        // Safety limit to prevent infinite loops
+        if (currentPage >= 15) break; 
+        
+        currentPage++;
+      }
 
       // Filter articles by user name if we have it
       if (name.value.isNotEmpty) {
-        userArticles.value = articles
+        userArticles.value = allFetchedArticles
             .where((a) => a.user?.name == name.value)
             .toList();
       } else {
-        userArticles.value = articles;
+        userArticles.value = allFetchedArticles;
       }
+      
+      likedArticles.value = allFetchedArticles
+          .where((a) => a.isLiked == true)
+          .toList();
 
-      // Update count if it was 0
-      if (articlesCount.value == 0) {
-        articlesCount.value = userArticles.length;
+      // Calculate actual likes, comments, and article count from the articles
+      int totalLikes = 0;
+      int totalComments = 0;
+      for (var article in userArticles) {
+        totalLikes += article.likesCount ?? 0;
+        totalComments += article.commentsCount ?? 0;
       }
+      
+      likesCount.value = totalLikes;
+      commentsCount.value = totalComments;
+      articlesCount.value = userArticles.length;
+      
     } catch (e) {
       print('Error fetching user articles: $e');
     } finally {
@@ -148,11 +172,18 @@ class ProfileController extends GetxController {
           selectedFileName.value = "";
 
           Get.snackbar('Sukses', 'Profil berhasil diperbarui');
+          
+          // AUTO CLOSE BOTTOM SHEET ON SUCCESS
+          if (Get.isBottomSheetOpen ?? false) {
+            Get.back();
+          } else if (Get.isDialogOpen ?? false) {
+            Get.back();
+          }
         }
       }
     } catch (e) {
       print('Error update profile: $e');
-      Get.snackbar('Error', 'Gagal memperbarui profil');
+      Get.snackbar('Error', 'Gagal memperbarui profil. Pastikan semua data valid.');
     } finally {
       isLoading.value = false;
     }
@@ -183,6 +214,88 @@ class ProfileController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'Gagal menghapus artikel');
     }
+  }
+
+  // Sync method for other controllers to update state
+  void updateArticleLikeState(int articleId, bool isLiked) {
+    // Sync user articles
+    final userIndex = userArticles.indexWhere((a) => a.id == articleId);
+    if (userIndex != -1) {
+      final article = userArticles[userIndex];
+      if (article.isLiked != isLiked) {
+        article.isLiked = isLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
+        userArticles[userIndex] = article;
+        userArticles.refresh();
+      }
+    }
+
+    // Sync liked articles (add or remove)
+    if (isLiked) {
+      // If liked, check if it's already in the likedArticles list
+      if (!likedArticles.any((a) => a.id == articleId)) {
+        ArticleModel? existsInAll;
+        for (var a in userArticles) {
+          if (a.id == articleId) {
+            existsInAll = a;
+            break;
+          }
+        }
+        
+        if (existsInAll == null && Get.isRegistered<DashboardController>()) {
+          try {
+            final dashboardArticles = Get.find<DashboardController>().articles;
+            for (var a in dashboardArticles) {
+              if (a.id == articleId) {
+                existsInAll = a;
+                break;
+              }
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+        
+        if (existsInAll == null && Get.isRegistered<dynamic>(tag: 'ArticleDetailController')) {
+          try {
+            final detailArticle = Get.find<dynamic>(tag: 'ArticleDetailController').article.value;
+            if (detailArticle.id == articleId) {
+              existsInAll = detailArticle;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (existsInAll == null) {
+          // Placeholder that gets updated asynchronously
+          existsInAll = ArticleModel(
+            id: articleId,
+            isLiked: true,
+            title: "Article #$articleId",
+            likesCount: 1,
+            commentsCount: 0,
+          );
+          
+          _apiProvider.getArticles().then((articles) {
+            final fetched = articles.firstWhereOrNull((a) => a.id == articleId);
+            if (fetched != null) {
+              final idx = likedArticles.indexWhere((a) => a.id == articleId);
+              if (idx != -1) {
+                fetched.isLiked = true;
+                likedArticles[idx] = fetched;
+                likedArticles.refresh();
+              }
+            }
+          }).catchError((_) {});
+        }
+        
+        likedArticles.add(existsInAll);
+      }
+    } else {
+      likedArticles.removeWhere((a) => a.id == articleId);
+    }
+    likedArticles.refresh();
   }
 
   Future<void> logout() async {

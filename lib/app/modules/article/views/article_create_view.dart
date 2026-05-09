@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
 import '../controllers/article_create_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../../data/services/theme_service.dart';
 
 class ArticleCreateView extends GetView<ArticleCreateController> {
   const ArticleCreateView({super.key});
@@ -13,27 +14,30 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF8FF),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF131B2E)),
+          icon: Icon(Icons.arrow_back, color: context.theme.appBarTheme.foregroundColor),
           onPressed: () => Get.back(),
         ),
         title: Text(
           'Ruang IT',
-          style: GoogleFonts.manrope(
+          style: GoogleFonts.kulimPark(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF131B2E),
+            color: context.theme.appBarTheme.foregroundColor,
             letterSpacing: -0.5,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFF131B2E)),
-            onPressed: () {},
+            icon: Icon(
+              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: context.theme.appBarTheme.foregroundColor,
+            ),
+            onPressed: () => Get.find<ThemeService>().switchTheme(),
           ),
         ],
         bottom: PreferredSize(
@@ -56,18 +60,18 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                     children: [
                       Text(
                         'Tulis Artikel Baru',
-                        style: GoogleFonts.manrope(
+                        style: GoogleFonts.kulimPark(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF131B2E),
+                          color: context.theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Bagikan wawasan teknologi Anda kepada komunitas.',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.kulimPark(
                           fontSize: 13,
-                          color: const Color(0xFF444653),
+                          color: Get.isDarkMode ? Colors.white60 : const Color(0xFF444653),
                         ),
                       ),
                     ],
@@ -95,7 +99,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         children: [
                           Text(
                             'Terbitkan',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.kulimPark(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -116,10 +120,10 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFC5C5D6),
+                    color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6),
                     width: 2,
                     style: BorderStyle.solid, 
                   ),
@@ -144,15 +148,15 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         const SizedBox(height: 12),
                         Text(
                           'Klik untuk unggah atau seret file',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.kulimPark(
                             fontSize: 15,
-                            color: const Color(0xFF131B2E),
+                            color: context.theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Rekomendasi ukuran: 1200 x 630 px (Max 2MB)',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.kulimPark(
                             fontSize: 13,
                             color: const Color(0xFF444653),
                           ),
@@ -166,14 +170,14 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             // Form Title (Judul)
             TextField(
               controller: controller.titleController,
-              style: GoogleFonts.manrope(
+              style: GoogleFonts.kulimPark(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF131B2E),
+                color: context.theme.textTheme.bodyLarge?.color,
               ),
               decoration: InputDecoration(
                 hintText: 'Judul Artikel...',
-                hintStyle: GoogleFonts.manrope(
+                hintStyle: GoogleFonts.kulimPark(
                   color: const Color(0xFFC5C5D6),
                 ),
                 enabledBorder: const UnderlineInputBorder(
@@ -193,7 +197,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
               children: [
                 Text(
                   'Kategori Utama',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.kulimPark(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF444653),
@@ -203,19 +207,20 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                 Obx(() => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFC5C5D6)),
+                    border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
+                      dropdownColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                       value: controller.selectedCategoryId.value == 0 ? null : controller.selectedCategoryId.value,
-                      hint: Text('Pilih Kategori...', style: GoogleFonts.inter(fontSize: 13)),
+                      hint: Text('Pilih Kategori...', style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653))),
                       isExpanded: true,
                       items: controller.categories.map((cat) {
                         return DropdownMenuItem<int>(
                           value: cat['id'],
-                          child: Text(cat['name'], style: GoogleFonts.inter(fontSize: 13)),
+                          child: Text(cat['name'], style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E))),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -231,7 +236,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             // Area Quill Editor
             Text(
               'Isi Konten',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.kulimPark(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF444653),
@@ -240,9 +245,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFC5C5D6)),
+                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
               ),
               child: Column(
                 children: [
@@ -250,18 +255,38 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
+                      multiRowsDisplay: false,
+                      buttonOptions: const QuillSimpleToolbarButtonOptions(
+                        base: QuillToolbarBaseButtonOptions(
+                          iconSize: 22,
+                        ),
+                      ),
+                      toolbarSectionSpacing: 14,
                       showFontFamily: false,
                       showFontSize: false,
                       showSubscript: false,
                       showSuperscript: false,
-                      showColorButton: false,
-                      showBackgroundColorButton: false,
                       showSearchButton: false,
                       showInlineCode: false,
+                      showColorButton: false,
+                      showBackgroundColorButton: false,
+                      showClearFormat: false,
+                      showAlignmentButtons: false,
+                      showLeftAlignment: false,
+                      showCenterAlignment: false,
+                      showRightAlignment: false,
+                      showJustifyAlignment: false,
+                      showHeaderStyle: false,
+                      showListCheck: false,
                       showCodeBlock: false,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF2F3FF),
-                        borderRadius: BorderRadius.only(
+                      showQuote: false,
+                      showIndent: false,
+                      showDirection: false,
+                      showUndo: false,
+                      showRedo: false,
+                      decoration: BoxDecoration(
+                        color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
+                        borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12)),
                       ),
@@ -279,9 +304,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         scrollable: true,
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
-                            GoogleFonts.inter(
+                            GoogleFonts.kulimPark(
                               fontSize: 15,
-                              color: const Color(0xFF131B2E),
+                              color: context.theme.textTheme.bodyMedium?.color,
                               height: 1.5,
                             ),
                             const VerticalSpacing(0, 0),
@@ -300,47 +325,46 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         ),
       ),
       bottomNavigationBar: Container(
-        height: 80,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE2E7FF))),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+          border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF))),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home_outlined, 'Home', false, () => Get.offAllNamed(Routes.DASHBOARD)),
-            _buildNavItem(Icons.add_circle, 'Add', true, () {}),
-            _buildNavItem(Icons.person_outline, 'Profile', false, () => Get.offNamed(Routes.PROFILE)),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
+          unselectedItemColor: const Color(0xFF757685),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
+          unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
+          currentIndex: 1,
+          onTap: (index) {
+            if (index == 0) {
+              Get.offAllNamed(Routes.DASHBOARD);
+            } else if (index == 2) {
+              Get.offNamed(Routes.PROFILE);
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
+              label: 'Tambah',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
+              label: 'Profil',
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Widget _toolbarButton yang lama sudah saya hapus karena tidak dipakai lagi
-
-  // Navigasi Bawah tetap dipertahankan
-  Widget _buildNavItem(IconData icon, String label, bool isActive, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
-            size: 24,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.manrope(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-              color: isActive ? const Color(0xFF092BA2) : const Color(0xFF757685),
-            ),
-          ),
-        ],
       ),
     );
   }

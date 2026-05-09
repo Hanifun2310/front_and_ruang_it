@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Topik untuk anda</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-styles">
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #ffffff;
+      color: #111111;
+    }
+
+    /* Custom shadow and border for the neo-brutalism style */
+    .neo-card {
+      border: 2px solid #000000;
+      border-radius: 1.5rem;
+    }
+
+    .neo-button {
+      border: 1px solid #000000;
+      border-radius: 9999px;
+    }
+
+    /* Overlapping avatar styles */
+    .avatar-stack > img {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      border: 2px solid transparent; /* To match the overlapping effect */
+      object-fit: cover;
+    }
+    
+    .avatar-stack > img:not(:first-child) {
+      margin-left: -0.75rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col relative px-6 py-8">
+<!-- BEGIN: Header -->
+<header class="w-full flex justify-between items-center mb-12">
+<!-- Back Button -->
+<button aria-label="Go back" class="p-2 -ml-2">
+<svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 12H5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+<path d="M12 19L5 12L12 5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</button>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Main Content -->
+<main class="flex-grow flex flex-col items-center">
+<!-- Title Section -->
+<div class="text-center mb-10 w-full max-w-sm">
+<h1 class="text-3xl font-medium mb-3">Topik untuk anda</h1>
+<p class="text-gray-700 text-[15px] leading-snug">Kami telah menghimpun penulis dan publikasi populer dalam topik anda</p>
+</div>
+<!-- Topics List -->
+<div class="w-full space-y-5 flex flex-col items-center">
+<!-- Technology Card -->
+<div class="neo-card w-full max-w-sm bg-[#ff8a80] p-5 flex flex-col justify-between h-[120px] relative">
+<h2 class="text-lg font-medium text-black">Technology</h2>
+<div class="flex items-center justify-between mt-auto">
+<!-- Avatars -->
+<div class="avatar-stack flex items-center">
+<img alt="Author 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwXgpEynSHKdOE24TvdM7vVG-G9GZRrb51agX8BO2KfLoD3adggf4VN4hGZD3jbqFqwHqrKO9YdOSiiko0dr3veOV6_AkDsDv5pcU1Z33YWBkiV2XzQOx49S-jFBGQnUVg-4rSnGvJ21aIcnoh1GLc7pYDsqeS6rXs5fh28jLxvahN_I1aPrDs6XOOt2IQeVCCU8JxCQQjq3fg49AnckPM-PUNm0yvubgv3xAqoBha0wqeWGu6ym0WUKdzAOcgPvZ39FEeuXjpIHdc"/>
+<img alt="Author 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM3BllcewYWDxagKQvq6rqnOEfFTHSA_Zm5u8BAt9EXCTz3r-MdYKtfmpw5xAlg7CBGf4fyFQuNJLuGnO7oXkGlEigik6_W3i9NJGOHqNy8S_EtUFMSbe23ACypsoEWbWmCnUZhFbx6dVscJcgINK_bk_4jwnkNLGfwUmSNXsf9DS1CFhg3Zh--Dh1fo31bKIgsF3lIBIWBvIrtV-JaCtre-s1rWOiSjh1poLs_bzAtTMD2UBT3eIWGM-jcAdHmmrZufSTv_a-26zL"/>
+<img alt="Author 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDfEiR6BOv4tD9ii87MdYnn046ZE1CUVmr_dYJMtWT_wI55QisPQrfkPmdcWkh7typR91a54NSoY5AuZwhABJeSMyVH_NxV1moLjpdhfq8C1SFiOtgzmoRcaxBomM5LB07hqxiLzkNUIT2Hh5NrVx_Wvf5_opvMttt1_cMm4qW1qig1c41m4wYsyq9SV3IHoYR6xtrM12gZo8sTOghSLH3tQ5_AX0lK6flRtEdU6-tSorlGRtx2lth7bGG_Q7RYTtLTAKMN5K8yaAe"/>
+<img alt="Author 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUMTjEpfMJXsGAak7AqVKJX272szB7fbvQFLO8wWMPuVXzTEMJraRg-7Nlc19r_T4yiGm_et-eXwXCGh5KLhMgHgrfQfIqHe5qZ424RNEp06xGhR2qoh6C0e-amuYVIZwoqVUcahcA68rabgVA5PR2mtE_vmvb28a7KamgZWKYGJxylgD5vYDh7ARyz13_hSwocWAGI9ii8E0AFOUOqiuMxqN3NjFKNSR7RrzbTpty9tObOz1hhazz8Wp-d9fd4xiaY_frUAQbW_cC"/>
+</div>
+<!-- Explore Button -->
+<button class="neo-button bg-white px-4 py-2 flex items-center space-x-2 text-sm z-10 absolute right-[-10px] sm:right-5 shadow-sm">
+<span>Jelajahi Topik</span>
+<svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 12H19" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+<path d="M12 5L19 12L12 19" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Design Card -->
+<div class="neo-card w-full max-w-sm bg-[#ffeb3b] p-5 flex flex-col justify-between h-[120px] relative">
+<h2 class="text-lg font-medium text-black">Design</h2>
+<div class="flex items-center justify-between mt-auto">
+<!-- Avatars -->
+<div class="avatar-stack flex items-center">
+<img alt="Author 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsgVLoUdNX_fYVw8pPLPMa3CofQO-lO_SWew7SPtokDByrVID9MD49aGYFf1tnCeB7Rz4jtwTcXbcTOfzsDTzYSrvPGUJiyc0_UwR5P1m_2JOtwIGqe4Fmz0JA4AcgBZBPG_rZ2eokG3fNnwmKZazInElBIoyzysLgTG72UHHLxP0et8t6XNLyqGAxRT7UCdXJLjUiU5DNaGOF2akta-uqvo6ubUK6lVA2UJNhoAO4La2m_hIcUVLIde14aAAth4KpbQ7XcyE1cON2"/>
+<img alt="Author 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjhfdKzsGrkrPJe7V6BJwmB9iijvbm7U7JhpK9J6esnQiprhs40NNMVAKnDKbSIzyuWxX1f_lBYgpw1a1w-APKEzVhJ6emeueAVV9bAwidvR4dF-6Ptvd8FuN19tNeIEOJjiOK-7aXZ08EEoxeFP19TlLrGaNXxtFGADBOPy7zSs2D2UhKuYz39yQ5mUYRCp-CaTUI5-qK3x30jNTBy9dWnYUqTNEaKlh3mUhIM9AOo7W1s_r4GXPVXpAADxdO7eRH34L6rBbjqYI9"/>
+<img alt="Author 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXnktYue4veM5ovY1jB5_0MPv3zxRAipU9S0PQfXlbsd5iOQuzdpKvbhWkCQ5773ENwxde-xGkA8Q4HKXGZDXJW4CY7ShVfvlP4zcvpjP16BJB0rtAecJg9iExy6q0T8wmex7j3xIaMKA_ULEZK3VZKDT5s6vwRWOaOoJoZM34TBbEGNaJ8gzfiUFe0Bi4ek4ChpT95_axYQqqGDd1MsXKI-2J6Qri3xyZVoBL0sUIyUJL8HmT7TyOwxZqthwHrBd4gMSXIpQWrxUs"/>
+<img alt="Author 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpgja-y-yAe6IYhXCRPjF6bqTqbRpsQUkxm8gt2jV3j_s_pxgVyYPi1D689tz7ejBwpLU5IpyHYVqZqbpZPwjNp2Ufwdn0Mr6Ble8C7kuGTB2vXghlw5hJn_d-ZMxpyDW1XFzbrYT7iaUYo2gN_lEl7xhfcOflHrcI98XshtxOAVLABqD29PGOo1S03iYkfkdO9ruTVwu3oKfxyr2VZh3k7PSG2IK-z30VnA_3XfbW3Chg-L8h5QpoMqVE4-d1oKvoCqymym-7AO0Z"/>
+</div>
+<!-- Explore Button -->
+<button class="neo-button bg-white px-4 py-2 flex items-center space-x-2 text-sm z-10 absolute right-[-10px] sm:right-5 shadow-sm">
+<span>Jelajahi Topik</span>
+<svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 12H19" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+<path d="M12 5L19 12L12 19" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Programming Card -->
+<div class="neo-card w-full max-w-sm bg-[#98fb98] p-5 flex flex-col justify-between h-[120px] relative">
+<h2 class="text-lg font-medium text-black">Programming</h2>
+<div class="flex items-center justify-between mt-auto">
+<!-- Avatars -->
+<div class="avatar-stack flex items-center">
+<img alt="Author 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzLNIIE3-QyLok0X_XwIVeXlHFI8O56QxdHDBLRGZ1nkbnonvQU81t1X1wwUc4vCFr-rcGlJdSNfhDlukxgYmE9xvwOGVvV7-HaKnMmz2OQGki4P1Vxjt576D2WyjuRKsLYXRCBPMc6TKwmwikjrJsxZEwOmqxlKZcGHkz5W0V55vszm4oWOL5knh3jrwlA5GK9YGCiJH3tbOFy6PbNuzmc-RC5h_UKhVkTkbFhvRNfE90j4LL-Ha9tYGA8T5yJYG_qIixkxOXhUOo"/>
+<img alt="Author 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzFeYTbS3JJwidmasySBFV1w-kyxX_YJUGW7yS5CxYD059B_rabMxevtS6BiEBbmF3tMjjkYaDOdRbQPARaHdx9PwVem2LD5tdrXr57uhaMaEFXPQrYYhQoxZ3M74y_yGWq5qbhwtW5YKa5BtsQagAl_WNRcBCDJSdGJdrBekjhb2bMSgd3gxTwZcvVBOYvDitqnF2QVPZGKEpDGuuFuDDs50sZ8i-qYxlZZudUPCAfJCZIKJ6jKVYdG5j8MGjkViNYYaSHPtZPKmk"/>
+<img alt="Author 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjuapFAk5nyzDTmltkK1TSAyuNZCJ1tPE9Z93f71q5_mZBG8DqtlnTjK0Kv9tX8Uvn2v5oqIcqnEM4x4qW4Xbjw-aAhwVFe34t-9QU76EzaMKMMZsbUWgmuku1kdWnaJil_AXxe9PITL8uXCFIl4cnLsw_yvxDRR-jL8LVfltY3W_J8hoCmwCDVF53raQDqTj_2y5e-xOdxnPdL73vacnDZuhNA04ErKitUPUl3TGTUjp146g53tzer326XAMOVFZuLt4xeh4yKH-c"/>
+<img alt="Author 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU3DTF7abY6okCq_MZI5i2c578sSlOoUHu-QJY3X_zoFDbNTHRijA8gXvmIHRpoTSK6iqyK8KuWtlhd-iJLFPexwnG6i0wq89rTsHxSRmQvZx3DCrkVIT5tOtfJHLxjl9bmcGQLrVOHj32cRCjsZWLUERTewx19E6xeuXcVZHU5BGYjIRJJs_qmijBoameoDsx6gAduJYx3Js_7qzC4u9wyufGdzr95nHuyJKp279fKcmHNqr1rofmp7qVh9q_l0RnvlABq5EM7iNj"/>
+</div>
+<!-- Explore Button -->
+<button class="neo-button bg-white px-4 py-2 flex items-center space-x-2 text-sm z-10 absolute right-[-10px] sm:right-5 shadow-sm">
+<span>Jelajahi Topik</span>
+<svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 12H19" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+<path d="M12 5L19 12L12 19" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Footer -->
+<footer class="w-full flex justify-center mt-12 pb-4">
+<button class="w-full max-w-sm bg-[#4a90e2] text-black font-medium py-3.5 rounded-full text-[16px] hover:bg-blue-500 transition-colors">
+      Lanjutkan
+    </button>
+</footer>
+<!-- END: Footer -->
+</body></html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pilih Topik</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-utilities">
+    .pill-button {
+      border: 1px solid #111827;
+      border-radius: 9999px;
+      padding: 0.375rem 1rem;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      background-color: #ffffff;
+      color: #111827;
+      line-height: 1.25rem;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="bg-white min-h-screen font-sans flex flex-col antialiased text-gray-900">
+<!-- BEGIN: MainContainer -->
+<div class="max-w-md w-full mx-auto flex flex-col min-h-screen px-6 pt-12 pb-8">
+<!-- BEGIN: Header -->
+<header class="mb-8">
+<!-- Back Arrow Icon Placeholder -->
+<button aria-label="Go back" class="mb-12 focus:outline-none">
+<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<div class="text-center">
+<h1 class="text-3xl font-medium mb-2 tracking-tight">Apa yang anda sukai</h1>
+<p class="text-gray-600 font-light">Pilih topik yang anda sukai</p>
+</div>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: MainContent -->
+<main class="flex-grow space-y-8 overflow-y-auto pb-6">
+<!-- Category: Technology -->
+<section data-purpose="category-section">
+<h2 class="text-lg font-bold mb-4">Technology</h2>
+<div class="flex flex-wrap gap-x-2 gap-y-3">
+<button class="pill-button">Technology</button>
+<button class="pill-button">AI</button>
+<button class="pill-button">Artificial Intelligence</button>
+<button class="pill-button">Cyber security</button>
+<button class="pill-button">AWS</button>
+<button class="pill-button">LLM</button>
+<button class="pill-button">Android</button>
+<button class="pill-button">IOS</button>
+<button class="pill-button">Apple</button>
+<button class="pill-button">AI Agent</button>
+<button class="pill-button">Future</button>
+<button class="pill-button">Tech</button>
+</div>
+</section>
+<!-- Category: Programming -->
+<section data-purpose="category-section">
+<h2 class="text-lg font-bold mb-4">Programming</h2>
+<div class="flex flex-wrap gap-x-2 gap-y-3">
+<button class="pill-button">Programming</button>
+<button class="pill-button">Python</button>
+<button class="pill-button">Data science</button>
+<button class="pill-button">Software development</button>
+<button class="pill-button">Software Engineering</button>
+<button class="pill-button">Machine Learnig</button>
+<button class="pill-button">DevOps</button>
+<button class="pill-button">Web Development</button>
+<button class="pill-button">Java</button>
+<button class="pill-button">Java Script</button>
+<button class="pill-button">React</button>
+</div>
+</section>
+<!-- Category: Design -->
+<section data-purpose="category-section">
+<h2 class="text-lg font-bold mb-4">Design</h2>
+<div class="flex flex-wrap gap-x-2 gap-y-3">
+<button class="pill-button">UI UX</button>
+<button class="pill-button">UI Design</button>
+<button class="pill-button">Digital drawing</button>
+<button class="pill-button">Figma</button>
+<button class="pill-button">Motion Graphic</button>
+<button class="pill-button">Adobe</button>
+</div>
+</section>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: Footer -->
+<footer class="mt-auto pt-6 bg-white">
+<button class="w-full bg-[#4A90E2] hover:bg-blue-600 text-white py-4 rounded-full font-medium text-lg mb-4 transition-colors">
+        Lanjutkan
+      </button>
+<p class="text-center text-gray-600 font-light text-sm">
+        Pilih minimal 3 Topik atau lebih
+      </p>
+</footer>
+<!-- END: Footer -->
+</div>
+<!-- END: MainContainer -->
+</body></html>
