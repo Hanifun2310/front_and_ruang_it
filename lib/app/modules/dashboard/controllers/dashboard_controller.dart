@@ -92,7 +92,19 @@ class DashboardController extends GetxController {
       if (newArticles.isEmpty) {
         hasMoreData.value = false;
       } else {
-        articles.addAll(newArticles);
+        // FILTER: Jangan tampilkan artikel terblokir di Dashboard
+        final publicArticles = newArticles.where((a) => !a.isBlocked).toList();
+        articles.addAll(publicArticles);
+        
+        // Jika semua artikel di halaman ini terblokir, tapi masih ada data di server, 
+        // kita mungkin perlu fetch page berikutnya secara otomatis, tapi untuk 
+        // simplifikasi kita biarkan pagination berjalan normal.
+        if (publicArticles.isEmpty && newArticles.isNotEmpty) {
+           currentPage++;
+           fetchArticles();
+           return;
+        }
+
         currentPage++;
       }
     } catch (e) {

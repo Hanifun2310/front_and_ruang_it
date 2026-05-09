@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../widgets/loading_widget.dart';
 import '../controllers/author_profile_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -313,7 +314,7 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(32.0),
-                child: CircularProgressIndicator(),
+                child: const LoadingWidget(),
               ),
             );
           }

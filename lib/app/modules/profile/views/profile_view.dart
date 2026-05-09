@@ -11,6 +11,7 @@ import '../../../data/services/theme_service.dart';
 import '../../../routes/app_routes.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import '../../../widgets/loading_widget.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
@@ -340,7 +341,7 @@ class ProfileView extends GetView<ProfileController> {
         return const Center(
           child: Padding(
             padding: EdgeInsets.all(32.0),
-            child: CircularProgressIndicator(),
+            child: const LoadingWidget(),
           ),
         );
       }
@@ -408,6 +409,33 @@ class ProfileView extends GetView<ProfileController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (article.isBlocked) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Artikel ini telah diblokir dan tidak tampil di publik.',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             // Theme Label
             Row(
               children: [
@@ -929,13 +957,10 @@ class ProfileView extends GetView<ProfileController> {
                     elevation: 0,
                   ),
                   child: controller.isLoading.value
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
+                      ? const LoadingWidget(
+                          size: 20,
+                          color: Colors.white,
+                          strokeWidth: 2,
                         )
                       : Text(
                           "SIMPAN PERUBAHAN",

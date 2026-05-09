@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../widgets/loading_widget.dart';
 import '../controllers/search_controller.dart';
 import '../../../routes/app_routes.dart';
 import 'dart:convert';
@@ -102,7 +103,7 @@ class SearchView extends GetView<ArticleSearchController> {
               }
 
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const LoadingWidget();
               }
 
               if (controller.articles.isEmpty) {

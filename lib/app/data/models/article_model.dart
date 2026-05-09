@@ -8,6 +8,9 @@ class ArticleModel {
   int? commentsCount;
   bool? isLiked;
   DateTime? createdAt;
+  String? status;
+
+  bool get isBlocked => status == 'blocked' || status == 'inactive';
 
   String get formattedDate {
     if (createdAt == null) return '';
@@ -41,6 +44,7 @@ class ArticleModel {
     this.commentsCount,
     this.isLiked,
     this.createdAt,
+    this.status,
     this.user,
     this.category,
   });
@@ -73,6 +77,7 @@ class ArticleModel {
       commentsCount: json['comments_count'] ?? 0,
       isLiked: json['is_liked'] == true || json['is_liked'] == 1 || json['is_liked'] == '1',
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      status: json['status']?.toString().toLowerCase(),
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'])
@@ -90,6 +95,7 @@ class ArticleModel {
       'likes_count': likesCount,
       'comments_count': commentsCount,
       'is_liked': isLiked,
+      'status': status,
       'user': user?.toJson(),
       'category': category?.toJson(),
     };

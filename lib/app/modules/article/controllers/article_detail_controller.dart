@@ -9,12 +9,13 @@ import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
+import '../../../data/services/auth_service.dart';
 
 class ArticleDetailController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   
   // Ambil identifier (slug/id) dari argument navigasi
-  final String identifier = Get.arguments;
+  final String identifier = Get.arguments?.toString() ?? "";
 
   var article = ArticleModel().obs;
   var comments = <CommentModel>[].obs;
@@ -37,6 +38,17 @@ class ArticleDetailController extends GetxController {
       // 1. Ambil Detail Artikel
       article.value = await _apiProvider.getArticleDetail(identifier);
       
+      // Keamanan: Jika artikel diblokir, hanya penulis yang bisa lihat
+      if (article.value.isBlocked) {
+        final authService = Get.find<AuthService>();
+        final currentUserId = authService.currentUser?['id'];
+        if (article.value.user?.id != currentUserId) {
+          Get.back();
+          Get.snackbar('Akses Terbatas', 'Artikel ini sedang diblokir.');
+          return;
+        }
+      }
+
       // Inisialisasi Quill Controller setelah data artikel didapat
       _initQuillController(article.value.content ?? "");
       // 2. Ambil Komentar

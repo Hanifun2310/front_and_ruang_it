@@ -38,7 +38,8 @@ class ExploreController extends GetxController {
       final fetchedArticles = await _apiProvider.getArticles(
         category: selectedCategory.value?.id.toString(),
       );
-      articles.value = fetchedArticles;
+      // FILTER: Jangan tampilkan artikel terblokir di Explore
+      articles.value = fetchedArticles.where((a) => !a.isBlocked).toList();
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat artikel');
     } finally {

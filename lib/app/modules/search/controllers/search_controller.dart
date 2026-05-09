@@ -67,7 +67,8 @@ class ArticleSearchController extends GetxController {
     isLoading.value = true;
     try {
       final fetched = await _apiProvider.getArticles(search: searchQuery.value);
-      articles.value = fetched;
+      // FILTER: Jangan tampilkan artikel terblokir di Hasil Pencarian
+      articles.value = fetched.where((a) => !a.isBlocked).toList();
       
       // If we got results and it's a "substantial" search, save it to history when user stops typing
       // Note: In real-world, you might want to save history only on "Enter" or specific triggers,

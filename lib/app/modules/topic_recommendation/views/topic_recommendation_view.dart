@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../widgets/loading_widget.dart';
 import '../controllers/topic_recommendation_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -52,7 +53,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const LoadingWidget();
                   }
                   
                   if (controller.selectedCategories.isEmpty) {

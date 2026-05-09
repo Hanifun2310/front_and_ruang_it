@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../widgets/loading_widget.dart';
 import '../controllers/interest_selection_controller.dart';
 
 class InterestSelectionView extends GetView<InterestSelectionController> {
@@ -50,7 +51,7 @@ class InterestSelectionView extends GetView<InterestSelectionController> {
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const LoadingWidget();
                   }
                   
                   if (controller.categories.isEmpty) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../../../widgets/loading_widget.dart';
 
 class RegisterView extends GetView<AuthController> {
   const RegisterView({Key? key}) : super(key: key);
@@ -215,7 +216,7 @@ class RegisterView extends GetView<AuthController> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          child: const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
                         )
                       : const Text(
                           "Daftar Sekarang",

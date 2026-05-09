@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../widgets/loading_widget.dart';
 import '../controllers/category_detail_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -81,7 +82,7 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.white));
+                    return const LoadingWidget(color: Colors.white);
                   }
                   
                   if (controller.author == null) {

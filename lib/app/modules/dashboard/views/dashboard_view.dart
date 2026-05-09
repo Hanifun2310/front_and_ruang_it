@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../widgets/loading_widget.dart';
 import '../controllers/dashboard_controller.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -83,7 +84,7 @@ class DashboardView extends GetView<DashboardController> {
               final displayList = isTerbaru ? controller.articles : controller.trendingArticles;
 
               if (controller.isLoading.value && displayList.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
+                return const LoadingWidget();
               }
 
               if (displayList.isEmpty) {
@@ -103,7 +104,7 @@ class DashboardView extends GetView<DashboardController> {
                     if (isTerbaru && index == displayList.length) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: const LoadingWidget(size: 30),
                       );
                     }
 

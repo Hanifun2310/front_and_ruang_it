@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import Quill
+import '../../../widgets/loading_widget.dart';
 import '../controllers/article_edit_controller.dart';
 import '../../../data/services/theme_service.dart';
 
@@ -88,11 +89,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                     elevation: 0,
                   ),
                   child: controller.isLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2))
+                      ? const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2)
                       : Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -232,38 +229,41 @@ class ArticleEditView extends GetView<ArticleEditController> {
               child: Column(
                 children: [
                   // Quill Toolbar
-                   QuillToolbar.simple(
+                    QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
-                      multiRowsDisplay: false,
+                      multiRowsDisplay: true,
                       buttonOptions: const QuillSimpleToolbarButtonOptions(
                         base: QuillToolbarBaseButtonOptions(
-                          iconSize: 22,
+                          iconSize: 12,
                         ),
                       ),
-                      toolbarSectionSpacing: 14,
+                      toolbarSectionSpacing: 12,
                       showFontFamily: false,
                       showFontSize: false,
-                      showSubscript: false,
-                      showSuperscript: false,
-                      showSearchButton: false,
-                      showInlineCode: false,
+                      showBoldButton: true,
+                      showItalicButton: true,
+                      showUnderLineButton: true,
+                      showStrikeThrough: true,
+                      showInlineCode: true,
+                      showLink: true,
+                      showListNumbers: true,
+                      showListBullets: true,
                       showColorButton: false,
                       showBackgroundColorButton: false,
                       showClearFormat: false,
                       showAlignmentButtons: false,
-                      showLeftAlignment: false,
-                      showCenterAlignment: false,
-                      showRightAlignment: false,
-                      showJustifyAlignment: false,
                       showHeaderStyle: false,
                       showListCheck: false,
                       showCodeBlock: false,
                       showQuote: false,
                       showIndent: false,
                       showDirection: false,
-                      showUndo: false,
-                      showRedo: false,
+                      showSearchButton: false,
+                      showSubscript: false,
+                      showSuperscript: false,
+                      showUndo: true,
+                      showRedo: true,
                       decoration: BoxDecoration(
                         color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
                         borderRadius: const BorderRadius.only(

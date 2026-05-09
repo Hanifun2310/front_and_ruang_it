@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/loading_widget.dart';
 
 class LoginView extends GetView<AuthController> {
   const LoginView({Key? key}) : super(key: key);
@@ -142,7 +143,7 @@ class LoginView extends GetView<AuthController> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          child: const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
                         )
                       : const Text(
                           "Masuk",
@@ -177,4 +178,4 @@ class LoginView extends GetView<AuthController> {
       ),
     );
   }
-}
+}
