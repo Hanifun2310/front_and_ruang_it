@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Technology Profile Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-fonts">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            salmon: {
+              DEFAULT: '#FF7D7D',
+            },
+            dark: {
+              DEFAULT: '#222330',
+              lighter: '#2A2B3A'
+            }
+          },
+          borderRadius: {
+            '4xl': '2rem',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-salmon min-h-screen text-white relative antialiased flex flex-col max-w-md mx-auto h-[844px] overflow-hidden">
+<!-- BEGIN: Header Section -->
+<header class="pt-12 pb-4 px-6 relative z-10" data-purpose="top-navigation">
+<div class="flex items-center justify-between mb-8">
+<!-- Back Button -->
+<button aria-label="Go back" class="text-black p-2 -ml-2">
+<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<h1 class="text-black text-[34px] font-medium tracking-tight">Technology</h1>
+<button class="bg-dark text-white text-base px-6 py-2 rounded-full border border-white font-medium shadow-sm">
+        Ikuti semua
+      </button>
+</div>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 px-6 pb-24 overflow-y-auto" data-purpose="main-scrollable-content">
+<!-- Profile Card -->
+<section class="bg-dark rounded-[32px] p-6 shadow-xl relative mt-4">
+<!-- Profile Header -->
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-4">
+<div class="relative w-16 h-16 rounded-full bg-gradient-to-tr from-gray-700 to-gray-500 p-[2px]">
+<img alt="Zeventrd Profile Picture" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD1gD1-YnxDUPrT70A3Z-EVUzfv5NS8B_WpgJ-6m33mTmV_GJY7irLABGKFQkGF7XMmfz6AouR71V-n1-9xSqThuPuQ8NYptfZ0QmoUKeAEbsZCX4rWgRiETK57bqreMjGeIBIUTqcEcwg7_Yq-7cnwcLGMYA-JVDBGcOaLl2CiTqyIHNjJev0aokJB6zcLHlWqdlB2AvW9hFREqGG8Y8XfYM4egXOZeGIf0CXuAdoOi0SKGbXUioA14yiaixYewX1ZaLqaZcUoans"/>
+</div>
+<div>
+<h2 class="text-white text-2xl font-medium tracking-wide">Zeventrd</h2>
+<p class="text-gray-300 text-sm font-light mt-0.5">18.4K follower</p>
+</div>
+</div>
+<!-- Refresh Button -->
+<button aria-label="Refresh" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-dark">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Bio -->
+<p class="text-gray-300 text-sm font-light leading-relaxed mb-6 w-11/12">
+        Mechanic from STM Sukamakmur, likes to write about robotics and things about machines
+      </p>
+<div class="h-px bg-white/10 w-full mb-6"></div>
+<!-- Articles Section -->
+<div>
+<h3 class="text-white text-[13px] tracking-widest font-medium uppercase mb-5">Artikel Populer</h3>
+<div class="space-y-6">
+<!-- Article Item 1 -->
+<article class="flex items-center gap-4 cursor-pointer group">
+<div class="w-24 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-200">
+<img alt="Books on a windowsill" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIsXyOKUh34l3dTx-rcdrNxHpUyToOfn8yFxcU9NQcKO2Hf7Mg8m7Ac3MrOs1-CALtl_alhUbysmdtg1lyT2tJEYUTEbd_8-4IOLk7Zh1rgqovvJi1se_xkscGfq6haS65v1CEINf6uKLM--OdGfXw43IWOt7x03uV4Sv_fnSUhaidgrnHIDy762O7xbGxuNyLVqFeaXV3Iq0lg76KHZuBjtYiTanGJ4txNnjCo3K1LgS513lw3zDBB0mNhBMTe573PBzUCp8ISt-0"/>
+</div>
+<div>
+<h4 class="text-white text-base font-medium leading-tight group-hover:text-salmon transition-colors">The Architecture in silence</h4>
+<p class="text-gray-400 text-sm font-light mt-1 leading-snug">Find foccus in the hyper-connected world</p>
+</div>
+</article>
+<!-- Article Item 2 -->
+<article class="flex items-center gap-4 cursor-pointer group">
+<div class="w-24 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-200">
+<img alt="Books on a windowsill" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCmt7LcnPj7oxaEJJKmGsSDft5-gq2x7n97FXvUGHLn-kwhRf3FD7XlOw6VWYAZ16rllT79V9xNtG8P25D-JcxT_ZhAzOC7ceMz9vwRusjak8blsV9r4OVEf4ZTa3tkqTAqoeAzcyEaFnO0EHEvL4EccAo49pRZnMgxq9kqSRhL6XNTYfg5iEE0K9o-mAnHFE1zMjcEfY5c-5KZR5Tm_SCA057Rth8R2NbQaCadnUUqtvplGV5su3v4U3j9NdkcNCkfRjkLachQYjw"/>
+</div>
+<div>
+<h4 class="text-white text-base font-medium leading-tight group-hover:text-salmon transition-colors">The Architecture in silence</h4>
+<p class="text-gray-400 text-sm font-light mt-1 leading-snug">Find foccus in the hyper-connected world</p>
+</div>
+</article>
+<!-- Article Item 3 -->
+<article class="flex items-center gap-4 cursor-pointer group">
+<div class="w-24 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-200">
+<img alt="Books on a windowsill" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1cZ_IJksutMXKu89VMMs518VbrvY6IiWovA5z11-_rJu0grazmhFcLXWbDmylWbt-G90kBPi_hPfIS-PS1En1oRqKWLM56poh5sWEJ2-jx3n36u6HAo32p9Cukr7kU3HZdFiOD_vszbAbmKd7s8wNu73l30HhVru6IhqSYhXUxkKTLvSMgKElj0iGAFnENMhPQetlGs5KO_CtZpEDig_VY24E4MBZhr7j5LRU61ABzuRpu6UG-AWY7RLxE9qMMdxG4qqpa-vyNX4_"/>
+</div>
+<div>
+<h4 class="text-white text-base font-medium leading-tight group-hover:text-salmon transition-colors">The Architecture in silence</h4>
+<p class="text-gray-400 text-sm font-light mt-1 leading-snug">Find foccus in the hyper-connected world</p>
+</div>
+</article>
+</div>
+</div>
+</section>
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: Bottom Action Area -->
+<footer class="absolute bottom-0 w-full p-6 bg-salmon pb-10" data-purpose="bottom-action">
+<button class="w-full py-4 rounded-full border border-black text-black font-medium text-[17px] hover:bg-black/5 transition-colors">
+      Lanjutkan
+    </button>
+</footer>
+<!-- END: Bottom Action Area -->
+</body></html>

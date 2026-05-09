@@ -117,9 +117,9 @@ Future<void> register() async {
           
           Get.snackbar('Sukses', 'Akun berhasil dibuat dan otomatis masuk!');
           
-          // 3. LANGSUNG ARAHKAN KE PROFILE
+          // 3. LANGSUNG ARAHKAN KE INTEREST SELECTION
           FocusManager.instance.primaryFocus?.unfocus();
-          Get.offAllNamed(Routes.PROFILE); 
+          Get.offAllNamed(Routes.INTEREST_SELECTION); 
         } else {
           // Jika Laravel tidak mengirim token, terpaksa diarahkan ke Login saja
           Get.snackbar('Sukses', 'Akun dibuat, silakan login manual.');

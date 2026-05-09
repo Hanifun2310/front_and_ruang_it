@@ -21,6 +21,17 @@ import '../modules/article/bindings/article_create_binding.dart';
 import '../modules/article/views/article_edit_view.dart';
 import '../modules/article/controllers/article_edit_controller.dart';
 
+import '../modules/interest_selection/bindings/interest_selection_binding.dart';
+import '../modules/interest_selection/views/interest_selection_view.dart';
+
+import '../modules/topic_recommendation/bindings/topic_recommendation_binding.dart';
+import '../modules/topic_recommendation/views/topic_recommendation_view.dart';
+
+import '../modules/category_detail/bindings/category_detail_binding.dart';
+import '../modules/category_detail/views/category_detail_view.dart';
+import '../modules/author_profile/bindings/author_profile_binding.dart';
+import '../modules/author_profile/views/author_profile_view.dart';
+
 class AppPages {
   AppPages._();
 
@@ -68,6 +79,26 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.put(ArticleEditController());
       }),
+    ),
+    GetPage(
+      name: Routes.INTEREST_SELECTION,
+      page: () => const InterestSelectionView(),
+      binding: InterestSelectionBinding(),
+    ),
+    GetPage(
+      name: Routes.TOPIC_RECOMMENDATION,
+      page: () => const TopicRecommendationView(),
+      binding: TopicRecommendationBinding(),
+    ),
+    GetPage(
+      name: Routes.CATEGORY_DETAIL,
+      page: () => const CategoryDetailView(),
+      binding: CategoryDetailBinding(),
+    ),
+    GetPage(
+      name: Routes.AUTHOR_PROFILE,
+      page: () => const AuthorProfileView(),
+      binding: AuthorProfileBinding(),
     ),
   ];
   
