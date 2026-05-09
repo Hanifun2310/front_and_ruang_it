@@ -31,6 +31,8 @@ import '../modules/category_detail/bindings/category_detail_binding.dart';
 import '../modules/category_detail/views/category_detail_view.dart';
 import '../modules/author_profile/bindings/author_profile_binding.dart';
 import '../modules/author_profile/views/author_profile_view.dart';
+import '../modules/explore/views/explore_view.dart';
+import '../modules/explore/bindings/explore_binding.dart';
 
 class AppPages {
   AppPages._();
@@ -99,6 +101,11 @@ class AppPages {
       name: Routes.AUTHOR_PROFILE,
       page: () => const AuthorProfileView(),
       binding: AuthorProfileBinding(),
+    ),
+    GetPage(
+      name: Routes.EXPLORE,
+      page: () => const ExploreView(),
+      binding: ExploreBinding(),
     ),
   ];
   

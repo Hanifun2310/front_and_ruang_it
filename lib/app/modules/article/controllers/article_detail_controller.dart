@@ -51,17 +51,18 @@ class ArticleDetailController extends GetxController {
   // Fungsi pintar untuk membaca JSON Quill atau teks biasa
   void _initQuillController(String content) {
     try {
-      final deltaJson = jsonDecode(content);
-      quillController = QuillController(
-        document: Document.fromJson(deltaJson),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      // Cek apakah content berupa list json (Quill format)
+      if (content.trim().startsWith('[')) {
+        final deltaJson = jsonDecode(content);
+        quillController = QuillController(
+          document: Document.fromJson(deltaJson),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      } else {
+        quillController = null; // Biarkan null agar menggunakan HtmlWidget
+      }
     } catch (e) {
-      // Fallback jika format artikel lama bukan JSON
-      quillController = QuillController(
-        document: Document()..insert(0, content),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      quillController = null;
     }
   }
 

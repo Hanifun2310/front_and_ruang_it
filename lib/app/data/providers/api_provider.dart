@@ -12,8 +12,8 @@ class ApiProvider {
   ApiProvider() {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -141,12 +141,14 @@ class ApiProvider {
     };
 
     if (imageBytes != null && fileName != null) {
-      final multipartFile = MultipartFile.fromBytes(
+      data['photo_profile'] = MultipartFile.fromBytes(
         imageBytes,
         filename: fileName,
       );
-      data['photo_profile'] = multipartFile;
-      data['image'] = multipartFile; // Backup key
+      data['image'] = MultipartFile.fromBytes(
+        imageBytes,
+        filename: fileName,
+      ); // Backup key
     } else if (imagePath != null && imagePath.isNotEmpty) {
       data['photo_profile'] = await MultipartFile.fromFile(imagePath);
       data['image'] = await MultipartFile.fromFile(imagePath); // Backup key
@@ -194,7 +196,7 @@ class ApiProvider {
       'title': title,
       'content': content,
       'category_id': categoryId,
-      '_method': 'PUT', // Laravel membutuhkan ini jika mengirim FormData untuk Update
+      '_method': 'PUT',
     };
 
     if (imageBytes != null && fileName != null) {

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sobat IT Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="custom-styles">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #ffffff;
+      color: #1a1a1a;
+    }
+    
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;  
+      overflow: hidden;
+    }
+
+    /* Bottom Navigation Safe Area */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- BEGIN: Top System Bar Placeholder -->
+<div class="h-12 w-full bg-black text-white px-4 flex items-center justify-between text-xs font-medium z-50">
+<div class="flex items-center gap-2">
+<span>13.58</span>
+<i class="fa-brands fa-whatsapp"></i>
+</div>
+<div class="flex items-center gap-2">
+<i class="fa-solid fa-signal"></i>
+<i class="fa-solid fa-wifi"></i>
+<div class="flex items-center gap-1 border border-white/40 rounded px-1 text-[10px]">
+<span>23</span>
+<i class="fa-solid fa-bolt text-green-400"></i>
+</div>
+</div>
+</div>
+<!-- END: Top System Bar Placeholder -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-grow overflow-y-auto pb-20">
+<!-- BEGIN: Header Section -->
+<div class="px-4 pt-4 pb-2 relative">
+<!-- Settings Icon -->
+<button class="absolute top-4 right-4 p-2 text-gray-800">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+<circle cx="12" cy="12" r="3"></circle>
+</svg>
+</button>
+<!-- Profile Info -->
+<div class="flex items-center mt-12 mb-6">
+<div class="w-24 h-24 rounded-full border-2 border-blue-400 flex items-center justify-center bg-gray-100 mr-4 overflow-hidden">
+<svg class="w-20 h-20 text-gray-300 mt-4" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h1 class="text-2xl font-semibold mb-1">Sobat IT</h1>
+<div class="text-gray-600 text-sm flex items-center gap-2">
+<span>0 Pengikut</span>
+<span class="text-gray-400 text-xs">•</span>
+<span>38 Mengikuti</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex gap-3 mb-6">
+<button class="flex-1 bg-[#4285F4] text-white py-2.5 rounded-full font-medium text-sm">
+          Statistik
+        </button>
+<button class="flex-1 border border-gray-400 text-gray-800 py-2.5 rounded-full font-medium text-sm">
+          Edit profil Anda
+        </button>
+</div>
+</div>
+<!-- END: Header Section -->
+<!-- BEGIN: Navigation Tabs -->
+<div class="border-b border-gray-200">
+<ul class="flex px-4 gap-6 text-sm font-medium text-gray-600">
+<li class="pb-3 border-b-2 border-black text-black">
+          Cerita
+        </li>
+<li class="pb-3">
+          Aktivitas
+        </li>
+<li class="pb-3">
+          Daftar
+        </li>
+</ul>
+</div>
+<!-- END: Navigation Tabs -->
+<!-- BEGIN: Article Feed -->
+<div class="px-4 py-4 space-y-6">
+<!-- Article Card 1 -->
+<article class="flex gap-4 border-b border-gray-100 pb-6">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<h2 class="text-[17px] font-semibold leading-tight mb-2 text-gray-900">Wasbang 20 kilometer menuju mental baja</h2>
+<p class="text-sm text-gray-400 mb-4">Sebulan pertama di IDN</p>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-6 h-6 rounded-full bg-gray-300"></div>
+<span class="text-sm text-gray-800">Sobat IT</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-sm text-gray-500">Nov 14, 2023</span>
+<div class="flex items-center gap-4 text-gray-700">
+<button class="flex items-center gap-1.5">
+<i class="fa-regular fa-thumbs-up text-lg"></i>
+<span class="text-sm font-medium">45k</span>
+</button>
+<button class="flex items-center gap-1.5">
+<i class="fa-regular fa-comment text-lg"></i>
+<span class="text-sm font-medium">408</span>
+</button>
+<button class="px-1">
+<i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+</button>
+</div>
+</div>
+</div>
+<!-- Thumbnail -->
+<div class="w-[140px] h-[100px] shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img alt="Wasbang Training" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJmmDnwP3zvvNkcTz9fDxTqEAuNShlCEanlAXQdS__KGvhsdx9Ke5DJadTR1lEpIojUBnvcw2ZdGEQKXLHEJKnlbMaLOkf-YNFutNPMuxjQgGglRGuNqpDvFvNfZjOYfhdSf9rF3yWBYea7Pk-ei1I6vnVcH5VBTLevGDxwk5SO0JWfY6k41Y3rQJ5qoUYJ4TPFxxkhn_ZCrsi83ZseM-jG9XyBHm04tJHa0wEwQJ9vrjO9TO9v9lOrGTciF2h1mgqeO6HlkJUm1DJ"/>
+</div>
+</article>
+<!-- Article Card 2 -->
+<article class="flex gap-4 pb-2">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<h2 class="text-[17px] font-semibold leading-tight mb-2 text-gray-900">Perjalanan dari Bogor ke Palembang</h2>
+<p class="text-sm text-gray-400 mb-4">Sebulan pertama di IDN</p>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-6 h-6 rounded-full bg-gray-300"></div>
+<span class="text-sm text-gray-800">Sobat IT</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-sm text-gray-500">Nov 14, 2023</span>
+<div class="flex items-center gap-4 text-gray-700">
+<button class="flex items-center gap-1.5">
+<i class="fa-regular fa-thumbs-up text-lg"></i>
+<span class="text-sm font-medium">45k</span>
+</button>
+<button class="flex items-center gap-1.5">
+<i class="fa-regular fa-comment text-lg"></i>
+<span class="text-sm font-medium">408</span>
+</button>
+<button class="px-1">
+<i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+</button>
+</div>
+</div>
+</div>
+<!-- Thumbnail -->
+<div class="w-[140px] h-[100px] shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img alt="Perjalanan Bogor Palembang" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkYJhsnYd7G2wnF8wuZO6r0MxTpOBR4_yf0oqKlWgtzMYZdxxnuQBvgU6aJqHLuNj5yD2PukKvNT6DYWusBm0O8GtTroYT-kAg5Q3HMvVhMz5JJrlSLmPQfBSeh4CY7Y5tBQByqIRCpjvPucduZT-CYYfRp4W0wRnqXtndXPj_XgIrDk8_YV_Dl0-F4gz_Fo_ZVw0QljD_6E7qsZ_TU6rdY1oXU70w6-ZR1z4LRsXgVss6VAbdSLb-X2_9W8-v9DVcFXO21_fPUs_Q"/>
+</div>
+</article>
+</div>
+<!-- END: Article Feed -->
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center pt-2 pb-safe z-40">
+<a class="flex flex-col items-center p-2 text-gray-800 w-16" href="#">
+<i class="fa-solid fa-house text-xl mb-1"></i>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center p-2 text-gray-800 w-16" href="#">
+<i class="fa-regular fa-compass text-xl mb-1"></i>
+<span class="text-[10px] font-medium">Explore</span>
+</a>
+<a class="flex flex-col items-center p-2 text-gray-800 w-16" href="#">
+<i class="fa-solid fa-magnifying-glass text-xl mb-1"></i>
+<span class="text-[10px] font-medium">Search</span>
+</a>
+<a class="flex flex-col items-center p-2 text-gray-800 w-16" href="#">
+<i class="fa-solid fa-book-open text-xl mb-1"></i>
+<span class="text-[10px] font-medium">Library</span>
+</a>
+<a class="flex flex-col items-center p-2 text-blue-500 w-16" href="#">
+<i class="fa-regular fa-user text-xl mb-1"></i>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+<!-- END: Bottom Navigation -->
+</body></html>

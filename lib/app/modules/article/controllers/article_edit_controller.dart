@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:dio/dio.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 
@@ -43,9 +44,15 @@ class ArticleEditController extends GetxController {
         selection: const TextSelection.collapsed(offset: 0),
       );
     } catch (e) {
-      // Jika gagal di-parse, berarti ini artikel lama (Plain Text/Markdown)
+      // Jika gagal di-parse, berarti ini artikel lama yang mungkin menggunakan HTML.
+      // Ubah tag baris baru menjadi newline, lalu hapus sisa tag HTML agar lebih rapi.
+      String plainText = content
+          .replaceAll(RegExp(r'</p>|<br\s*/?>', caseSensitive: false), '\n')
+          .replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), '')
+          .trim();
+          
       quillController = QuillController(
-        document: Document()..insert(0, content),
+        document: Document()..insert(0, plainText),
         selection: const TextSelection.collapsed(offset: 0),
       );
     }
@@ -103,11 +110,37 @@ class ArticleEditController extends GetxController {
       } else {
         Get.snackbar('Gagal', 'Gagal memperbarui artikel: ${response.statusMessage}');
       }
+    } on DioException catch (e) {
+      String message = _parseError(e, 'Gagal memperbarui artikel.');
+      Get.snackbar('Error', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: $e');
+      Get.snackbar('Error', 'Terjadi kesalahan sistem: $e');
     } finally {
       isLoading.value = false;
     }
+  }
+
+  String _parseError(DioException e, String defaultMessage) {
+    if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
+      return 'Koneksi ke server terputus. Pastikan internet stabil (gambar mungkin terlalu besar).';
+    }
+    if (e.type == DioExceptionType.connectionError) {
+      return 'Tidak dapat terhubung ke server.';
+    }
+    
+    if (e.response?.data != null) {
+      final data = e.response!.data;
+      if (e.response?.statusCode == 422 && data['errors'] != null && data['errors'] is Map) {
+        final Map<String, dynamic> errors = data['errors'];
+        if (errors.isNotEmpty) {
+          return errors.values.first[0].toString();
+        }
+      }
+      if (data['message'] != null) {
+        return data['message'].toString();
+      }
+    }
+    return defaultMessage;
   }
 
   @override

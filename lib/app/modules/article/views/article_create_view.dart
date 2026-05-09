@@ -339,11 +339,15 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
           unselectedFontSize: 11,
           selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
           unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
-          currentIndex: 1,
+          currentIndex: 3, // Since it's linked to Profile now
           onTap: (index) {
             if (index == 0) {
               Get.offAllNamed(Routes.DASHBOARD);
+            } else if (index == 1) {
+              Get.offNamed(Routes.EXPLORE);
             } else if (index == 2) {
+              Get.snackbar('Coming Soon', 'Fitur Search sedang dalam pengembangan');
+            } else if (index == 3) {
               Get.offNamed(Routes.PROFILE);
             }
           },
@@ -351,17 +355,22 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
               activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
-              label: 'Beranda',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
-              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
-              label: 'Tambah',
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore)),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search)),
+              label: 'Search',
             ),
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
               activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
-              label: 'Profil',
+              label: 'Profile',
             ),
           ],
         ),

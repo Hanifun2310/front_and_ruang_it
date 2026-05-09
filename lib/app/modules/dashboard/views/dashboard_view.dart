@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/dashboard_controller.dart';
+import 'dart:convert';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/theme_service.dart';
 import '../../../routes/app_routes.dart';
@@ -15,7 +18,9 @@ class DashboardView extends GetView<DashboardController> {
     final ScrollController scrollController = ScrollController();
     scrollController.addListener(() {
       if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 50) {
-        controller.loadMoreArticles();
+        if (controller.activeTab.value == 0) {
+          controller.loadMoreArticles();
+        }
       }
     });
 
@@ -25,338 +30,85 @@ class DashboardView extends GetView<DashboardController> {
         backgroundColor: context.theme.appBarTheme.backgroundColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         title: Image.asset(
           'assets/images/newlogo.png',
-          height: 36,
+          height: 28,
           fit: BoxFit.contain,
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text(
+                'Ruang IT',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Get.isDarkMode ? Colors.white : const Color(0xFF1056C9),
+                  letterSpacing: -0.5,
+                ),
+              ),
             ),
-            onPressed: () => Get.find<ThemeService>().switchTheme(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
           child: Container(
-            color: Colors.grey.shade200,
+            color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade200,
             height: 1.0,
           ),
         ),
       ),
       body: Column(
         children: [
-          // --- SEARCH BAR ---
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                textInputAction: TextInputAction.search,
-                onSubmitted: (value) => controller.searchArticles(value),
-                style: GoogleFonts.kulimPark(fontSize: 15, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E)),
-                decoration: InputDecoration(
-                  hintText: 'Cari judul atau penulis...',
-                  hintStyle: GoogleFonts.kulimPark(color: const Color(0xFF757685), fontSize: 15),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF757685)),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
+          // TABS
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade300)),
             ),
-          ),
-          
-          // --- HORIZONTAL KATEGORI ---
-          SizedBox(
-            height: 40,
-            child: Obx(() => ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: controller.categories.length + 1,
-              itemBuilder: (context, index) {
-                final isSemua = index == 0;
-                final category = isSemua ? null : controller.categories[index - 1];
-                final isSelected = isSemua 
-                    ? controller.selectedCategory.value == null 
-                    : controller.selectedCategory.value?.id == category?.id;
-                final categoryName = isSemua ? 'Semua' : (category?.name ?? '');
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: InkWell(
-                    onTap: () => controller.changeCategory(category),
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected 
-                            ? const Color(0xFF092BA2) 
-                            : (Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF2F3FF)),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isSelected 
-                              ? Colors.transparent 
-                              : (Get.isDarkMode ? Colors.white10 : const Color(0xFFC5C5D6)),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          categoryName,
-                          style: GoogleFonts.kulimPark(
-                            color: isSelected 
-                                ? Colors.white 
-                                : (Get.isDarkMode ? Colors.white70 : const Color(0xFF444653)),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+            child: Obx(() => Row(
+              children: [
+                _buildTab('Artikel Terbaru', 0),
+                _buildTab('Artikel Populer', 1),
+              ],
             )),
           ),
-          const SizedBox(height: 16),
-          
+
           // --- DAFTAR ARTIKEL (INFINITE SCROLL) ---
           Expanded(
             child: Obx(() {
-              if (controller.isLoading.value && controller.articles.isEmpty) {
+              final isTerbaru = controller.activeTab.value == 0;
+              final displayList = isTerbaru ? controller.articles : controller.trendingArticles;
+
+              if (controller.isLoading.value && displayList.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (controller.articles.isEmpty) {
-                return Center(child: Text("Belum ada artikel di kategori ini.", style: GoogleFonts.kulimPark()));
+              if (displayList.isEmpty) {
+                return Center(child: Text("Belum ada artikel.", style: GoogleFonts.inter()));
               }
 
               return RefreshIndicator(
-                onRefresh: () async => controller.changeCategory(controller.selectedCategory.value),
+                onRefresh: () async {
+                  if (isTerbaru) {
+                    controller.changeCategory(controller.selectedCategory.value);
+                  }
+                },
                 child: ListView.builder(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  itemCount: controller.articles.length + (controller.hasMoreData.value ? 1 : 0),
+                  controller: isTerbaru ? scrollController : null, // hanya scroll paging di tab terbaru
+                  itemCount: displayList.length + (isTerbaru && controller.hasMoreData.value ? 1 : 0),
                   itemBuilder: (context, index) {
-                    
-                    if (index == controller.articles.length) {
+                    if (isTerbaru && index == displayList.length) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),
                         child: Center(child: CircularProgressIndicator()),
                       );
                     }
 
-                    final article = controller.articles[index];
-                    final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
-                    final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
-                    final String categoryName = article.category?.name ?? 'Umum';
-                    final authService = Get.find<AuthService>();
-                    final currentUserId = authService.currentUser?['id'];
-                    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 24),
-                      decoration: BoxDecoration(
-                        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFC5C5D6)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Gambar dan Kategori
-                            Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                  child: Image.network(
-                                    imageUrl,
-                                    width: double.infinity,
-                                    height: 180,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: double.infinity,
-                                        height: 180,
-                                        color: Colors.grey.shade300,
-                                        child: const Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 12,
-                                  left: 12,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      categoryName,
-                                      style: GoogleFonts.kulimPark(
-                                        color: const Color(0xFF092BA2),
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (isAuthor)
-                                  Positioned(
-                                    top: 12,
-                                    right: 12,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        _showArticleOptions(context, article);
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withValues(alpha: 0.5),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.more_vert,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            
-                            // Konten
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    article.title ?? 'Tanpa Judul',
-                                    style: GoogleFonts.kulimPark(
-                                      fontSize: 18, 
-                                      fontWeight: FontWeight.w700,
-                                      color: context.theme.textTheme.bodyLarge?.color,
-                                      height: 1.4,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  
-                                  // --- PERUBAHAN ADA DI BARIS INI ---
-                                  Text(
-                                    controller.getSnippetText(article.content),
-                                    style: GoogleFonts.kulimPark(
-                                      color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
-                                      fontSize: 13,
-                                      height: 1.5,
-                                    ),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  // ----------------------------------
-                                  
-                                  const SizedBox(height: 16),
-                                  
-                                  // Footer Card
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    decoration: const BoxDecoration(
-                                      border: Border(top: BorderSide(color: Color(0xFFC5C5D6))),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        // Author
-                                        Row(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 12,
-                                              backgroundImage: NetworkImage(avatarUrl),
-                                              onBackgroundImageError: (_, _) {},
-                                              backgroundColor: Colors.grey.shade300,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              article.user?.name ?? 'Admin',
-                                              style: GoogleFonts.kulimPark(
-                                                fontSize: 13, 
-                                                fontWeight: FontWeight.w600, 
-                                                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        // Likes & Comments
-                                        Row(
-                                          children: [
-                                            InkWell(
-                                              onTap: () {
-                                                if (article.id != null) {
-                                                  controller.toggleLike(article.id!);
-                                                }
-                                              },
-                                              child: Icon(
-                                                (article.isLiked ?? false) ? Icons.favorite : Icons.favorite_border, 
-                                                size: 18, 
-                                                color: (article.isLiked ?? false) ? Colors.red : const Color(0xFF5F6473),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '${article.likesCount ?? 0}', 
-                                              style: GoogleFonts.kulimPark(fontSize: 12, color: const Color(0xFF5F6473)),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            const Icon(Icons.chat_bubble, size: 18, color: Color(0xFF5F6473)),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '${article.commentsCount ?? 0}', 
-                                              style: GoogleFonts.kulimPark(fontSize: 12, color: const Color(0xFF5F6473)),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    final article = displayList[index];
+                    return _buildArticleCard(context, article);
                   },
                 ),
               );
@@ -373,17 +125,19 @@ class DashboardView extends GetView<DashboardController> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
-          unselectedItemColor: const Color(0xFF757685),
+          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF1056C9),
+          unselectedItemColor: Get.isDarkMode ? Colors.white54 : Colors.grey.shade800,
           selectedFontSize: 11,
           unselectedFontSize: 11,
-          selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
-          unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
+          selectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
           currentIndex: 0,
           onTap: (index) {
             if (index == 1) {
-              Get.offNamed(Routes.ARTICLE_CREATE);
+              Get.offNamed(Routes.EXPLORE);
             } else if (index == 2) {
+              Get.snackbar('Coming Soon', 'Fitur Search sedang dalam pengembangan');
+            } else if (index == 3) {
               Get.offNamed(Routes.PROFILE);
             }
           },
@@ -391,17 +145,235 @@ class DashboardView extends GetView<DashboardController> {
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
               activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
-              label: 'Beranda',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
-              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
-              label: 'Tambah',
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore)),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search_outlined)),
+              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search)),
+              label: 'Search',
             ),
             BottomNavigationBarItem(
               icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
               activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
-              label: 'Profil',
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTab(String title, int index) {
+    final controller = Get.find<DashboardController>();
+    final isSelected = controller.activeTab.value == index;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => controller.switchTab(index),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected ? (Get.isDarkMode ? Colors.white : Colors.black) : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            title,
+            style: GoogleFonts.inter(
+              color: isSelected 
+                  ? (Get.isDarkMode ? Colors.white : Colors.black) 
+                  : (Get.isDarkMode ? Colors.white54 : Colors.grey.shade600),
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+              fontSize: 15,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArticleCard(BuildContext context, dynamic article) {
+    final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
+    final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+    final String categoryName = article.category?.name ?? 'Umum';
+    final authService = Get.find<AuthService>();
+    final currentUserId = authService.currentUser?['id'];
+    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
+
+    return InkWell(
+      onTap: () {
+        Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? context.theme.scaffoldBackgroundColor : Colors.white,
+          border: Border(
+            bottom: BorderSide(
+              color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
+            ),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Theme Label
+            Row(
+              children: [
+                Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                const SizedBox(width: 8),
+                Text(
+                  'Theme: $categoryName',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            
+            // Author Info
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundImage: NetworkImage(avatarUrl),
+                  onBackgroundImageError: (_, _) {},
+                  backgroundColor: Colors.grey.shade200,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  article.user?.name ?? 'Admin',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            
+            // Article Content Preview
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        article.title ?? 'Tanpa Judul',
+                        style: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                          color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildSnippetPreview(article.content),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Thumbnail Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    width: 120,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 120,
+                        height: 80,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            
+            // Article Meta & Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        if (article.id != null) {
+                          controller.toggleLike(article.id!);
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                            size: 20,
+                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${article.likesCount ?? 0}',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline,
+                          size: 20,
+                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${article.commentsCount ?? 0}',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isAuthor) ...[
+                      const SizedBox(width: 20),
+                      GestureDetector(
+                        onTap: () => _showArticleOptions(context, article),
+                        child: Icon(
+                          Icons.more_horiz,
+                          size: 20,
+                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                        ),
+                      ),
+                    ]
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -434,7 +406,7 @@ class DashboardView extends GetView<DashboardController> {
             const SizedBox(height: 24),
             Text(
               'Opsi Artikel',
-              style: GoogleFonts.kulimPark(
+              style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
@@ -446,7 +418,7 @@ class DashboardView extends GetView<DashboardController> {
               leading: const Icon(Icons.edit, color: Colors.blueAccent),
               title: Text(
                 'Edit Artikel',
-                style: GoogleFonts.kulimPark(
+                style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                 ),
@@ -461,7 +433,7 @@ class DashboardView extends GetView<DashboardController> {
               leading: const Icon(Icons.delete, color: Colors.redAccent),
               title: Text(
                 'Hapus Artikel',
-                style: GoogleFonts.kulimPark(
+                style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   color: Colors.redAccent,
                 ),
@@ -486,18 +458,18 @@ class DashboardView extends GetView<DashboardController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Hapus Artikel',
-          style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
         ),
         content: Text(
           'Apakah Anda yakin ingin menghapus artikel ini secara permanen?',
-          style: GoogleFonts.kulimPark(),
+          style: GoogleFonts.inter(),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               'Batal',
-              style: GoogleFonts.kulimPark(color: Colors.grey),
+              style: GoogleFonts.inter(color: Colors.grey),
             ),
           ),
           ElevatedButton(
@@ -513,11 +485,76 @@ class DashboardView extends GetView<DashboardController> {
             ),
             child: Text(
               'Hapus',
-              style: GoogleFonts.kulimPark(fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildSnippetPreview(String? content) {
+    if (content == null || content.isEmpty) {
+      return Text('Tidak ada ringkasan...', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey));
+    }
+
+    try {
+      if (content.trim().startsWith('[')) {
+        final deltaJson = jsonDecode(content);
+        final quillController = QuillController(
+          document: Document.fromJson(deltaJson),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+        return SizedBox(
+          height: 44, // Sekitar 2 baris teks
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: AbsorbPointer(
+              child: QuillEditor.basic(
+                configurations: QuillEditorConfigurations(
+                  controller: quillController,
+                  readOnly: true,
+                  showCursor: false,
+                  autoFocus: false,
+                  expands: false,
+                  padding: EdgeInsets.zero,
+                  customStyles: DefaultStyles(
+                    paragraph: DefaultTextBlockStyle(
+                      GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                        height: 1.4,
+                      ),
+                      const VerticalSpacing(0, 0),
+                      const VerticalSpacing(0, 0),
+                      null,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        return SizedBox(
+          height: 44,
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: AbsorbPointer(
+              child: HtmlWidget(
+                content,
+                textStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      return Text('Tidak ada ringkasan...', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey));
+    }
   }
 }

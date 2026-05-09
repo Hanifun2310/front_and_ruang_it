@@ -63,12 +63,8 @@ class AuthController extends GetxController {
     } on DioException catch (e) {
       // 3. ERROR JARINGAN ATAU PASSWORD SALAH (401/422)
       print("DIO ERROR: ${e.response?.data}");
-      String message = 'Gagal melakukan login.';
-      
-      if (e.response?.data != null && e.response?.data['message'] != null) {
-        message = e.response?.data['message'];
-      }
-      Get.snackbar('Login Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white);
+      String message = _parseError(e, 'Gagal melakukan login. Silakan periksa kredensial Anda.');
+      Get.snackbar('Login Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
     } catch (e) {
       // 4. PENANGKAP SILENT ERROR
       print("ERROR SISTEM/CODE: $e");
@@ -128,8 +124,8 @@ Future<void> register() async {
       }
     } on DioException catch (e) {
       print("ERROR REGISTRASI: ${e.response?.data}");
-      String message = e.response?.data['message'] ?? 'Gagal registrasi.';
-      Get.snackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white);
+      String message = _parseError(e, 'Gagal memproses pendaftaran. Pastikan data yang dimasukkan benar.');
+      Get.snackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
     } catch (e) {
       print("ERROR SISTEM REGIS: $e");
       Get.snackbar('Terjadi Kesalahan', 'Gagal memproses pendaftaran.');
@@ -140,7 +136,36 @@ Future<void> register() async {
     }
   }
 
-@override
+  // Helper untuk mem-parsing error dari API agar lebih informatif bagi User
+  String _parseError(DioException e, String defaultMessage) {
+    if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
+      return 'Koneksi ke server terputus. Pastikan internet Anda stabil dan coba lagi.';
+    }
+    if (e.type == DioExceptionType.connectionError) {
+      return 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+    }
+    
+    if (e.response?.data != null) {
+      final data = e.response!.data;
+      
+      // Jika ada error validasi spesifik (biasanya dari Laravel 422)
+      if (e.response?.statusCode == 422 && data['errors'] != null && data['errors'] is Map) {
+        final Map<String, dynamic> errors = data['errors'];
+        if (errors.isNotEmpty) {
+          // Mengambil pesan error pertama dari field pertama yang gagal
+          return errors.values.first[0].toString();
+        }
+      }
+      
+      // Fallback ke pesan error message umum
+      if (data['message'] != null) {
+        return data['message'].toString();
+      }
+    }
+    return defaultMessage;
+  }
+
+  @override
   void onClose() {
     emailController.dispose();
     passwordController.dispose();

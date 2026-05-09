@@ -20,6 +20,17 @@ class DashboardController extends GetxController {
   var isFetchingMore = false.obs;  
   var currentPage = 1;
   var hasMoreData = true.obs;
+  var activeTab = 0.obs;
+
+  void switchTab(int index) {
+    activeTab.value = index;
+  }
+
+  List<ArticleModel> get trendingArticles {
+    var sorted = List<ArticleModel>.from(articles);
+    sorted.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
+    return sorted.take(5).toList();
+  }
 
   @override
   void onInit() {
