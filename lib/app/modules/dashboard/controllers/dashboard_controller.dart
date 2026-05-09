@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
 
@@ -124,6 +126,26 @@ class DashboardController extends GetxController {
   void loadMoreArticles() {
     if (!isLoading.value && !isFetchingMore.value && hasMoreData.value) {
       fetchArticles();
+    }
+  }
+
+  // --- FUNGSI BARU UNTUK MENGUBAH JSON MENJADI TEKS PREVIEW ---
+  String getSnippetText(String? content) {
+    if (content == null || content.trim().isEmpty) return 'Tidak ada ringkasan...';
+
+    try {
+      // Cek apakah ini format JSON dari Quill
+      if (content.trim().startsWith('[')) {
+        final deltaJson = jsonDecode(content);
+        final document = Document.fromJson(deltaJson);
+        // Ambil teks asli dan ubah "enter" menjadi "spasi"
+        return document.toPlainText().replaceAll('\n', ' ').trim(); 
+      }
+      // Fallback untuk artikel lama yang mungkin pakai HTML
+      return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
+    } catch (e) {
+      // Jika error, bersihkan sebisa mungkin
+      return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
     }
   }
 }

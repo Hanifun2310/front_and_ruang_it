@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../routes/app_routes.dart';
+
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
 
@@ -243,8 +244,10 @@ class DashboardView extends GetView<DashboardController> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 8),
+                                  
+                                  // --- PERUBAHAN ADA DI BARIS INI ---
                                   Text(
-                                    (article.content ?? 'Tidak ada ringkasan...').replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim(),
+                                    controller.getSnippetText(article.content),
                                     style: const TextStyle(
                                       color: Color(0xFF444653), 
                                       fontSize: 13,
@@ -253,6 +256,8 @@ class DashboardView extends GetView<DashboardController> {
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
+                                  // ----------------------------------
+                                  
                                   const SizedBox(height: 16),
                                   
                                   // Footer Card

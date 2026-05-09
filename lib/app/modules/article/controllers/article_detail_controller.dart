@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import Quill
 import '../../../data/models/article_model.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
@@ -15,6 +17,8 @@ class ArticleDetailController extends GetxController {
   var isLoading = true.obs;
   var isLiking = false.obs;
 
+  // Controller untuk membaca format Quill
+  QuillController? quillController;
   final commentController = TextEditingController();
 
   @override
@@ -29,6 +33,9 @@ class ArticleDetailController extends GetxController {
       // 1. Ambil Detail Artikel
       article.value = await _apiProvider.getArticleDetail(identifier);
       
+      // Inisialisasi Quill Controller setelah data artikel didapat
+      _initQuillController(article.value.content ?? "");
+
       // 2. Ambil Komentar
       if (article.value.id != null) {
         await fetchComments();
@@ -37,6 +44,23 @@ class ArticleDetailController extends GetxController {
       Get.snackbar('Error', 'Gagal memuat detail artikel');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Fungsi pintar untuk membaca JSON Quill atau teks biasa
+  void _initQuillController(String content) {
+    try {
+      final deltaJson = jsonDecode(content);
+      quillController = QuillController(
+        document: Document.fromJson(deltaJson),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    } catch (e) {
+      // Fallback jika format artikel lama bukan JSON
+      quillController = QuillController(
+        document: Document()..insert(0, content),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
     }
   }
 

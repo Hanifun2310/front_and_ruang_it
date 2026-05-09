@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_quill/flutter_quill.dart'; // Import Quill pengganti HTML
 import '../controllers/article_detail_controller.dart';
 
 class ArticleDetailView extends GetView<ArticleDetailController> {
@@ -115,15 +115,36 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                       color: Color(0xFFEEEEEE),
                     ),
 
-                    // --- ISI KONTEN HTML ---
-                    HtmlWidget(
-                      art.content ?? '<p>Konten tidak tersedia.</p>',
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        height: 1.6,
-                        color: Colors.black87,
+                    // --- ISI KONTEN QUILL ---
+                    if (controller.quillController != null)
+                      QuillEditor.basic(
+                        configurations: QuillEditorConfigurations(
+                          controller: controller.quillController!,
+                          readOnly: true, // Hanya baca
+                          showCursor: false, // Hilangkan kursor
+                          autoFocus: false,
+                          expands: false,
+                          padding: EdgeInsets.zero,
+                          customStyles: DefaultStyles(
+                            paragraph: DefaultTextBlockStyle(
+                              const TextStyle(
+                                fontSize: 16, // Mengikuti desain lama HtmlWidget
+                                height: 1.6,
+                                color: Colors.black87,
+                              ),
+                              const VerticalSpacing(0, 0),
+                              const VerticalSpacing(0, 0),
+                              null,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      const Text(
+                        'Konten tidak tersedia.',
+                        style: TextStyle(fontSize: 16, color: Colors.black87),
                       ),
-                    ),
+                    
                     const SizedBox(height: 40),
 
                     const Text(
