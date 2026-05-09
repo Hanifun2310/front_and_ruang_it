@@ -51,7 +51,7 @@ class LoginView extends GetView<AuthController> {
 
                 // --- Email Input ---
                 const Text(
-                  "Email Address",
+                  "Alamat Email",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -63,7 +63,7 @@ class LoginView extends GetView<AuthController> {
                   controller: controller.emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    hintText: "Enter your email",
+                    hintText: "Masukkan email Anda",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.black, width: 1.5),
@@ -85,7 +85,7 @@ class LoginView extends GetView<AuthController> {
 
                 // --- Password Input ---
                 const Text(
-                  "Password",
+                  "Kata Sandi",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class LoginView extends GetView<AuthController> {
                   controller: controller.passwordController,
                   obscureText: controller.isPasswordHidden.value,
                   decoration: InputDecoration(
-                    hintText: "Enter your password",
+                    hintText: "Masukkan kata sandi Anda",
                     suffixIcon: IconButton(
                       icon: Icon(
                         controller.isPasswordHidden.value
@@ -145,7 +145,7 @@ class LoginView extends GetView<AuthController> {
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                         )
                       : const Text(
-                          "Login",
+                          "Masuk",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                 )),

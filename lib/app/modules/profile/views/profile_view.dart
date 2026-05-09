@@ -29,12 +29,57 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: Icon(
-              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              Icons.settings,
               color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
             ),
-            onPressed: () => Get.find<ThemeService>().switchTheme(),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            onSelected: (value) {
+              if (value == 'theme') {
+                Get.find<ThemeService>().switchTheme();
+              } else if (value == 'logout') {
+                _showLogoutConfirmation(context);
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'theme',
+                child: Row(
+                  children: [
+                    Icon(
+                      Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                      color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      Get.isDarkMode ? 'Mode Terang' : 'Mode Gelap',
+                      style: GoogleFonts.kulimPark(
+                        fontWeight: FontWeight.w600,
+                        color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    const Icon(Icons.logout, color: Colors.redAccent),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Keluar',
+                      style: GoogleFonts.kulimPark(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
         bottom: PreferredSize(
@@ -369,12 +414,12 @@ class ProfileView extends GetView<ProfileController> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          "ALL ARTICLES",
+                          "Semua Artikel",
                           style: GoogleFonts.kulimPark(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
                             color: controller.selectedTab.value == 0 ? (Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2)) : Colors.grey,
-                            letterSpacing: 1.2,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -392,12 +437,12 @@ class ProfileView extends GetView<ProfileController> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          "LIKED ARTICLES",
+                          "Artikel Favorit",
                           style: GoogleFonts.kulimPark(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
                             color: controller.selectedTab.value == 1 ? (Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2)) : Colors.grey,
-                            letterSpacing: 1.2,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -441,7 +486,7 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      controller.selectedTab.value == 0 ? "No articles yet" : "No liked articles",
+                      controller.selectedTab.value == 0 ? "Belum ada artikel" : "Belum ada artikel favorit",
                       style: GoogleFonts.kulimPark(color: Colors.grey),
                     ),
                   ],
@@ -667,17 +712,17 @@ class ProfileView extends GetView<ProfileController> {
           BottomNavigationBarItem(
             icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
             activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
-            label: 'Home',
+            label: 'Beranda',
           ),
           BottomNavigationBarItem(
             icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle_outline)),
             activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.add_circle)),
-            label: 'Add',
+            label: 'Tambah',
           ),
           BottomNavigationBarItem(
             icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
             activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
-            label: 'Profile',
+            label: 'Profil',
           ),
         ],
       ),
