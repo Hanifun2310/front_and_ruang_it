@@ -7,6 +7,8 @@ import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
+import '../../explore/controllers/explore_controller.dart';
+import '../../search/controllers/search_controller.dart';
 
 class ArticleDetailController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -104,6 +106,18 @@ class ArticleDetailController extends GetxController {
           }
           if (Get.isRegistered<ProfileController>()) {
             Get.find<ProfileController>().updateArticleLikeState(
+              article.value.id!, 
+              !currentStatus
+            );
+          }
+          if (Get.isRegistered<ExploreController>()) {
+            Get.find<ExploreController>().updateArticleLikeState(
+              article.value.id!, 
+              !currentStatus
+            );
+          }
+          if (Get.isRegistered<ArticleSearchController>()) {
+            Get.find<ArticleSearchController>().updateArticleLikeState(
               article.value.id!, 
               !currentStatus
             );

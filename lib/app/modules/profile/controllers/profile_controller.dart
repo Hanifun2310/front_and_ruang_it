@@ -6,6 +6,8 @@ import '../../../data/models/article_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
+import '../../explore/controllers/explore_controller.dart';
+import '../../search/controllers/search_controller.dart';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -296,6 +298,48 @@ class ProfileController extends GetxController {
       likedArticles.removeWhere((a) => a.id == articleId);
     }
     likedArticles.refresh();
+  }
+
+  Future<void> toggleLike(int articleId) async {
+    try {
+      // Sync userArticles
+      final userIndex = userArticles.indexWhere((a) => a.id == articleId);
+      final likedIndex = likedArticles.indexWhere((a) => a.id == articleId);
+      
+      bool isCurrentlyLiked = false;
+      if (userIndex != -1) {
+        isCurrentlyLiked = userArticles[userIndex].isLiked ?? false;
+      } else if (likedIndex != -1) {
+        isCurrentlyLiked = likedArticles[likedIndex].isLiked ?? false;
+      }
+
+      final newLikedStatus = !isCurrentlyLiked;
+      
+      // Update local state
+      updateArticleLikeState(articleId, newLikedStatus);
+      
+      // API Call
+      await _apiProvider.toggleLike(articleId);
+
+      // SYNC: Update other controllers
+      _syncLikeState(articleId, newLikedStatus);
+    } catch (e) {
+      fetchUserArticles(); // Revert on error
+    }
+  }
+
+  void _syncLikeState(int articleId, bool isLiked) {
+    try {
+      if (Get.isRegistered<DashboardController>()) {
+        Get.find<DashboardController>().updateArticleLikeState(articleId, isLiked);
+      }
+      if (Get.isRegistered<ExploreController>()) {
+        Get.find<ExploreController>().updateArticleLikeState(articleId, isLiked);
+      }
+      if (Get.isRegistered<ArticleSearchController>()) {
+        Get.find<ArticleSearchController>().updateArticleLikeState(articleId, isLiked);
+      }
+    } catch (_) {}
   }
 
   Future<void> logout() async {

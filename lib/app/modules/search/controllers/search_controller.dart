@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+import '../../explore/controllers/explore_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class ArticleSearchController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -87,5 +90,57 @@ class ArticleSearchController extends GetxController {
   void selectHistory(String query) {
     searchQuery.value = query;
     // This will trigger the debounce fetchArticles
+  }
+
+  Future<void> toggleLike(int articleId) async {
+    try {
+      final index = articles.indexWhere((a) => a.id == articleId);
+      if (index == -1) return;
+
+      final article = articles[index];
+      final isCurrentlyLiked = article.isLiked ?? false;
+      
+      // Optimistic update
+      article.isLiked = !isCurrentlyLiked;
+      article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+      
+      articles[index] = article;
+      articles.refresh();
+      
+      await _apiProvider.toggleLike(articleId);
+
+      // SYNC: Update other controllers
+      _syncLikeState(articleId, !isCurrentlyLiked);
+    } catch (e) {
+      // Revert if error
+      fetchArticles();
+    }
+  }
+
+  void updateArticleLikeState(int articleId, bool isLiked) {
+    final index = articles.indexWhere((a) => a.id == articleId);
+    if (index != -1) {
+      final article = articles[index];
+      if (article.isLiked != isLiked) {
+        article.isLiked = isLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
+        articles[index] = article;
+        articles.refresh();
+      }
+    }
+  }
+
+  void _syncLikeState(int articleId, bool isLiked) {
+    try {
+      if (Get.isRegistered<DashboardController>()) {
+        Get.find<DashboardController>().updateArticleLikeState(articleId, isLiked);
+      }
+      if (Get.isRegistered<ExploreController>()) {
+        Get.find<ExploreController>().updateArticleLikeState(articleId, isLiked);
+      }
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().updateArticleLikeState(articleId, isLiked);
+      }
+    } catch (_) {}
   }
 }

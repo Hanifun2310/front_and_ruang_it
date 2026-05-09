@@ -4,6 +4,8 @@ import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../profile/controllers/profile_controller.dart';
+import '../../explore/controllers/explore_controller.dart';
+import '../../search/controllers/search_controller.dart';
 
 class DashboardController extends GetxController {
   // Inisialisasi ApiProvider
@@ -123,14 +125,8 @@ class DashboardController extends GetxController {
       
       await _apiProvider.toggleLike(articleId);
 
-      // SYNC: Update ProfileController if registered
-      try {
-        if (Get.isRegistered<ProfileController>()) {
-          Get.find<ProfileController>().updateArticleLikeState(articleId, !isCurrentlyLiked);
-        }
-      } catch (e) {
-        // Ignore sync errors
-      }
+      // SYNC: Update other controllers
+      _syncLikeState(articleId, !isCurrentlyLiked);
     } catch (e) {
       final index = articles.indexWhere((a) => a.id == articleId);
       if (index != -1) {
@@ -158,6 +154,20 @@ class DashboardController extends GetxController {
         articles.refresh();
       }
     }
+  }
+
+  void _syncLikeState(int articleId, bool isLiked) {
+    try {
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().updateArticleLikeState(articleId, isLiked);
+      }
+      if (Get.isRegistered<ExploreController>()) {
+        Get.find<ExploreController>().updateArticleLikeState(articleId, isLiked);
+      }
+      if (Get.isRegistered<ArticleSearchController>()) {
+        Get.find<ArticleSearchController>().updateArticleLikeState(articleId, isLiked);
+      }
+    } catch (_) {}
   }
 
   void loadMoreArticles() {

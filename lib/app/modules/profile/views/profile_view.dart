@@ -509,11 +509,7 @@ class ProfileView extends GetView<ProfileController> {
                     InkWell(
                       onTap: () {
                         if (article.id != null) {
-                          try {
-                            if (Get.isRegistered<DashboardController>()) {
-                              Get.find<DashboardController>().toggleLike(article.id!);
-                            }
-                          } catch (_) {}
+                          controller.toggleLike(article.id!);
                         }
                       },
                       child: Row(

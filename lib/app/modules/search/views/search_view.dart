@@ -318,23 +318,30 @@ class SearchView extends GetView<ArticleSearchController> {
                 ),
                 Row(
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
-                          size: 20,
-                          color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${article.likesCount ?? 0}',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                    InkWell(
+                      onTap: () {
+                        if (article.id != null) {
+                          controller.toggleLike(article.id!);
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                            size: 20,
+                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          Text(
+                            '${article.likesCount ?? 0}',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 20),
                     Row(
