@@ -224,7 +224,8 @@ class ProfileController extends GetxController {
     final userIndex = userArticles.indexWhere((a) => a.id == articleId);
     if (userIndex != -1) {
       final article = userArticles[userIndex];
-      if (article.isLiked != isLiked) {
+      final bool currentIsLiked = article.isLiked ?? false;
+      if (currentIsLiked != isLiked) {
         article.isLiked = isLiked;
         article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
         userArticles[userIndex] = article;

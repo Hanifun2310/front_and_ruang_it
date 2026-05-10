@@ -42,7 +42,7 @@ class AuthorProfileController extends GetxController {
       }
 
       userArticles.value = allFetchedArticles
-          .where((a) => a.user?.id == author.id)
+          .where((a) => a.user?.id == author.id && !a.isBlocked)
           .toList();
 
       // Compute stats dynamically

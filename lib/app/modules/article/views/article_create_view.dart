@@ -32,15 +32,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             letterSpacing: -0.5,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: context.theme.appBarTheme.foregroundColor,
-            ),
-            onPressed: () => Get.find<ThemeService>().switchTheme(),
-          ),
-        ],
+        actions: const [],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(color: const Color(0xFFE2E7FF), height: 1),
@@ -259,10 +251,11 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       multiRowsDisplay: true,
                       buttonOptions: const QuillSimpleToolbarButtonOptions(
                         base: QuillToolbarBaseButtonOptions(
-                          iconSize: 12,
+                          iconSize: 18,
                         ),
                       ),
-                      toolbarSectionSpacing: 12,
+                      toolbarSectionSpacing: 8,
+                      showDividers: false,
                       showFontFamily: false,
                       showFontSize: false,
                       showBoldButton: true,

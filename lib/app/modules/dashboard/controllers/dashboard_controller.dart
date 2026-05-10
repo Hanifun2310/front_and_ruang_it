@@ -159,7 +159,8 @@ class DashboardController extends GetxController {
     final index = articles.indexWhere((a) => a.id == articleId);
     if (index != -1) {
       final article = articles[index];
-      if (article.isLiked != isLiked) {
+      final bool currentIsLiked = article.isLiked ?? false;
+      if (currentIsLiked != isLiked) {
         article.isLiked = isLiked;
         article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
         articles[index] = article;

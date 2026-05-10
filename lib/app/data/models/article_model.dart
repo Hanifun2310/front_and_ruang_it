@@ -10,7 +10,7 @@ class ArticleModel {
   DateTime? createdAt;
   String? status;
 
-  bool get isBlocked => status == 'blocked' || status == 'inactive';
+  bool get isBlocked => status == 'banned';
 
   String get formattedDate {
     if (createdAt == null) return '';
@@ -75,7 +75,13 @@ class ArticleModel {
       imageUrl: formatImageUrl(json['image_url'] ?? json['image']),
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
-      isLiked: json['is_liked'] == true || json['is_liked'] == 1 || json['is_liked'] == '1',
+      isLiked: json['is_liked'] == true || 
+               json['is_liked'] == 1 || 
+               json['is_liked'] == '1' || 
+               json['liked'] == true || 
+               json['liked'] == 1 ||
+               json['isLiked'] == true ||
+               json['isLiked'] == 1,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
       status: json['status']?.toString().toLowerCase(),
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,

@@ -34,7 +34,7 @@ class CategoryDetailController extends GetxController {
       isLoading.value = true;
       final response = await _apiProvider.getArticles(category: category.name);
       // Filter dynamically: get articles belonging to this specific author
-      authorArticles.value = response.where((a) => a.user?.id == author!.id).toList();
+      authorArticles.value = response.where((a) => a.user?.id == author!.id && !a.isBlocked).toList();
     } catch (e) {
       Get.log("Failed to fetch author articles: $e");
     } finally {

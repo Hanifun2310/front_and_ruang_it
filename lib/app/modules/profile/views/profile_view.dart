@@ -39,7 +39,7 @@ class ProfileView extends GetView<ProfileController> {
                   ),
                   PopupMenuButton<String>(
                     icon: Icon(
-                      Icons.settings_outlined,
+                      Icons.settings_rounded,
                       size: 28,
                       color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                     ),
@@ -438,16 +438,45 @@ class ProfileView extends GetView<ProfileController> {
             ],
             // Theme Label
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
-                const SizedBox(width: 8),
-                Text(
-                  'Theme: $categoryName',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Theme: $categoryName',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
                 ),
+                if (article.status == 'banned')
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.red.withOpacity(0.5)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.report_problem, size: 12, color: Colors.red),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Banned',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 12),
@@ -563,7 +592,7 @@ class ProfileView extends GetView<ProfileController> {
                     Row(
                       children: [
                         Icon(
-                          Icons.mode_comment_outlined,
+                          Icons.chat_bubble_outline_rounded,
                           size: 20,
                           color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
                         ),
@@ -727,7 +756,7 @@ class ProfileView extends GetView<ProfileController> {
         items: const [
           BottomNavigationBarItem(
             icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
-            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_rounded)),
             label: 'Home',
           ),
           BottomNavigationBarItem(

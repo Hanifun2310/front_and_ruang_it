@@ -261,7 +261,7 @@ class ExploreView extends GetView<ExploreController> {
                     Row(
                       children: [
                         Icon(
-                          Icons.mode_comment_outlined,
+                          Icons.chat_bubble_outline_rounded,
                           size: 20,
                           color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
                         ),
@@ -379,7 +379,7 @@ class ExploreView extends GetView<ExploreController> {
         items: const [
           BottomNavigationBarItem(
             icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
-            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
+            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_rounded)),
             label: 'Home',
           ),
           BottomNavigationBarItem(
