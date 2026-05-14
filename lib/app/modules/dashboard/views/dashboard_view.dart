@@ -286,7 +286,7 @@ class DashboardView extends GetView<DashboardController> {
                       child: Row(
                         children: [
                           Icon(
-                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                            (article.isLiked ?? false) ? Icons.favorite : Icons.favorite_border,
                             size: 20,
                             color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
                           ),

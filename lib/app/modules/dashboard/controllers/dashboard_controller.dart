@@ -23,6 +23,7 @@ class DashboardController extends GetxController {
   var currentPage = 1;
   var hasMoreData = true.obs;
   var activeTab = 0.obs;
+  var isLiking = false.obs;
 
   void switchTab(int index) {
     activeTab.value = index;
@@ -121,6 +122,8 @@ class DashboardController extends GetxController {
   }
 
   Future<void> toggleLike(int articleId) async {
+    if (isLiking.value) return;
+    isLiking.value = true;
     try {
       final index = articles.indexWhere((a) => a.id == articleId);
       if (index == -1) return;
@@ -151,6 +154,8 @@ class DashboardController extends GetxController {
         articles.refresh();
       }
       Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini');
+    } finally {
+      isLiking.value = false;
     }
   }
   
