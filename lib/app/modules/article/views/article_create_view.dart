@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
 import '../../../widgets/loading_widget.dart';
+import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/article_create_controller.dart';
 import '../../../routes/app_routes.dart';
 import '../../../data/services/theme_service.dart';
@@ -321,57 +322,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
-          border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF))),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
-          unselectedItemColor: const Color(0xFF757685),
-          selectedFontSize: 11,
-          unselectedFontSize: 11,
-          selectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w700),
-          unselectedLabelStyle: GoogleFonts.kulimPark(fontWeight: FontWeight.w600),
-          currentIndex: 3, // Since it's linked to Profile now
-          onTap: (index) {
-            if (index == 0) {
-              Get.offAllNamed(Routes.DASHBOARD);
-            } else if (index == 1) {
-              Get.offNamed(Routes.EXPLORE);
-            } else if (index == 2) {
-              Get.offNamed(Routes.SEARCH);
-            } else if (index == 3) {
-              Get.offNamed(Routes.PROFILE);
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
-              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home)),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore_outlined)),
-              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore)),
-              label: 'Explore',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search_outlined)),
-              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search)),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
-              activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const CustomBottomNav(currentIndex: -1),
     );
   }
 }

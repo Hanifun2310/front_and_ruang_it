@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ruang IT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed": "#311400",
+                      "tertiary-fixed": "#ffdcc6",
+                      "on-tertiary-container": "#fffbff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-surface": "#0b1c30",
+                      "tertiary-fixed-dim": "#ffb786",
+                      "on-secondary-container": "#586377",
+                      "surface-bright": "#f8f9ff",
+                      "secondary-container": "#d5e0f8",
+                      "surface-container-low": "#eff4ff",
+                      "background": "#f8f9ff",
+                      "outline-variant": "#c2c6d6",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-container": "#b75b00",
+                      "on-surface-variant": "#424754",
+                      "surface-container": "#e5eeff",
+                      "on-error": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#727785",
+                      "on-tertiary-fixed-variant": "#723600",
+                      "secondary-fixed": "#d8e3fb",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-high": "#dce9ff",
+                      "tertiary": "#924700",
+                      "inverse-surface": "#213145",
+                      "primary-container": "#2170e4",
+                      "on-primary": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#adc6ff",
+                      "on-primary-container": "#fefcff",
+                      "primary": "#0058be",
+                      "on-background": "#0b1c30",
+                      "on-primary-fixed-variant": "#004395",
+                      "secondary": "#545f73",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#001a42",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-on-surface": "#eaf1ff",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#bcc7de",
+                      "on-secondary-fixed-variant": "#3c475a",
+                      "surface-tint": "#005ac2",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed": "#111c2d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "0.5rem",
+                      "stack-lg": "1.5rem",
+                      "gutter-item": "1rem",
+                      "margin-page": "1.25rem",
+                      "stack-md": "1rem",
+                      "safe": "env(safe-area-inset-bottom)"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter", "sans-serif"],
+                      "headline-md": ["Inter", "sans-serif"],
+                      "body-md": ["Inter", "sans-serif"],
+                      "label-lg": ["Inter", "sans-serif"],
+                      "label-sm": ["Inter", "sans-serif"]
+              },
+              "fontSize": {
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-lg": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 font-body-md antialiased">
+<!-- Top App Bar -->
+<header class="bg-surface dark:bg-surface sticky top-0 z-40">
+<div class="flex justify-between items-center w-full px-margin-page py-stack-md">
+<!-- Logo area placeholder -->
+<div class="flex items-center text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0;">
+                    view_in_ar
+                </span>
+</div>
+<h1 class="text-headline-md font-headline-md font-semibold text-primary dark:text-inverse-primary">Ruang IT</h1>
+</div>
+<!-- Segmented Tabs -->
+<nav class="flex border-b border-outline-variant dark:border-outline px-margin-page">
+<button class="px-4 py-3 text-label-lg font-label-lg text-primary dark:text-inverse-primary border-b-2 border-primary relative top-[1px]">
+                For you
+            </button>
+<button class="px-4 py-3 text-label-lg font-label-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors">
+                Trending
+            </button>
+</nav>
+</header>
+<!-- Main Content Feed -->
+<main class="px-margin-page pt-stack-md flex flex-col gap-stack-lg max-w-3xl mx-auto">
+<!-- Article Card 1 -->
+<article class="flex flex-col gap-stack-sm pb-stack-md border-b border-outline-variant/50">
+<!-- Meta Header -->
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">article</span>
+<span class="text-body-sm font-body-sm">Theme: Philosophy</span>
+</div>
+<!-- Content Area -->
+<div class="flex gap-gutter-item items-start justify-between mt-2">
+<!-- Text Content (Left 65%) -->
+<div class="flex-1 max-w-[65%] flex flex-col gap-stack-sm">
+<!-- Author -->
+<div class="flex items-center gap-2">
+<img alt="Elena Rossi profile" class="w-6 h-6 rounded-full object-cover" data-alt="A small, circular avatar portrait of a professional woman with dark hair against a soft background. Light mode corporate UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSV4mdyjUtch_l3wfEB4q98ROS06OqgrovcKVqZ-jTeUuAGlv-xipHMEYKxHhHsJm07wNHBYCeAx2h1BeyQbA1dzgtQLJZCEYtd1a38rtdQF-LJqhZueryECiCNdaFdj7fSPwzGppBg-ZMy1kFrV4egcw4lRqjLwya2No_5gequbDt6WYXgCz4YezPmYC7saSevIYxntwaXaBu5uDinem_1hvKz1PdijH15rFUkqKtlhjZBanGwStbSb3_dLcocj4Xe7PdTgnFf3k"/>
+<span class="text-body-sm font-body-sm text-on-surface">Elena Rossi</span>
+</div>
+<!-- Title & Excerpt -->
+<h2 class="text-headline-md font-headline-md text-on-surface mt-1">The Architecture in silence</h2>
+<p class="text-body-md font-body-md text-on-surface-variant line-clamp-2 mt-1">
+                        Find foccus in the hyper-connected world
+                    </p>
+</div>
+<!-- Thumbnail (Right) -->
+<div class="w-28 h-20 shrink-0 rounded-lg overflow-hidden bg-surface-container">
+<img alt="Books by window" class="w-full h-full object-cover" data-alt="A stack of several old books resting on a light-colored windowsill, with a softly blurred, bright outdoor scene visible through the glass. The aesthetic is clean, muted, and slightly moody but well-lit, fitting a modern editorial layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXZ1H6TaBdw3T4daB1lWkScP1qFwJrb0gmKVJIarsxMmBQUi3iJ38nd4_3xd3flC2d3lDB2fM1gnwob6OZQEhg5pgv__FH31AM_txsz8m2oVundPr_g_gly-Ad3f98tfyHchV8yikCwyuYDf1ltHGbJhpcQoBpyDtfx83UAAFcg7tVTjt3EQvbbN-wotvYHmYwS6W7ClSwZ91TD92b0esMP5brvq8SohelXJpZMlldYTnRLGEMjcAIzClV2nDtUSQEYVSPo3RTk2w"/>
+</div>
+</div>
+<!-- Footer Interaction Bar -->
+<div class="flex items-center justify-between mt-2 text-on-surface-variant">
+<span class="text-body-sm font-body-sm">Nov 14, 2023</span>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">thumb_up</span>
+<span class="text-body-sm font-body-sm">45k</span>
+</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">chat_bubble</span>
+<span class="text-body-sm font-body-sm">408</span>
+</button>
+<button class="hover:text-primary transition-colors ml-2">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">more_vert</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Article Card 2 -->
+<article class="flex flex-col gap-stack-sm pb-stack-md border-b border-outline-variant/50">
+<!-- Meta Header -->
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">article</span>
+<span class="text-body-sm font-body-sm">Theme: Philosophy</span>
+</div>
+<!-- Content Area -->
+<div class="flex gap-gutter-item items-start justify-between mt-2">
+<!-- Text Content -->
+<div class="flex-1 max-w-[65%] flex flex-col gap-stack-sm">
+<!-- Author -->
+<div class="flex items-center gap-2">
+<img alt="Ujang kedut profile" class="w-6 h-6 rounded-full object-cover" data-alt="A small, circular avatar portrait of a man looking directly at the camera, set against a solid dark blue background. Corporate modern UI styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU8Pb6hik48nH6LxrShsZm0IIm7H2gOGKUiZX_hgEgLLN6BfQqttFzVJ2HOVsca0bj57UKIb5TkqWrAY9meuuXOnfWwfqZizyPqhFEP0vtcYt5KEF5KG1ZejZJ9WshyBxH4rHJPuXW49_27SkOAwsOoyrHdietIpIqKpTzJqb0rQ8-8bqrhxLwtHHbyOEmFlo-fjsm81QhPOGAPhizmWwVTjI62AVPWWPdcFPrzGwekzHb5Fdx-BffUX-wpvECXWS7S6k-cArXdyI"/>
+<span class="text-body-sm font-body-sm text-on-surface">Ujang kedut</span>
+</div>
+<!-- Title & Excerpt -->
+<h2 class="text-headline-md font-headline-md text-on-surface mt-1">The ghost in the machine</h2>
+<p class="text-body-md font-body-md text-on-surface-variant line-clamp-2 mt-1">
+                        Why we still long for analog tools
+                    </p>
+</div>
+<!-- Thumbnail -->
+<div class="w-28 h-20 shrink-0 rounded-lg overflow-hidden bg-surface-container">
+<img alt="Vintage typewriter" class="w-full h-full object-cover" data-alt="A vintage, dark-colored mechanical typewriter illuminated by a warm, dramatic spotlight from a desk lamp in a darkened room. A single sheet of white paper is fed into it. The mood is moody, nostalgic, and professional, suitable for an editorial feed thumbnail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-MqF9R-rSkomLouDCagRumnYuIlHiZWbXaXTqH9TWxJA2Y-Z6vZHpVJt8SVyN0Bx1yHcBkmEp9GSaz6j3MkrhZ6i07o-czKHbJ9XunBb_RJ6NR--F1eSe2Tl7fOD2XjT3jNB2ciuGBOgEPJ19pzd-I-gYZjTUh9PJkdMWyP5TzO8m5mbuD5hFvZ6G-rVKS62JSylhVOhNHwQT6wX1KsIpJOJdAqn1UEkVpjqIHAE_EezBfC4aAIUe8pQLmsQtvaFezyK4_geL2rc"/>
+</div>
+</div>
+<!-- Footer Interaction Bar -->
+<div class="flex items-center justify-between mt-2 text-on-surface-variant">
+<span class="text-body-sm font-body-sm">Nov 14, 2023</span>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">thumb_up</span>
+<span class="text-body-sm font-body-sm">45k</span>
+</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">chat_bubble</span>
+<span class="text-body-sm font-body-sm">408</span>
+</button>
+<button class="hover:text-primary transition-colors ml-2">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">more_vert</span>
+</button>
+</div>
+</div>
+</article>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center bg-surface dark:bg-surface px-2 pb-safe h-16 border-t border-outline-variant dark:border-outline md:hidden shadow-sm">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-inverse-primary hover:text-primary transition-colors flex-1">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-sm font-label-sm">Home</span>
+</button>
+<!-- Explore -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors flex-1">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 0;">explore</span>
+<span class="text-label-sm font-label-sm">Explore</span>
+</button>
+<!-- FAB Container (Center, Create) -->
+<div class="relative flex-1 flex justify-center h-full">
+<button class="absolute -top-6 bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full shadow-lg scale-110 w-14 h-14 flex items-center justify-center border-4 border-surface dark:border-surface">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 0;">edit</span>
+</button>
+</div>
+<!-- Search -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors flex-1">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 0;">search</span>
+<span class="text-label-sm font-label-sm">Search</span>
+</button>
+<!-- Profile -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors flex-1">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-label-sm font-label-sm">Profile</span>
+</button>
+</nav>
+</body></html>

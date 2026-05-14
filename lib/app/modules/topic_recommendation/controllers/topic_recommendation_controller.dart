@@ -10,13 +10,15 @@ class TopicRecommendationController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   
   var selectedCategories = <CategoryModel>[].obs;
-  var categoryTopAuthors = <int, UserModel?>{}.obs;
+  var topArticles = <int, ArticleModel?>{}.obs;
   var isLoading = true.obs;
+  var currentIndex = 0.obs;
+  final PageController pageController = PageController();
 
   // Predefined pastel colors matching the design system
   final List<Color> _palette = [
-    const Color(0xFFFF8A80), // Red
     const Color(0xFFFFEB3B), // Yellow
+    const Color(0xFFFF8A80), // Red
     const Color(0xFF98FB98), // Green
     const Color(0xFF80D8FF), // Light Blue
     const Color(0xFFB388FF), // Purple
@@ -31,20 +33,20 @@ class TopicRecommendationController extends GetxController {
     if (Get.arguments != null && Get.arguments is List<CategoryModel>) {
       selectedCategories.value = Get.arguments as List<CategoryModel>;
       _assignRandomColors();
-      _fetchTopAuthors();
+      _fetchPopularArticles();
     } else {
       isLoading.value = false;
     }
   }
 
   void _assignRandomColors() {
-    final random = Random();
-    for (var category in selectedCategories) {
-      backgroundColors[category.id] = _palette[random.nextInt(_palette.length)];
+    for (int i = 0; i < selectedCategories.length; i++) {
+      final category = selectedCategories[i];
+      backgroundColors[category.id!] = _palette[i % _palette.length];
     }
   }
 
-  Future<void> _fetchTopAuthors() async {
+  Future<void> _fetchPopularArticles() async {
     isLoading.value = true;
     
     for (var category in selectedCategories) {
@@ -53,33 +55,32 @@ class TopicRecommendationController extends GetxController {
         final articles = await _apiProvider.getArticles(category: category.name);
         
         if (articles.isNotEmpty) {
-          // Count author occurrences
-          Map<int, int> authorCounts = {};
-          Map<int, UserModel> authorDetails = {};
-          
-          for (var article in articles) {
-            if (article.user != null && article.user!.id != null) {
-              int userId = article.user!.id!;
-              authorCounts[userId] = (authorCounts[userId] ?? 0) + 1;
-              authorDetails[userId] = article.user!;
-            }
-          }
-          
-          if (authorCounts.isNotEmpty) {
-            // Find author with max count
-            int topUserId = authorCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-            categoryTopAuthors[category.id] = authorDetails[topUserId];
-          }
+          // Sort by likesCount descending and take first
+          articles.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
+          topArticles[category.id!] = articles.first;
+        } else {
+          topArticles[category.id!] = null;
         }
       } catch (e) {
-        Get.log("Failed to fetch articles for category ${category.name}: $e");
+        Get.log("Failed to fetch popular article for category ${category.name}: $e");
+        topArticles[category.id!] = null;
       }
     }
     
     isLoading.value = false;
   }
 
+  void onPageChanged(int index) {
+    currentIndex.value = index;
+  }
+
   void lanjutkan() {
     Get.offAllNamed(Routes.DASHBOARD);
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    super.onClose();
   }
 }

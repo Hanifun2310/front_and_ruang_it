@@ -12,6 +12,7 @@ import '../../../routes/app_routes.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../widgets/loading_widget.dart';
+import '../../../widgets/custom_bottom_nav.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
@@ -118,7 +119,7 @@ class ProfileView extends GetView<ProfileController> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: const CustomBottomNav(currentIndex: 3),
     );
   }
 
@@ -725,59 +726,6 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
-        border: Border(top: BorderSide(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E8F0))),
-      ),
-      child: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF1056C9),
-        unselectedItemColor: Get.isDarkMode ? Colors.white54 : Colors.grey.shade800,
-        selectedFontSize: 11,
-        unselectedFontSize: 11,
-        selectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
-        unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
-        currentIndex: 3,
-        onTap: (index) {
-          if (index == 0) {
-            Get.offNamed(Routes.DASHBOARD);
-          } else if (index == 1) {
-            Get.offNamed(Routes.EXPLORE);
-          } else if (index == 2) {
-            Get.offNamed(Routes.SEARCH);
-          } else if (index == 3) {
-            // Already on profile
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_outlined)),
-            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_rounded)),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore_outlined)),
-            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.explore)),
-            label: 'Explore', 
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search_outlined)),
-            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.search)),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_outline)),
-            activeIcon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person)),
-            label: 'Profile', 
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
