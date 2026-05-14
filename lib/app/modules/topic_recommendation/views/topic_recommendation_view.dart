@@ -136,7 +136,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                               )
                             : SingleChildScrollView(
                                 padding: const EdgeInsets.all(24.0),
-                                physics: const NeverScrollableScrollPhysics(),
+                                physics: const BouncingScrollPhysics(),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
@@ -270,6 +270,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                             ],
                                           ),
                                         ),
+                                        const SizedBox(width: 12),
                                         // Actions Pill
                                         Container(
                                           padding: const EdgeInsets.symmetric(

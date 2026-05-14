@@ -75,7 +75,14 @@ class TopicRecommendationController extends GetxController {
   }
 
   void lanjutkan() {
-    Get.offAllNamed(Routes.DASHBOARD);
+    if (currentIndex.value < selectedCategories.length - 1) {
+      pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      Get.offAllNamed(Routes.ONBOARDING_FINISH);
+    }
   }
 
   @override

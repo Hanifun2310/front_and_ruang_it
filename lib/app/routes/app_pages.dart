@@ -35,6 +35,8 @@ import '../modules/explore/views/explore_view.dart';
 import '../modules/explore/bindings/explore_binding.dart';
 import '../modules/search/views/search_view.dart';
 import '../modules/search/bindings/search_binding.dart';
+import '../modules/onboarding_finish/bindings/onboarding_finish_binding.dart';
+import '../modules/onboarding_finish/views/onboarding_finish_view.dart';
 
 class AppPages {
   AppPages._();
@@ -113,6 +115,11 @@ class AppPages {
       name: Routes.SEARCH,
       page: () => const SearchView(),
       binding: SearchBinding(),
+    ),
+    GetPage(
+      name: Routes.ONBOARDING_FINISH,
+      page: () => const OnboardingFinishView(),
+      binding: OnboardingFinishBinding(),
     ),
   ];
   

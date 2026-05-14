@@ -14,6 +14,7 @@ abstract class Routes {
   static const AUTHOR_PROFILE = _Paths.AUTHOR_PROFILE;
   static const EXPLORE = _Paths.EXPLORE;
   static const SEARCH = _Paths.SEARCH;
+  static const ONBOARDING_FINISH = _Paths.ONBOARDING_FINISH;
 }
 
 abstract class _Paths {
@@ -31,4 +32,5 @@ abstract class _Paths {
   static const AUTHOR_PROFILE = '/author-profile';
   static const EXPLORE = '/explore';
   static const SEARCH = '/search';
+  static const ONBOARDING_FINISH = '/onboarding-finish';
 }
