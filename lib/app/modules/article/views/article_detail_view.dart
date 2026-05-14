@@ -13,17 +13,6 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.theme.appBarTheme.backgroundColor,
-        title: Text(
-          "Detail Artikel", 
-          style: TextStyle(
-            fontSize: 18,
-            color: context.theme.appBarTheme.foregroundColor,
-          ),
-        ),
-        centerTitle: true,
-      ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const LoadingWidget();
@@ -31,101 +20,87 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
 
         final art = controller.article.value;
 
-        return Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+        return CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 300,
+              pinned: true,
+              backgroundColor: context.theme.scaffoldBackgroundColor,
+              elevation: 0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Image.network(
+                  art.imageUrl ?? 'https://via.placeholder.com/600x400',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey.shade100,
+                    child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  ),
+                ),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Get.back(),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- GAMBAR ARTIKEL (ANTI-CRASH) ---
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        art.imageUrl ?? 'https://via.placeholder.com/600x400',
-                        width: double.infinity,
-                        height: 220,
-                        fit: BoxFit.cover,
-                        // Jika gambar gagal dimuat, tampilkan kotak abu-abu dengan icon
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: double.infinity,
-                          height: 220,
-                          color: Colors.grey.shade100,
-                          child: const Icon(
-                            Icons.broken_image,
-                            size: 50,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Judul Artikel
                     Text(
-                      art.title ?? 'Tanpa Judul',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        height: 1.2,
+                      art.category?.name?.toUpperCase() ?? 'UMUM',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.0,
+                        color: Colors.blueAccent,
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // --- INFO PENULIS & KATEGORI ---
+                    Text(
+                      art.title ?? 'Tanpa Judul',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        height: 1.2,
+                        color: context.theme.textTheme.titleLarge?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     Row(
                       children: [
-                        // Foto Profil Penulis (ANTI-CRASH)
                         CircleAvatar(
-                          radius: 16,
+                          radius: 20,
                           backgroundColor: Colors.grey.shade200,
                           backgroundImage: NetworkImage(
                             art.user?.photoProfile ??
                                 'https://ui-avatars.com/api/?name=${art.user?.name ?? "User"}',
                           ),
                         ),
-                        const SizedBox(width: 10),
-
-                        Expanded(
-                          child: Text(
-                            art.user?.name ?? 'Penulis Anonim',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              art.user?.name ?? 'Penulis Anonim',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            art.category?.name ?? 'Umum',
-                            style: const TextStyle(
-                              color: Colors.blue,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              art.formattedDate,
+                              style: GoogleFonts.inter(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
-                    const Divider(
-                      height: 40,
-                      thickness: 1,
-                      color: Color(0xFFE2E8F0),
-                    ),
-
-                    // --- ISI KONTEN HTML/QUILL ---
+                    const SizedBox(height: 32),
                     if (controller.quillController != null)
                       QuillEditor.basic(
                         configurations: QuillEditorConfigurations(
@@ -137,10 +112,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                           padding: EdgeInsets.zero,
                           customStyles: DefaultStyles(
                             paragraph: DefaultTextBlockStyle(
-                              GoogleFonts.kulimPark(
+                              GoogleFonts.inter(
                                 fontSize: 16,
                                 color: Get.isDarkMode ? Colors.white : Colors.black87,
-                                height: 1.6,
+                                height: 1.8,
                               ),
                               const VerticalSpacing(0, 0),
                               const VerticalSpacing(0, 0),
@@ -152,101 +127,92 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     else
                       HtmlWidget(
                         art.content ?? '<p>Konten tidak tersedia.</p>',
-                        textStyle: TextStyle(
+                        textStyle: GoogleFonts.inter(
                           fontSize: 16,
-                          height: 1.6,
+                          height: 1.8,
                           color: context.theme.textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
-                    const SizedBox(height: 40),
-
-                    const Text(
+                    const SizedBox(height: 48),
+                    const Divider(),
+                    const SizedBox(height: 32),
+                    Text(
                       "Komentar",
-                      style: TextStyle(
-                        fontSize: 18,
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    // --- LIST KOMENTAR ---
+                    const SizedBox(height: 24),
                     if (controller.comments.isEmpty)
-                      const Text(
+                      Text(
                         "Belum ada komentar. Jadilah yang pertama!",
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: Colors.grey,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
-
                     ListView.separated(
                       shrinkWrap: true,
+                      padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: controller.comments.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
+                      separatorBuilder: (context, index) => const SizedBox(height: 24),
                       itemBuilder: (context, index) {
                         final comment = controller.comments[index];
-                        return Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Avatar Komentator (ANTI-CRASH)
-                              CircleAvatar(
-                                radius: 14,
-                                backgroundColor: Colors.grey.shade200,
-                                backgroundImage: NetworkImage(
-                                  comment.user?.photoProfile ??
-                                      'https://ui-avatars.com/api/?name=${comment.user?.name ?? "User"}',
-                                ),
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 18,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: NetworkImage(
+                                comment.user?.photoProfile ??
+                                    'https://ui-avatars.com/api/?name=${comment.user?.name ?? "User"}',
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      comment.user?.name ?? 'User',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                      ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    comment.user?.name ?? 'User',
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      comment.isHidden == true
-                                          ? 'Komentar ini telah disembunyikan oleh moderator'
-                                          : (comment.content ?? ''),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: comment.isHidden == true ? FontStyle.italic : FontStyle.normal,
-                                        color: comment.isHidden == true 
-                                            ? Colors.grey 
-                                            : (Get.isDarkMode ? Colors.white70 : Colors.black87),
-                                      ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    comment.isHidden == true
+                                        ? 'Komentar ini telah disembunyikan oleh moderator'
+                                        : (comment.content ?? ''),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontStyle: comment.isHidden == true ? FontStyle.italic : FontStyle.normal,
+                                      color: comment.isHidden == true 
+                                          ? Colors.grey 
+                                          : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                                      height: 1.5,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         );
                       },
                     ),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
             ),
-            // Bottom Bar Like & Komentar
-            _buildBottomAction(),
           ],
         );
       }),
+      bottomNavigationBar: Obx(() => _buildBottomAction()),
     );
   }
 
@@ -255,13 +221,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
       child: SafeArea(
         child: Row(
@@ -279,15 +239,17 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
             ),
             Text(
               "${controller.article.value.likesCount ?? 0}",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: TextField(
                 controller: controller.commentController,
+                style: GoogleFonts.inter(fontSize: 14),
                 decoration: InputDecoration(
                   hintText: "Tulis komentar...",
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  hintStyle: GoogleFonts.inter(fontSize: 14),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
