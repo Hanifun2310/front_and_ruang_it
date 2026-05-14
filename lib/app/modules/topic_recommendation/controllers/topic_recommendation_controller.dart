@@ -59,6 +59,8 @@ class TopicRecommendationController extends GetxController {
           articles.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
           topArticles[category.id!] = articles.first;
         } else {
+          // Try fetching without category filter if specific filter yields nothing, 
+          // but that might be misleading. Better to just stay with null if no match.
           topArticles[category.id!] = null;
         }
       } catch (e) {
@@ -68,6 +70,15 @@ class TopicRecommendationController extends GetxController {
     }
     
     isLoading.value = false;
+  }
+
+  void goToArticleDetail(ArticleModel article) {
+    if (article.slug != null || article.id != null) {
+      Get.toNamed(
+        Routes.ARTICLE_DETAIL, 
+        arguments: article.slug ?? article.id.toString()
+      );
+    }
   }
 
   void onPageChanged(int index) {

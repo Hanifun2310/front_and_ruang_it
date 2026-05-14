@@ -69,6 +69,7 @@ class RegisterView extends GetView<AuthController> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: controller.nameController,
+                  style: const TextStyle(color: Color(0xFF1E293B)),
                   decoration: InputDecoration(
                     hintText: "Masukkan nama lengkap",
                     border: OutlineInputBorder(
@@ -102,6 +103,7 @@ class RegisterView extends GetView<AuthController> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: controller.emailController,
+                  style: const TextStyle(color: Color(0xFF1E293B)),
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: "Masukkan email aktif",
@@ -136,6 +138,7 @@ class RegisterView extends GetView<AuthController> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: controller.professionController,
+                  style: const TextStyle(color: Color(0xFF1E293B)),
                   decoration: InputDecoration(
                     hintText: "Contoh: Mahasiswa, Developer",
                     border: OutlineInputBorder(
@@ -169,6 +172,7 @@ class RegisterView extends GetView<AuthController> {
                 const SizedBox(height: 8),
                 Obx(() => TextField(
                   controller: controller.passwordController,
+                  style: const TextStyle(color: Color(0xFF1E293B)),
                   obscureText: controller.isPasswordHidden.value,
                   decoration: InputDecoration(
                     hintText: "Minimal 6 karakter",

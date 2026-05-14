@@ -33,18 +33,8 @@ class ProfileView extends GetView<ProfileController> {
                 left: 16.0,
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.add_circle_outline_rounded,
-                      size: 28,
-                      color: Get.isDarkMode
-                          ? Colors.white
-                          : const Color(0xFF131B2E),
-                    ),
-                    onPressed: () => Get.toNamed(Routes.ARTICLE_CREATE),
-                  ),
                   PopupMenuButton<String>(
                     icon: Icon(
                       Icons.settings_rounded,
@@ -362,10 +352,10 @@ class ProfileView extends GetView<ProfileController> {
             ),
             const Divider(height: 24),
             _buildStatRow(
-              Icons.favorite,
+              Icons.thumb_up,
               'Total Likes',
               '${controller.likesCount.value}',
-              Colors.redAccent,
+              Colors.blueAccent,
             ),
             const Divider(height: 24),
             _buildStatRow(
@@ -702,11 +692,11 @@ class ProfileView extends GetView<ProfileController> {
                         children: [
                           Icon(
                             (article.isLiked ?? false)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
+                                ? Icons.thumb_up
+                                : Icons.thumb_up_outlined,
                             size: 20,
                             color: (article.isLiked ?? false)
-                                ? Colors.red
+                                ? Colors.blueAccent
                                 : (Get.isDarkMode
                                       ? Colors.white70
                                       : Colors.grey.shade700),

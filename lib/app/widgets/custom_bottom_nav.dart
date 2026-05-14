@@ -5,8 +5,13 @@ import '../routes/app_routes.dart';
 
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
+  final bool showCreateButton;
 
-  const CustomBottomNav({super.key, required this.currentIndex});
+  const CustomBottomNav({
+    super.key, 
+    required this.currentIndex,
+    this.showCreateButton = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,42 +91,43 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
           // Center Action Button
-          Positioned(
-            top: -24, // Raised above the navbar
-            left: 0,
-            right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  Get.toNamed(Routes.ARTICLE_CREATE);
-                },
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: activeColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: backgroundColor,
-                      width: 4,
+          if (showCreateButton)
+            Positioned(
+              top: -24, // Raised above the navbar
+              left: 0,
+              right: 0,
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Get.toNamed(Routes.ARTICLE_CREATE);
+                  },
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: activeColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: backgroundColor,
+                        width: 4,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.edit_outlined,
-                    color: Colors.white,
-                    size: 28,
+                    child: const Icon(
+                      Icons.edit_outlined,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

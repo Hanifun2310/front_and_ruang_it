@@ -107,6 +107,16 @@ class ApiProvider {
     });
   }
 
+  Future<Response> updateComment(int commentId, String content) async {
+    return await _dio.put('/comments/$commentId', data: {
+      'content': content,
+    });
+  }
+
+  Future<Response> deleteComment(int commentId) async {
+    return await _dio.delete('/comments/$commentId');
+  }
+
   Future<Response> getProfile() async {
     return await _dio.get('/profile');
   }

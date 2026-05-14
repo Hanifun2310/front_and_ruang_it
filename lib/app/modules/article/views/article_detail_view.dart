@@ -5,6 +5,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/loading_widget.dart';
 import '../controllers/article_detail_controller.dart';
+import '../../../data/services/auth_service.dart';
 
 class ArticleDetailView extends GetView<ArticleDetailController> {
   const ArticleDetailView({Key? key}) : super(key: key);
@@ -50,7 +51,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                   children: [
                     Text(
                       art.category?.name?.toUpperCase() ?? 'UMUM',
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
@@ -60,11 +61,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     const SizedBox(height: 16),
                     Text(
                       art.title ?? 'Tanpa Judul',
-                      style: GoogleFonts.playfairDisplay(
+                      style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
                         height: 1.2,
-                        color: context.theme.textTheme.titleLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -84,14 +84,14 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                           children: [
                             Text(
                               art.user?.name ?? 'Penulis Anonim',
-                              style: GoogleFonts.inter(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
                             ),
                             Text(
                               art.formattedDate,
-                              style: GoogleFonts.inter(
+                              style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
@@ -112,9 +112,9 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                           padding: EdgeInsets.zero,
                           customStyles: DefaultStyles(
                             paragraph: DefaultTextBlockStyle(
-                              GoogleFonts.inter(
+                              TextStyle(
                                 fontSize: 16,
-                                color: Get.isDarkMode ? Colors.white : Colors.black87,
+                                color: Get.isDarkMode ? Colors.white70 : Colors.black87,
                                 height: 1.8,
                               ),
                               const VerticalSpacing(0, 0),
@@ -127,10 +127,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     else
                       HtmlWidget(
                         art.content ?? '<p>Konten tidak tersedia.</p>',
-                        textStyle: GoogleFonts.inter(
+                        textStyle: TextStyle(
                           fontSize: 16,
                           height: 1.8,
-                          color: context.theme.textTheme.bodyLarge?.color ?? Colors.black87,
+                          color: Get.isDarkMode ? Colors.white70 : Colors.black87,
                         ),
                       ),
                     const SizedBox(height: 48),
@@ -138,7 +138,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     const SizedBox(height: 32),
                     Text(
                       "Komentar",
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -147,7 +147,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     if (controller.comments.isEmpty)
                       Text(
                         "Belum ada komentar. Jadilah yang pertama!",
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
                           color: Colors.grey,
                           fontStyle: FontStyle.italic,
                         ),
@@ -160,6 +160,8 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                       separatorBuilder: (context, index) => const SizedBox(height: 24),
                       itemBuilder: (context, index) {
                         final comment = controller.comments[index];
+                        final currentUserId = Get.find<AuthService>().currentUser?['id'];
+                        final isCommentOwner = comment.user?.id != null && comment.user?.id == currentUserId;
                         return Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -178,7 +180,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                                 children: [
                                   Text(
                                     comment.user?.name ?? 'User',
-                                    style: GoogleFonts.inter(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -188,18 +190,36 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                                     comment.isHidden == true
                                         ? 'Komentar ini telah disembunyikan oleh moderator'
                                         : (comment.content ?? ''),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: 14,
-                                      fontStyle: comment.isHidden == true ? FontStyle.italic : FontStyle.normal,
-                                      color: comment.isHidden == true 
-                                          ? Colors.grey 
-                                          : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                                      color: Get.isDarkMode ? Colors.white70 : Colors.black87,
                                       height: 1.5,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                            if (isCommentOwner)
+                              PopupMenuButton<String>(
+                                icon: const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
+                                onSelected: (value) {
+                                  if (value == 'edit') {
+                                    _showEditCommentDialog(context, comment);
+                                  } else if (value == 'delete') {
+                                    _showDeleteCommentDialog(context, comment);
+                                  }
+                                },
+                                itemBuilder: (context) => [
+                                  const PopupMenuItem(
+                                    value: 'edit',
+                                    child: Text('Edit Komentar'),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'delete',
+                                    child: Text('Hapus Komentar', style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
                           ],
                         );
                       },
@@ -213,6 +233,62 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
         );
       }),
       bottomNavigationBar: Obx(() => _buildBottomAction()),
+    );
+  }
+
+  void _showEditCommentDialog(BuildContext context, dynamic comment) {
+    final TextEditingController editController = TextEditingController(text: comment.content);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Komentar'),
+        content: TextField(
+          controller: editController,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'Tulis komentar Anda...',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (editController.text.trim().isNotEmpty) {
+                controller.updateComment(comment.id, editController.text.trim());
+                Get.back();
+              }
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteCommentDialog(BuildContext context, dynamic comment) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Komentar'),
+        content: const Text('Apakah Anda yakin ingin menghapus komentar ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              controller.deleteComment(comment.id);
+              Get.back();
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -230,25 +306,25 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               onPressed: controller.toggleLike,
               icon: Icon(
                 controller.article.value.isLiked == true
-                    ? Icons.favorite
-                    : Icons.favorite_border,
+                    ? Icons.thumb_up
+                    : Icons.thumb_up_outlined,
                 color: controller.article.value.isLiked == true
-                    ? Colors.red
+                    ? Colors.blueAccent
                     : Colors.grey,
               ),
             ),
             Text(
               "${controller.article.value.likesCount ?? 0}",
-              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: TextField(
                 controller: controller.commentController,
-                style: GoogleFonts.inter(fontSize: 14),
+                style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
                   hintText: "Tulis komentar...",
-                  hintStyle: GoogleFonts.inter(fontSize: 14),
+                  hintStyle: const TextStyle(fontSize: 14),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),

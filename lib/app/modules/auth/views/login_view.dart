@@ -63,6 +63,7 @@ class LoginView extends GetView<AuthController> {
                 TextField(
                   controller: controller.emailController,
                   keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(color: Color(0xFF1E293B)),
                   decoration: InputDecoration(
                     hintText: "Masukkan email Anda",
                     border: OutlineInputBorder(
@@ -97,6 +98,7 @@ class LoginView extends GetView<AuthController> {
                 Obx(() => TextField(
                   controller: controller.passwordController,
                   obscureText: controller.isPasswordHidden.value,
+                  style: const TextStyle(color: Color(0xFF1E293B)),
                   decoration: InputDecoration(
                     hintText: "Masukkan kata sandi Anda",
                     suffixIcon: IconButton(

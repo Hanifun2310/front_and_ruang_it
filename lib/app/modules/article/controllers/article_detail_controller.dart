@@ -164,4 +164,30 @@ class ArticleDetailController extends GetxController {
       Get.snackbar('Error', 'Gagal mengirim komentar');
     }
   }
+
+  // LOGIKA UPDATE KOMENTAR
+  Future<void> updateComment(int commentId, String content) async {
+    try {
+      final response = await _apiProvider.updateComment(commentId, content);
+      if (response.statusCode == 200) {
+        fetchComments(); // Refresh list komentar
+        Get.snackbar('Sukses', 'Komentar berhasil diperbarui');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memperbarui komentar');
+    }
+  }
+
+  // LOGIKA HAPUS KOMENTAR
+  Future<void> deleteComment(int commentId) async {
+    try {
+      final response = await _apiProvider.deleteComment(commentId);
+      if (response.statusCode == 200) {
+        fetchComments(); // Refresh list komentar
+        Get.snackbar('Sukses', 'Komentar berhasil dihapus');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menghapus komentar');
+    }
+  }
 }

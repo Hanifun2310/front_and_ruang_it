@@ -35,7 +35,7 @@ class OnboardingFinishView extends GetView<OnboardingFinishController> {
               Text(
                 'Selamat membaca',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
+                style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w900,
                   color: Colors.black,
@@ -46,7 +46,7 @@ class OnboardingFinishView extends GetView<OnboardingFinishController> {
               Text(
                 'Semoga anda menemukan inovasi yang dapat memotivasi anda',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                   height: 1.6,
@@ -69,7 +69,7 @@ class OnboardingFinishView extends GetView<OnboardingFinishController> {
                   ),
                   child: Text(
                     'Mulai Membaca',
-                    style: GoogleFonts.inter(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),

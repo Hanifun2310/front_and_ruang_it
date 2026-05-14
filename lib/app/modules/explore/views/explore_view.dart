@@ -277,11 +277,11 @@ class ExploreView extends GetView<ExploreController> {
                         children: [
                           Icon(
                             (article.isLiked ?? false)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
+                                ? Icons.thumb_up
+                                : Icons.thumb_up_outlined,
                             size: 20,
                             color: (article.isLiked ?? false)
-                                ? Colors.red
+                                ? Colors.blueAccent
                                 : (Get.isDarkMode
                                       ? Colors.white70
                                       : Colors.grey.shade700),

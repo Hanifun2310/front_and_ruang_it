@@ -31,16 +31,17 @@ class InterestSelectionView extends GetView<InterestSelectionController> {
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.5,
+                    color: Color(0xFF131B2E),
                   ),
                 ),
               ),
               const SizedBox(height: 8),
-              const Center(
+              Center(
                 child: Text(
                   'Pilih topik yang anda sukai',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black54,
+                    color: Color(0xFF131B2E).withOpacity(0.7),
                     fontWeight: FontWeight.w300,
                   ),
                 ),
@@ -127,12 +128,12 @@ class InterestSelectionView extends GetView<InterestSelectionController> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Center(
+              Center(
                 child: Text(
                   'Pilih minimal 3 Topik atau lebih',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.black54,
+                    color: Color(0xFF131B2E).withOpacity(0.6),
                     fontWeight: FontWeight.w300,
                   ),
                 ),
