@@ -1,12 +1,14 @@
 import 'package:get/get.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../../data/services/like_sync_service.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../search/controllers/search_controller.dart';
 
 class ExploreController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
+  final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
 
   var articles = <ArticleModel>[].obs;
   var categories = <CategoryModel>[].obs;
@@ -39,7 +41,8 @@ class ExploreController extends GetxController {
         category: selectedCategory.value?.id.toString(),
       );
       // FILTER: Jangan tampilkan artikel terblokir di Explore
-      articles.value = fetchedArticles.where((a) => !a.isBlocked).toList();
+      final filtered = fetchedArticles.where((a) => !a.isBlocked).toList();
+      articles.value = _likeSyncService.applyLikeStateToArticles(filtered);
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat artikel');
     } finally {
@@ -56,7 +59,6 @@ class ExploreController extends GetxController {
     fetchArticles();
   }
 
-
   Future<void> toggleLike(int articleId) async {
     try {
       final index = articles.indexWhere((a) => a.id == articleId);
@@ -64,15 +66,17 @@ class ExploreController extends GetxController {
 
       final article = articles[index];
       final isCurrentlyLiked = article.isLiked ?? false;
-      
+
       // Optimistic update
       article.isLiked = !isCurrentlyLiked;
-      article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
-      
+      article.likesCount =
+          (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+
       articles[index] = article;
       articles.refresh();
-      
+
       await _apiProvider.toggleLike(articleId);
+      _likeSyncService.updateLikeStatus(articleId, !isCurrentlyLiked);
 
       // SYNC: Update other controllers
       _syncLikeState(articleId, !isCurrentlyLiked);
@@ -93,18 +97,29 @@ class ExploreController extends GetxController {
         articles.refresh();
       }
     }
+
+    _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<DashboardController>()) {
-        Get.find<DashboardController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<DashboardController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ProfileController>()) {
-        Get.find<ProfileController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ProfileController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ArticleSearchController>()) {
-        Get.find<ArticleSearchController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ArticleSearchController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
     } catch (_) {}
   }

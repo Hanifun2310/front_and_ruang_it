@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../../data/services/like_sync_service.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
@@ -24,6 +25,7 @@ class DashboardController extends GetxController {
   var hasMoreData = true.obs;
   var activeTab = 0.obs;
   var isLiking = false.obs;
+  final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
 
   void switchTab(int index) {
     activeTab.value = index;
@@ -97,7 +99,9 @@ class DashboardController extends GetxController {
       } else {
         // FILTER: Jangan tampilkan artikel terblokir di Dashboard
         final publicArticles = newArticles.where((a) => !a.isBlocked).toList();
-        articles.addAll(publicArticles);
+        articles.addAll(
+          _likeSyncService.applyLikeStateToArticles(publicArticles),
+        );
 
         // Jika semua artikel di halaman ini terblokir, tapi masih ada data di server,
         // kita mungkin perlu fetch page berikutnya secara otomatis, tapi untuk
@@ -143,6 +147,8 @@ class DashboardController extends GetxController {
 
       await _apiProvider.toggleLike(articleId);
 
+      _likeSyncService.updateLikeStatus(articleId, !isCurrentlyLiked);
+
       // SYNC: Update other controllers
       _syncLikeState(articleId, !isCurrentlyLiked);
     } catch (e) {
@@ -176,6 +182,8 @@ class DashboardController extends GetxController {
         articles.refresh();
       }
     }
+
+    _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
   void _syncLikeState(int articleId, bool isLiked) {

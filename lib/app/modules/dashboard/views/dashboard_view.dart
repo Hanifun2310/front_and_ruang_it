@@ -410,7 +410,7 @@ class DashboardView extends GetView<DashboardController> {
                                 : Icons.favorite_border,
                             size: 20,
                             color: (article.isLiked ?? false)
-                                ? Colors.blueAccent
+                                ? Colors.red
                                 : (Get.isDarkMode
                                       ? Colors.white70
                                       : Colors.grey.shade700),

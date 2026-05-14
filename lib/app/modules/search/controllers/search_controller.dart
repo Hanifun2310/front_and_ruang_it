@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../../data/services/like_sync_service.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
@@ -9,21 +10,26 @@ import '../../profile/controllers/profile_controller.dart';
 class ArticleSearchController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   final GetStorage _storage = GetStorage();
-  
+  final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
+
   var searchQuery = ''.obs;
   var articles = <ArticleModel>[].obs;
   var isLoading = false.obs;
   var searchHistory = <String>[].obs;
-  
+
   final String _historyKey = 'search_history';
 
   @override
   void onInit() {
     super.onInit();
     loadSearchHistory();
-    
+
     // Real-time search with debounce (500ms)
-    debounce(searchQuery, (_) => fetchArticles(), time: const Duration(milliseconds: 500));
+    debounce(
+      searchQuery,
+      (_) => fetchArticles(),
+      time: const Duration(milliseconds: 500),
+    );
   }
 
   void loadSearchHistory() {
@@ -35,16 +41,16 @@ class ArticleSearchController extends GetxController {
 
   void saveToHistory(String query) {
     if (query.isEmpty) return;
-    
+
     // Remove if already exists to move it to the top
     searchHistory.remove(query);
     searchHistory.insert(0, query);
-    
+
     // Limit to 10 items
     if (searchHistory.length > 10) {
       searchHistory.removeLast();
     }
-    
+
     _storage.write(_historyKey, searchHistory.toList());
   }
 
@@ -68,8 +74,9 @@ class ArticleSearchController extends GetxController {
     try {
       final fetched = await _apiProvider.getArticles(search: searchQuery.value);
       // FILTER: Jangan tampilkan artikel terblokir di Hasil Pencarian
-      articles.value = fetched.where((a) => !a.isBlocked).toList();
-      
+      final filtered = fetched.where((a) => !a.isBlocked).toList();
+      articles.value = _likeSyncService.applyLikeStateToArticles(filtered);
+
       // If we got results and it's a "substantial" search, save it to history when user stops typing
       // Note: In real-world, you might want to save history only on "Enter" or specific triggers,
       // but user asked for real-time history below search.
@@ -100,15 +107,17 @@ class ArticleSearchController extends GetxController {
 
       final article = articles[index];
       final isCurrentlyLiked = article.isLiked ?? false;
-      
+
       // Optimistic update
       article.isLiked = !isCurrentlyLiked;
-      article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
-      
+      article.likesCount =
+          (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+
       articles[index] = article;
       articles.refresh();
-      
+
       await _apiProvider.toggleLike(articleId);
+      _likeSyncService.updateLikeStatus(articleId, !isCurrentlyLiked);
 
       // SYNC: Update other controllers
       _syncLikeState(articleId, !isCurrentlyLiked);
@@ -130,18 +139,29 @@ class ArticleSearchController extends GetxController {
         articles.refresh();
       }
     }
+
+    _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<DashboardController>()) {
-        Get.find<DashboardController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<DashboardController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ExploreController>()) {
-        Get.find<ExploreController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ExploreController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ProfileController>()) {
-        Get.find<ProfileController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ProfileController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
     } catch (_) {}
   }
