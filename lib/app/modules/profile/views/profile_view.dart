@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    hide DefaultStyles;
 import '../controllers/profile_controller.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../../data/services/auth_service.dart';
@@ -26,7 +27,11 @@ class ProfileView extends GetView<ProfileController> {
           children: [
             // Top App Bar Area (Placeholder for Settings Icon)
             Padding(
-              padding: const EdgeInsets.only(top: 16.0, right: 16.0, left: 16.0),
+              padding: const EdgeInsets.only(
+                top: 16.0,
+                right: 16.0,
+                left: 16.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -34,7 +39,9 @@ class ProfileView extends GetView<ProfileController> {
                     icon: Icon(
                       Icons.add_circle_outline_rounded,
                       size: 28,
-                      color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                      color: Get.isDarkMode
+                          ? Colors.white
+                          : const Color(0xFF131B2E),
                     ),
                     onPressed: () => Get.toNamed(Routes.ARTICLE_CREATE),
                   ),
@@ -42,9 +49,13 @@ class ProfileView extends GetView<ProfileController> {
                     icon: Icon(
                       Icons.settings_rounded,
                       size: 28,
-                      color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                      color: Get.isDarkMode
+                          ? Colors.white
+                          : const Color(0xFF131B2E),
                     ),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     onSelected: (value) {
                       if (value == 'theme') {
                         Get.find<ThemeService>().switchTheme();
@@ -58,15 +69,21 @@ class ProfileView extends GetView<ProfileController> {
                         child: Row(
                           children: [
                             Icon(
-                              Get.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                              Get.isDarkMode
+                                  ? Icons.light_mode
+                                  : Icons.dark_mode,
+                              color: Get.isDarkMode
+                                  ? Colors.white
+                                  : const Color(0xFF131B2E),
                             ),
                             const SizedBox(width: 12),
                             Text(
                               Get.isDarkMode ? 'Mode Terang' : 'Mode Gelap',
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600,
-                                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                                color: Get.isDarkMode
+                                    ? Colors.white
+                                    : const Color(0xFF131B2E),
                               ),
                             ),
                           ],
@@ -94,14 +111,14 @@ class ProfileView extends GetView<ProfileController> {
                 ],
               ),
             ),
-            
+
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     // Profile Header Info
                     _buildProfileHeader(context),
-                    
+
                     // Action Buttons
                     _buildActionButtons(context),
 
@@ -130,55 +147,73 @@ class ProfileView extends GetView<ProfileController> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Avatar
-          Obx(() => Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.blueAccent.shade100, width: 2), 
-              color: Colors.grey.shade100,
+          Obx(
+            () => Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.blueAccent.shade100, width: 2),
+                color: Colors.grey.shade100,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(40),
+                child: controller.photoProfile.value.isNotEmpty
+                    ? Image.network(
+                        controller.photoProfile.value,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildAvatarFallback(),
+                      )
+                    : _buildAvatarFallback(),
+              ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(40),
-              child: controller.photoProfile.value.isNotEmpty
-                ? Image.network(
-                    controller.photoProfile.value,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _buildAvatarFallback(),
-                  )
-                : _buildAvatarFallback(),
-            ),
-          )),
+          ),
           const SizedBox(width: 16),
           // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Obx(() => Text(
-                  controller.name.value.isNotEmpty ? controller.name.value : "Sobat IT",
-                  style: GoogleFonts.inter(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: Get.isDarkMode ? Colors.white : Colors.black87,
+                Obx(
+                  () => Text(
+                    controller.name.value.isNotEmpty
+                        ? controller.name.value
+                        : "Sobat IT",
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Get.isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
-                )),
+                ),
                 const SizedBox(height: 4),
-                Obx(() => Text(
-                  controller.profession.value.isNotEmpty ? controller.profession.value : "Pekerjaan belum diisi",
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade600,
+                Obx(
+                  () => Text(
+                    controller.profession.value.isNotEmpty
+                        ? controller.profession.value
+                        : "Pekerjaan belum diisi",
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: Get.isDarkMode
+                          ? Colors.white70
+                          : Colors.grey.shade600,
+                    ),
                   ),
-                )),
+                ),
                 const SizedBox(height: 4),
-                Obx(() => Text(
-                  controller.bio.value.isNotEmpty ? controller.bio.value : "Bio belum diisi.",
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                Obx(
+                  () => Text(
+                    controller.bio.value.isNotEmpty
+                        ? controller.bio.value
+                        : "Bio belum diisi.",
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Get.isDarkMode
+                          ? Colors.white54
+                          : Colors.grey.shade500,
+                    ),
                   ),
-                )),
+                ),
               ],
             ),
           ),
@@ -210,7 +245,10 @@ class ProfileView extends GetView<ProfileController> {
               ),
               child: Text(
                 'Statistik',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
             ),
           ),
@@ -219,8 +257,12 @@ class ProfileView extends GetView<ProfileController> {
             child: OutlinedButton(
               onPressed: () => _showEditProfileSheet(context),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Get.isDarkMode ? Colors.white : Colors.grey.shade800,
-                side: BorderSide(color: Get.isDarkMode ? Colors.white30 : Colors.grey.shade400),
+                foregroundColor: Get.isDarkMode
+                    ? Colors.white
+                    : Colors.grey.shade800,
+                side: BorderSide(
+                  color: Get.isDarkMode ? Colors.white30 : Colors.grey.shade400,
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
@@ -228,7 +270,10 @@ class ProfileView extends GetView<ProfileController> {
               ),
               child: Text(
                 'Edit profil Anda',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
             ),
           ),
@@ -240,14 +285,20 @@ class ProfileView extends GetView<ProfileController> {
   Widget _buildNavigationTabs() {
     return Container(
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade200)),
+        border: Border(
+          bottom: BorderSide(
+            color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade200,
+          ),
+        ),
       ),
-      child: Obx(() => Row(
-        children: [
-          _buildTab('Semua Artikel', 0),
-          _buildTab('Artikel Favorit', 1),
-        ],
-      )),
+      child: Obx(
+        () => Row(
+          children: [
+            _buildTab('Semua Artikel', 0),
+            _buildTab('Artikel Favorit', 1),
+          ],
+        ),
+      ),
     );
   }
 
@@ -261,7 +312,9 @@ class ProfileView extends GetView<ProfileController> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isSelected ? (Get.isDarkMode ? Colors.white : Colors.black) : Colors.transparent,
+                color: isSelected
+                    ? (Get.isDarkMode ? Colors.white : Colors.black)
+                    : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -270,8 +323,8 @@ class ProfileView extends GetView<ProfileController> {
           child: Text(
             title,
             style: GoogleFonts.inter(
-              color: isSelected 
-                  ? (Get.isDarkMode ? Colors.white : Colors.black) 
+              color: isSelected
+                  ? (Get.isDarkMode ? Colors.white : Colors.black)
                   : (Get.isDarkMode ? Colors.white54 : Colors.grey.shade600),
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               fontSize: 14,
@@ -286,51 +339,90 @@ class ProfileView extends GetView<ProfileController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF1E293B)
+            : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Statistik Anda',
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Get.isDarkMode ? Colors.white : Colors.black87),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: Get.isDarkMode ? Colors.white : Colors.black87,
+          ),
           textAlign: TextAlign.center,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildStatRow(Icons.article_outlined, 'Artikel', '${controller.articlesCount.value}', Colors.blue),
+            _buildStatRow(
+              Icons.article_outlined,
+              'Artikel',
+              '${controller.articlesCount.value}',
+              Colors.blue,
+            ),
             const Divider(height: 24),
-            _buildStatRow(Icons.thumb_up_alt_outlined, 'Total Likes', '${controller.likesCount.value}', Colors.redAccent),
+            _buildStatRow(
+              Icons.favorite,
+              'Total Likes',
+              '${controller.likesCount.value}',
+              Colors.redAccent,
+            ),
             const Divider(height: 24),
-            _buildStatRow(Icons.chat_bubble_outline, 'Komentar', '${controller.commentsCount.value}', Colors.green),
+            _buildStatRow(
+              Icons.chat_bubble_outline,
+              'Komentar',
+              '${controller.commentsCount.value}',
+              Colors.green,
+            ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Tutup', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            child: Text(
+              'Tutup',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatRow(IconData icon, String label, String value, Color iconColor) {
+  Widget _buildStatRow(
+    IconData icon,
+    String label,
+    String value,
+    Color iconColor,
+  ) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: iconColor.withOpacity(0.1), shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
           child: Icon(icon, color: iconColor, size: 24),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+            ),
           ),
         ),
         Text(
           value,
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18, color: Get.isDarkMode ? Colors.white : Colors.black87),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Get.isDarkMode ? Colors.white : Colors.black87,
+          ),
         ),
       ],
     );
@@ -347,8 +439,8 @@ class ProfileView extends GetView<ProfileController> {
         );
       }
 
-      final currentArticles = controller.selectedTab.value == 0 
-          ? controller.userArticles 
+      final currentArticles = controller.selectedTab.value == 0
+          ? controller.userArticles
           : controller.likedArticles;
 
       if (currentArticles.isEmpty) {
@@ -364,7 +456,9 @@ class ProfileView extends GetView<ProfileController> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  controller.selectedTab.value == 0 ? "Belum ada artikel" : "Belum ada artikel favorit",
+                  controller.selectedTab.value == 0
+                      ? "Belum ada artikel"
+                      : "Belum ada artikel favorit",
                   style: GoogleFonts.inter(color: Colors.grey),
                 ),
               ],
@@ -387,12 +481,15 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   Widget _buildArticleCard(BuildContext context, dynamic article) {
-    final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
-    final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+    final String imageUrl =
+        article.imageUrl ?? 'https://via.placeholder.com/600x400';
+    final String avatarUrl =
+        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
     final String categoryName = article.category?.name ?? 'Umum';
     final authService = Get.find<AuthService>();
     final currentUserId = authService.currentUser?['id'];
-    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
+    final bool isAuthor =
+        article.user?.id != null && article.user?.id == currentUserId;
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
@@ -400,7 +497,9 @@ class ProfileView extends GetView<ProfileController> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Get.isDarkMode ? context.theme.scaffoldBackgroundColor : Colors.white,
+          color: Get.isDarkMode
+              ? context.theme.scaffoldBackgroundColor
+              : Colors.white,
           border: Border(
             bottom: BorderSide(
               color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
@@ -413,7 +512,10 @@ class ProfileView extends GetView<ProfileController> {
             if (article.isBlocked) ...[
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -421,7 +523,11 @@ class ProfileView extends GetView<ProfileController> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -443,20 +549,31 @@ class ProfileView extends GetView<ProfileController> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                    Icon(
+                      Icons.grid_view_rounded,
+                      size: 16,
+                      color: Get.isDarkMode
+                          ? Colors.white70
+                          : Colors.grey.shade700,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Theme: $categoryName',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                        color: Get.isDarkMode
+                            ? Colors.white70
+                            : Colors.grey.shade700,
                       ),
                     ),
                   ],
                 ),
                 if (article.status == 'banned')
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
@@ -465,7 +582,11 @@ class ProfileView extends GetView<ProfileController> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.report_problem, size: 12, color: Colors.red),
+                        const Icon(
+                          Icons.report_problem,
+                          size: 12,
+                          color: Colors.red,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Banned',
@@ -481,7 +602,7 @@ class ProfileView extends GetView<ProfileController> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Author Info
             Row(
               children: [
@@ -503,7 +624,7 @@ class ProfileView extends GetView<ProfileController> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Article Content Preview
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -518,7 +639,9 @@ class ProfileView extends GetView<ProfileController> {
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           height: 1.3,
-                          color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.grey.shade900,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -542,7 +665,10 @@ class ProfileView extends GetView<ProfileController> {
                         width: 120,
                         height: 80,
                         color: Colors.grey.shade200,
-                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                        ),
                       );
                     },
                   ),
@@ -550,7 +676,7 @@ class ProfileView extends GetView<ProfileController> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Article Meta & Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -559,7 +685,9 @@ class ProfileView extends GetView<ProfileController> {
                   article.formattedDate,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade600,
+                    color: Get.isDarkMode
+                        ? Colors.white54
+                        : Colors.grey.shade600,
                   ),
                 ),
                 Row(
@@ -573,9 +701,15 @@ class ProfileView extends GetView<ProfileController> {
                       child: Row(
                         children: [
                           Icon(
-                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                            (article.isLiked ?? false)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 20,
-                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                            color: (article.isLiked ?? false)
+                                ? Colors.red
+                                : (Get.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey.shade700),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -583,7 +717,9 @@ class ProfileView extends GetView<ProfileController> {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                              color: Get.isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -595,7 +731,9 @@ class ProfileView extends GetView<ProfileController> {
                         Icon(
                           Icons.chat_bubble_outline_rounded,
                           size: 20,
-                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -603,7 +741,9 @@ class ProfileView extends GetView<ProfileController> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
                           ),
                         ),
                       ],
@@ -615,10 +755,12 @@ class ProfileView extends GetView<ProfileController> {
                         child: Icon(
                           Icons.more_horiz,
                           size: 20,
-                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
                         ),
                       ),
-                    ]
+                    ],
                   ],
                 ),
               ],
@@ -668,7 +810,9 @@ class ProfileView extends GetView<ProfileController> {
                 'Edit Artikel',
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                  color: Get.isDarkMode
+                      ? Colors.white
+                      : const Color(0xFF131B2E),
                 ),
               ),
               onTap: () {
@@ -702,7 +846,9 @@ class ProfileView extends GetView<ProfileController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF1E293B)
+            : Colors.white,
         title: Text(
           'Hapus Artikel',
           style: GoogleFonts.inter(fontWeight: FontWeight.bold),
@@ -712,26 +858,36 @@ class ProfileView extends GetView<ProfileController> {
           style: GoogleFonts.inter(),
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Batal', style: GoogleFonts.inter(color: Colors.grey))),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Batal', style: GoogleFonts.inter(color: Colors.grey)),
+          ),
           ElevatedButton(
             onPressed: () {
               Get.back();
               controller.deleteArticle(article.id!);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            child: Text('Hapus', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(
+              'Hapus',
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF1E293B)
+            : Colors.white,
         title: Text(
           'Keluar',
           style: GoogleFonts.inter(fontWeight: FontWeight.bold),
@@ -755,7 +911,10 @@ class ProfileView extends GetView<ProfileController> {
               foregroundColor: Colors.white,
               elevation: 0,
             ),
-            child: Text('Keluar', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+            child: Text(
+              'Keluar',
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -805,7 +964,7 @@ class ProfileView extends GetView<ProfileController> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Edit Photo Section
             Center(
               child: Stack(
@@ -816,20 +975,25 @@ class ProfileView extends GetView<ProfileController> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Get.isDarkMode ? Colors.white24 : const Color(0xFFE2E7FF), width: 4),
+                        border: Border.all(
+                          color: Get.isDarkMode
+                              ? Colors.white24
+                              : const Color(0xFFE2E7FF),
+                          width: 4,
+                        ),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(50),
                         child: controller.selectedImagePath.value.isNotEmpty
                             ? (kIsWeb
-                                ? Image.network(
-                                    controller.selectedImagePath.value,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.file(
-                                    File(controller.selectedImagePath.value),
-                                    fit: BoxFit.cover,
-                                  ))
+                                  ? Image.network(
+                                      controller.selectedImagePath.value,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      File(controller.selectedImagePath.value),
+                                      fit: BoxFit.cover,
+                                    ))
                             : Image.network(
                                 controller.photoProfile.value,
                                 fit: BoxFit.cover,
@@ -863,46 +1027,71 @@ class ProfileView extends GetView<ProfileController> {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             TextField(
               controller: controller.nameController,
-              style: GoogleFonts.inter(color: Get.isDarkMode ? Colors.white : Colors.black87),
+              style: GoogleFonts.inter(
+                color: Get.isDarkMode ? Colors.white : Colors.black87,
+              ),
               decoration: InputDecoration(
                 labelText: "Nama Lengkap",
                 labelStyle: GoogleFonts.inter(color: Colors.grey),
-                prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
+                prefixIcon: const Icon(
+                  Icons.person_outline,
+                  color: Colors.grey,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade300),
+                  borderSide: BorderSide(
+                    color: Get.isDarkMode
+                        ? Colors.white24
+                        : Colors.grey.shade300,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade300),
+                  borderSide: BorderSide(
+                    color: Get.isDarkMode
+                        ? Colors.white24
+                        : Colors.grey.shade300,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller.professionController,
-              style: GoogleFonts.inter(color: Get.isDarkMode ? Colors.white : Colors.black87),
+              style: GoogleFonts.inter(
+                color: Get.isDarkMode ? Colors.white : Colors.black87,
+              ),
               decoration: InputDecoration(
                 labelText: "Pekerjaan",
                 labelStyle: GoogleFonts.inter(color: Colors.grey),
                 prefixIcon: const Icon(Icons.work_outline, color: Colors.grey),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade300),
+                  borderSide: BorderSide(
+                    color: Get.isDarkMode
+                        ? Colors.white24
+                        : Colors.grey.shade300,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade300),
+                  borderSide: BorderSide(
+                    color: Get.isDarkMode
+                        ? Colors.white24
+                        : Colors.grey.shade300,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller.bioController,
-              style: GoogleFonts.inter(color: Get.isDarkMode ? Colors.white : Colors.black87),
+              style: GoogleFonts.inter(
+                color: Get.isDarkMode ? Colors.white : Colors.black87,
+              ),
               maxLines: 3,
               decoration: InputDecoration(
                 labelText: "Bio",
@@ -910,11 +1099,19 @@ class ProfileView extends GetView<ProfileController> {
                 alignLabelWithHint: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade300),
+                  borderSide: BorderSide(
+                    color: Get.isDarkMode
+                        ? Colors.white24
+                        : Colors.grey.shade300,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade300),
+                  borderSide: BorderSide(
+                    color: Get.isDarkMode
+                        ? Colors.white24
+                        : Colors.grey.shade300,
+                  ),
                 ),
               ),
             ),
@@ -923,7 +1120,9 @@ class ProfileView extends GetView<ProfileController> {
               width: double.infinity,
               child: Obx(
                 () => ElevatedButton(
-                  onPressed: controller.isLoading.value ? null : controller.updateProfile,
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : controller.updateProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF092BA2),
                     foregroundColor: Colors.white,
@@ -958,7 +1157,10 @@ class ProfileView extends GetView<ProfileController> {
 
   Widget _buildSnippetPreview(String? content) {
     if (content == null || content.isEmpty) {
-      return Text('Tidak ada ringkasan...', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey));
+      return Text(
+        'Tidak ada ringkasan...',
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+      );
     }
 
     try {
@@ -985,7 +1187,9 @@ class ProfileView extends GetView<ProfileController> {
                     paragraph: DefaultTextBlockStyle(
                       GoogleFonts.inter(
                         fontSize: 14,
-                        color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                        color: Get.isDarkMode
+                            ? Colors.white54
+                            : Colors.grey.shade500,
                         height: 1.4,
                       ),
                       const VerticalSpacing(0, 0),
@@ -1017,7 +1221,10 @@ class ProfileView extends GetView<ProfileController> {
         );
       }
     } catch (e) {
-      return Text('Tidak ada ringkasan...', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey));
+      return Text(
+        'Tidak ada ringkasan...',
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+      );
     }
   }
 }

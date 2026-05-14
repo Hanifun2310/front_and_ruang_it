@@ -7,7 +7,8 @@ import '../controllers/search_controller.dart';
 import '../../../routes/app_routes.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    hide DefaultStyles;
 import '../../../data/services/auth_service.dart';
 
 class SearchView extends GetView<ArticleSearchController> {
@@ -16,7 +17,7 @@ class SearchView extends GetView<ArticleSearchController> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController textController = TextEditingController();
-    
+
     // Sync text controller with observable query (for history selection)
     ever(controller.searchQuery, (String query) {
       if (textController.text != query) {
@@ -45,7 +46,9 @@ class SearchView extends GetView<ArticleSearchController> {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : const Color(0xFF1056C9),
+                  color: Get.isDarkMode
+                      ? Colors.white
+                      : const Color(0xFF1056C9),
                   letterSpacing: -0.5,
                 ),
               ),
@@ -76,22 +79,29 @@ class SearchView extends GetView<ArticleSearchController> {
                 hintText: 'Cari artikel, penulis, atau kategori...',
                 hintStyle: GoogleFonts.inter(color: Colors.grey),
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
-                        onPressed: () {
-                          textController.clear();
-                          controller.onSearchChanged('');
-                        },
-                      )
-                    : const SizedBox()),
+                suffixIcon: Obx(
+                  () => controller.searchQuery.value.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.grey),
+                          onPressed: () {
+                            textController.clear();
+                            controller.onSearchChanged('');
+                          },
+                        )
+                      : const SizedBox(),
+                ),
                 filled: true,
-                fillColor: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
+                fillColor: Get.isDarkMode
+                    ? Colors.white10
+                    : Colors.grey.shade100,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 16,
+                ),
               ),
             ),
           ),
@@ -212,10 +222,12 @@ class SearchView extends GetView<ArticleSearchController> {
   }
 
   Widget _buildArticleCard(BuildContext context, dynamic article) {
-    final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
-    final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+    final String imageUrl =
+        article.imageUrl ?? 'https://via.placeholder.com/600x400';
+    final String avatarUrl =
+        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
     final String categoryName = article.category?.name ?? 'Umum';
-    
+
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
@@ -223,7 +235,9 @@ class SearchView extends GetView<ArticleSearchController> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Get.isDarkMode ? context.theme.scaffoldBackgroundColor : Colors.white,
+          color: Get.isDarkMode
+              ? context.theme.scaffoldBackgroundColor
+              : Colors.white,
           border: Border(
             bottom: BorderSide(
               color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
@@ -235,13 +249,19 @@ class SearchView extends GetView<ArticleSearchController> {
           children: [
             Row(
               children: [
-                Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                Icon(
+                  Icons.grid_view_rounded,
+                  size: 16,
+                  color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Theme: $categoryName',
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                    color: Get.isDarkMode
+                        ? Colors.white70
+                        : Colors.grey.shade700,
                   ),
                 ),
               ],
@@ -279,7 +299,9 @@ class SearchView extends GetView<ArticleSearchController> {
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           height: 1.3,
-                          color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.grey.shade900,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -301,7 +323,10 @@ class SearchView extends GetView<ArticleSearchController> {
                       width: 100,
                       height: 70,
                       color: Colors.grey.shade200,
-                      child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
@@ -315,7 +340,9 @@ class SearchView extends GetView<ArticleSearchController> {
                   article.formattedDate,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade600,
+                    color: Get.isDarkMode
+                        ? Colors.white54
+                        : Colors.grey.shade600,
                   ),
                 ),
                 Row(
@@ -329,9 +356,15 @@ class SearchView extends GetView<ArticleSearchController> {
                       child: Row(
                         children: [
                           Icon(
-                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                            (article.isLiked ?? false)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 20,
-                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                            color: (article.isLiked ?? false)
+                                ? Colors.red
+                                : (Get.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey.shade700),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -339,7 +372,9 @@ class SearchView extends GetView<ArticleSearchController> {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                              color: Get.isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -351,7 +386,9 @@ class SearchView extends GetView<ArticleSearchController> {
                         Icon(
                           Icons.chat_bubble_outline_rounded,
                           size: 20,
-                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -359,7 +396,9 @@ class SearchView extends GetView<ArticleSearchController> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
                           ),
                         ),
                       ],
@@ -400,7 +439,9 @@ class SearchView extends GetView<ArticleSearchController> {
                     paragraph: DefaultTextBlockStyle(
                       GoogleFonts.inter(
                         fontSize: 14,
-                        color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                        color: Get.isDarkMode
+                            ? Colors.white54
+                            : Colors.grey.shade500,
                         height: 1.4,
                       ),
                       const VerticalSpacing(0, 0),
@@ -435,5 +476,4 @@ class SearchView extends GetView<ArticleSearchController> {
       return const SizedBox();
     }
   }
-
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../data/services/like_sync_service.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +13,7 @@ import '../../search/controllers/search_controller.dart';
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   final AuthService _authService = Get.find<AuthService>();
+  final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
 
   var isLoading = false.obs;
   var isArticlesLoading = false.obs;
@@ -84,14 +86,18 @@ class ProfileController extends GetxController {
       while (true) {
         final articles = await _apiProvider.getArticles(page: currentPage);
         if (articles.isEmpty) break;
-        
+
         allFetchedArticles.addAll(articles);
-        
+
         // Safety limit to prevent infinite loops
-        if (currentPage >= 15) break; 
-        
+        if (currentPage >= 15) break;
+
         currentPage++;
       }
+
+      allFetchedArticles = _likeSyncService.applyLikeStateToArticles(
+        allFetchedArticles,
+      );
 
       // Filter articles by user name if we have it
       if (name.value.isNotEmpty) {
@@ -101,7 +107,7 @@ class ProfileController extends GetxController {
       } else {
         userArticles.value = allFetchedArticles;
       }
-      
+
       likedArticles.value = allFetchedArticles
           .where((a) => a.isLiked == true)
           .toList();
@@ -113,11 +119,10 @@ class ProfileController extends GetxController {
         totalLikes += article.likesCount ?? 0;
         totalComments += article.commentsCount ?? 0;
       }
-      
+
       likesCount.value = totalLikes;
       commentsCount.value = totalComments;
       articlesCount.value = userArticles.length;
-      
     } catch (e) {
       print('Error fetching user articles: $e');
     } finally {
@@ -174,7 +179,7 @@ class ProfileController extends GetxController {
           selectedFileName.value = "";
 
           Get.snackbar('Sukses', 'Profil berhasil diperbarui');
-          
+
           // AUTO CLOSE BOTTOM SHEET ON SUCCESS
           if (Get.isBottomSheetOpen ?? false) {
             Get.back();
@@ -185,7 +190,10 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       print('Error update profile: $e');
-      Get.snackbar('Error', 'Gagal memperbarui profil. Pastikan semua data valid.');
+      Get.snackbar(
+        'Error',
+        'Gagal memperbarui profil. Pastikan semua data valid.',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -244,7 +252,7 @@ class ProfileController extends GetxController {
             break;
           }
         }
-        
+
         if (existsInAll == null && Get.isRegistered<DashboardController>()) {
           try {
             final dashboardArticles = Get.find<DashboardController>().articles;
@@ -258,10 +266,13 @@ class ProfileController extends GetxController {
             // ignore
           }
         }
-        
-        if (existsInAll == null && Get.isRegistered<dynamic>(tag: 'ArticleDetailController')) {
+
+        if (existsInAll == null &&
+            Get.isRegistered<dynamic>(tag: 'ArticleDetailController')) {
           try {
-            final detailArticle = Get.find<dynamic>(tag: 'ArticleDetailController').article.value;
+            final detailArticle = Get.find<dynamic>(
+              tag: 'ArticleDetailController',
+            ).article.value;
             if (detailArticle.id == articleId) {
               existsInAll = detailArticle;
             }
@@ -279,26 +290,34 @@ class ProfileController extends GetxController {
             likesCount: 1,
             commentsCount: 0,
           );
-          
-          _apiProvider.getArticles().then((articles) {
-            final fetched = articles.firstWhereOrNull((a) => a.id == articleId);
-            if (fetched != null) {
-              final idx = likedArticles.indexWhere((a) => a.id == articleId);
-              if (idx != -1) {
-                fetched.isLiked = true;
-                likedArticles[idx] = fetched;
-                likedArticles.refresh();
-              }
-            }
-          }).catchError((_) {});
+
+          _apiProvider
+              .getArticles()
+              .then((articles) {
+                final fetched = articles.firstWhereOrNull(
+                  (a) => a.id == articleId,
+                );
+                if (fetched != null) {
+                  final idx = likedArticles.indexWhere(
+                    (a) => a.id == articleId,
+                  );
+                  if (idx != -1) {
+                    fetched.isLiked = true;
+                    likedArticles[idx] = fetched;
+                    likedArticles.refresh();
+                  }
+                }
+              })
+              .catchError((_) {});
         }
-        
+
         likedArticles.add(existsInAll);
       }
     } else {
       likedArticles.removeWhere((a) => a.id == articleId);
     }
     likedArticles.refresh();
+    _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
   Future<void> toggleLike(int articleId) async {
@@ -306,7 +325,7 @@ class ProfileController extends GetxController {
       // Sync userArticles
       final userIndex = userArticles.indexWhere((a) => a.id == articleId);
       final likedIndex = likedArticles.indexWhere((a) => a.id == articleId);
-      
+
       bool isCurrentlyLiked = false;
       if (userIndex != -1) {
         isCurrentlyLiked = userArticles[userIndex].isLiked ?? false;
@@ -315,12 +334,13 @@ class ProfileController extends GetxController {
       }
 
       final newLikedStatus = !isCurrentlyLiked;
-      
+
       // Update local state
       updateArticleLikeState(articleId, newLikedStatus);
-      
+
       // API Call
       await _apiProvider.toggleLike(articleId);
+      _likeSyncService.updateLikeStatus(articleId, newLikedStatus);
 
       // SYNC: Update other controllers
       _syncLikeState(articleId, newLikedStatus);
@@ -332,13 +352,22 @@ class ProfileController extends GetxController {
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<DashboardController>()) {
-        Get.find<DashboardController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<DashboardController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ExploreController>()) {
-        Get.find<ExploreController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ExploreController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ArticleSearchController>()) {
-        Get.find<ArticleSearchController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ArticleSearchController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
     } catch (_) {}
   }

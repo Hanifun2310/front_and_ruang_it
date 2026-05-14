@@ -8,7 +8,8 @@ import '../../../routes/app_routes.dart';
 import '../../../data/services/auth_service.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    hide DefaultStyles;
 
 class ExploreView extends GetView<ExploreController> {
   const ExploreView({super.key});
@@ -36,7 +37,9 @@ class ExploreView extends GetView<ExploreController> {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : const Color(0xFF1056C9),
+                  color: Get.isDarkMode
+                      ? Colors.white
+                      : const Color(0xFF1056C9),
                   letterSpacing: -0.5,
                 ),
               ),
@@ -58,35 +61,48 @@ class ExploreView extends GetView<ExploreController> {
           // Categories filter
           SizedBox(
             height: 40,
-            child: Obx(() => ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: controller.categories.length,
-              itemBuilder: (context, index) {
-                final category = controller.categories[index];
-                final isSelected = controller.selectedCategory.value?.id == category.id;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(category.name ?? ''),
-                    selected: isSelected,
-                    onSelected: (selected) => controller.filterByCategory(category),
-                    backgroundColor: Colors.white,
-                    selectedColor: Colors.grey.shade200,
-                    checkmarkColor: Colors.blueAccent,
-                    labelStyle: GoogleFonts.inter(
-                      color: isSelected ? Colors.blueAccent : (Get.isDarkMode ? Colors.black87 : Colors.black87),
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            child: Obx(
+              () => ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: controller.categories.length,
+                itemBuilder: (context, index) {
+                  final category = controller.categories[index];
+                  final isSelected =
+                      controller.selectedCategory.value?.id == category.id;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(category.name ?? ''),
+                      selected: isSelected,
+                      onSelected: (selected) =>
+                          controller.filterByCategory(category),
+                      backgroundColor: Colors.white,
+                      selectedColor: Colors.grey.shade200,
+                      checkmarkColor: Colors.blueAccent,
+                      labelStyle: GoogleFonts.inter(
+                        color: isSelected
+                            ? Colors.blueAccent
+                            : (Get.isDarkMode
+                                  ? Colors.black87
+                                  : Colors.black87),
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: isSelected ? Colors.blueAccent : Colors.black,
+                          width: 1,
+                        ),
+                      ),
+                      side: BorderSide.none,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: isSelected ? Colors.blueAccent : Colors.black, width: 1),
-                    ),
-                    side: BorderSide.none,
-                  ),
-                );
-              },
-            )),
+                  );
+                },
+              ),
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -126,12 +142,15 @@ class ExploreView extends GetView<ExploreController> {
   }
 
   Widget _buildArticleCard(BuildContext context, dynamic article) {
-    final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
-    final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+    final String imageUrl =
+        article.imageUrl ?? 'https://via.placeholder.com/600x400';
+    final String avatarUrl =
+        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
     final String categoryName = article.category?.name ?? 'Umum';
     final authService = Get.find<AuthService>();
     final currentUserId = authService.currentUser?['id'];
-    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
+    final bool isAuthor =
+        article.user?.id != null && article.user?.id == currentUserId;
 
     return InkWell(
       onTap: () {
@@ -140,7 +159,9 @@ class ExploreView extends GetView<ExploreController> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Get.isDarkMode ? context.theme.scaffoldBackgroundColor : Colors.white,
+          color: Get.isDarkMode
+              ? context.theme.scaffoldBackgroundColor
+              : Colors.white,
           border: Border(
             bottom: BorderSide(
               color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
@@ -152,13 +173,19 @@ class ExploreView extends GetView<ExploreController> {
           children: [
             Row(
               children: [
-                Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                Icon(
+                  Icons.grid_view_rounded,
+                  size: 16,
+                  color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Theme: $categoryName',
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                    color: Get.isDarkMode
+                        ? Colors.white70
+                        : Colors.grey.shade700,
                   ),
                 ),
               ],
@@ -196,7 +223,9 @@ class ExploreView extends GetView<ExploreController> {
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           height: 1.3,
-                          color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.grey.shade900,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -218,7 +247,10 @@ class ExploreView extends GetView<ExploreController> {
                       width: 100,
                       height: 70,
                       color: Colors.grey.shade200,
-                      child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
@@ -232,7 +264,9 @@ class ExploreView extends GetView<ExploreController> {
                   article.formattedDate,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade600,
+                    color: Get.isDarkMode
+                        ? Colors.white54
+                        : Colors.grey.shade600,
                   ),
                 ),
                 Row(
@@ -242,9 +276,15 @@ class ExploreView extends GetView<ExploreController> {
                       child: Row(
                         children: [
                           Icon(
-                            (article.isLiked ?? false) ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                            (article.isLiked ?? false)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 20,
-                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                            color: (article.isLiked ?? false)
+                                ? Colors.red
+                                : (Get.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey.shade700),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -252,7 +292,9 @@ class ExploreView extends GetView<ExploreController> {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                              color: Get.isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -264,7 +306,9 @@ class ExploreView extends GetView<ExploreController> {
                         Icon(
                           Icons.chat_bubble_outline_rounded,
                           size: 20,
-                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -272,7 +316,9 @@ class ExploreView extends GetView<ExploreController> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
                           ),
                         ),
                       ],
@@ -313,7 +359,9 @@ class ExploreView extends GetView<ExploreController> {
                     paragraph: DefaultTextBlockStyle(
                       GoogleFonts.inter(
                         fontSize: 14,
-                        color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                        color: Get.isDarkMode
+                            ? Colors.white54
+                            : Colors.grey.shade500,
                         height: 1.4,
                       ),
                       const VerticalSpacing(0, 0),
@@ -348,5 +396,4 @@ class ExploreView extends GetView<ExploreController> {
       return const SizedBox();
     }
   }
-
 }

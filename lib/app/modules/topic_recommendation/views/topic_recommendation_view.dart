@@ -25,9 +25,11 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
       // Prevent index range errors during transition
       int idx = controller.currentIndex.value;
       if (idx >= controller.selectedCategories.length) idx = 0;
-      
+
       final currentCategory = controller.selectedCategories[idx];
-      final scaffoldBgColor = controller.backgroundColors[currentCategory.id] ?? const Color(0xFFFFEB3B);
+      final scaffoldBgColor =
+          controller.backgroundColors[currentCategory.id] ??
+          const Color(0xFFFFEB3B);
 
       return Scaffold(
         backgroundColor: scaffoldBgColor,
@@ -36,7 +38,10 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
             children: [
               // Header Section
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 10.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -45,7 +50,11 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         alignment: Alignment.centerLeft,
-                        icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 28),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.black87,
+                          size: 28,
+                        ),
                         onPressed: () => Get.back(),
                       ),
                     ),
@@ -66,7 +75,10 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1C1E2B),
                             borderRadius: BorderRadius.circular(25),
@@ -99,7 +111,10 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
 
                     return AnimatedPadding(
                       duration: const Duration(milliseconds: 300),
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 12.0,
+                      ),
                       child: Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFF1C1E2B),
@@ -109,7 +124,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                               color: Colors.black.withOpacity(0.15),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
-                            )
+                            ),
                           ],
                         ),
                         child: article == null
@@ -140,14 +155,24 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(24),
                                       child: Image.network(
-                                        article.imageUrl ?? 'https://via.placeholder.com/600x400',
-                                        height: MediaQuery.of(context).size.height * 0.25,
+                                        article.imageUrl ??
+                                            'https://via.placeholder.com/600x400',
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                            0.25,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
                                         errorBuilder: (c, e, s) => Container(
-                                          height: MediaQuery.of(context).size.height * 0.25,
+                                          height:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              0.25,
                                           color: Colors.grey[800],
-                                          child: const Icon(Icons.image_not_supported, color: Colors.white),
+                                          child: const Icon(
+                                            Icons.image_not_supported,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -178,11 +203,15 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                       ),
                                     ),
                                     const SizedBox(height: 24),
-                                    Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
+                                    Divider(
+                                      color: Colors.white.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),
                                     const SizedBox(height: 16),
                                     // Bottom Author Area
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           child: Row(
@@ -192,10 +221,15 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                                 height: 42,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.white24, width: 1),
+                                                  border: Border.all(
+                                                    color: Colors.white24,
+                                                    width: 1,
+                                                  ),
                                                   image: DecorationImage(
                                                     image: NetworkImage(
-                                                      article.user?.photoProfile ??
+                                                      article
+                                                              .user
+                                                              ?.photoProfile ??
                                                           'https://via.placeholder.com/150',
                                                     ),
                                                     fit: BoxFit.cover,
@@ -205,15 +239,19 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                               const SizedBox(width: 12),
                                               Expanded(
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      article.user?.name ?? 'Unknown',
+                                                      article.user?.name ??
+                                                          'Unknown',
                                                       maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                       style: const TextStyle(
                                                         color: Colors.white,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 14,
                                                       ),
                                                     ),
@@ -221,7 +259,8 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                                     Text(
                                                       'Popular Author',
                                                       style: TextStyle(
-                                                        color: Colors.white.withOpacity(0.6),
+                                                        color: Colors.white
+                                                            .withOpacity(0.6),
                                                         fontSize: 11,
                                                       ),
                                                     ),
@@ -233,22 +272,38 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                         ),
                                         // Actions Pill
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius: BorderRadius.circular(25),
+                                            borderRadius: BorderRadius.circular(
+                                              25,
+                                            ),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(Icons.refresh, color: Colors.black87, size: 20),
+                                              const Icon(
+                                                Icons.refresh,
+                                                color: Colors.black87,
+                                                size: 20,
+                                              ),
                                               Container(
-                                                margin: const EdgeInsets.symmetric(horizontal: 8),
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                    ),
                                                 width: 1,
                                                 height: 14,
                                                 color: Colors.black26,
                                               ),
-                                              const Icon(Icons.thumb_up_outlined, color: Colors.black87, size: 20),
+                                              const Icon(
+                                                Icons.favorite_border,
+                                                color: Colors.black87,
+                                                size: 20,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -278,7 +333,10 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                           backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
-                            side: const BorderSide(color: Colors.black, width: 1.2),
+                            side: const BorderSide(
+                              color: Colors.black,
+                              width: 1.2,
+                            ),
                           ),
                         ),
                         child: const Text(
@@ -301,7 +359,9 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                           duration: const Duration(milliseconds: 300),
                           margin: const EdgeInsets.symmetric(horizontal: 3),
                           height: 4,
-                          width: controller.currentIndex.value == index ? 16 : 4,
+                          width: controller.currentIndex.value == index
+                              ? 16
+                              : 4,
                           decoration: BoxDecoration(
                             color: controller.currentIndex.value == index
                                 ? Colors.black87
