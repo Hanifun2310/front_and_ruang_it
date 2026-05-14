@@ -16,10 +16,10 @@ class DashboardController extends GetxController {
   var categories = <CategoryModel>[].obs;
   var selectedCategory = Rxn<CategoryModel>();
   var searchQuery = ''.obs;
-  
+
   // Pagination states
-  var isLoading = false.obs;       
-  var isFetchingMore = false.obs;  
+  var isLoading = false.obs;
+  var isFetchingMore = false.obs;
   var currentPage = 1;
   var hasMoreData = true.obs;
   var activeTab = 0.obs;
@@ -47,7 +47,9 @@ class DashboardController extends GetxController {
       final response = await _apiProvider.getCategories();
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['data'] ?? response.data;
-        List<CategoryModel> fetchedCategories = data.map((e) => CategoryModel.fromJson(e)).toList();
+        List<CategoryModel> fetchedCategories = data
+            .map((e) => CategoryModel.fromJson(e))
+            .toList();
         categories.value = fetchedCategories;
       }
     } catch (e) {
@@ -56,8 +58,8 @@ class DashboardController extends GetxController {
   }
 
   void changeCategory(CategoryModel? category) {
-    if (selectedCategory.value?.id == category?.id) return; 
-    
+    if (selectedCategory.value?.id == category?.id) return;
+
     selectedCategory.value = category;
     currentPage = 1;
     hasMoreData.value = true;
@@ -85,7 +87,7 @@ class DashboardController extends GetxController {
     try {
       // Menggunakan ApiProvider yang sesungguhnya!
       List<ArticleModel> newArticles = await _apiProvider.getArticles(
-        page: currentPage, 
+        page: currentPage,
         category: selectedCategory.value?.id.toString(),
         search: searchQuery.value,
       );
@@ -96,14 +98,14 @@ class DashboardController extends GetxController {
         // FILTER: Jangan tampilkan artikel terblokir di Dashboard
         final publicArticles = newArticles.where((a) => !a.isBlocked).toList();
         articles.addAll(publicArticles);
-        
-        // Jika semua artikel di halaman ini terblokir, tapi masih ada data di server, 
-        // kita mungkin perlu fetch page berikutnya secara otomatis, tapi untuk 
+
+        // Jika semua artikel di halaman ini terblokir, tapi masih ada data di server,
+        // kita mungkin perlu fetch page berikutnya secara otomatis, tapi untuk
         // simplifikasi kita biarkan pagination berjalan normal.
         if (publicArticles.isEmpty && newArticles.isNotEmpty) {
-           currentPage++;
-           fetchArticles();
-           return;
+          currentPage++;
+          fetchArticles();
+          return;
         }
 
         currentPage++;
@@ -111,7 +113,7 @@ class DashboardController extends GetxController {
     } catch (e) {
       // Jika terjadi error (misal server mati), tampilkan snackbar
       Get.snackbar(
-        'Gagal Memuat', 
+        'Gagal Memuat',
         'Terjadi kesalahan saat mengambil artikel',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -130,14 +132,15 @@ class DashboardController extends GetxController {
 
       final article = articles[index];
       final isCurrentlyLiked = article.isLiked ?? false;
-      
+
       // Optimistic update
       article.isLiked = !isCurrentlyLiked;
-      article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
-      
+      article.likesCount =
+          (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+
       articles[index] = article; // trigger reactivity
       articles.refresh();
-      
+
       await _apiProvider.toggleLike(articleId);
 
       // SYNC: Update other controllers
@@ -149,7 +152,8 @@ class DashboardController extends GetxController {
         final isCurrentlyLiked = article.isLiked ?? false;
         // Revert
         article.isLiked = !isCurrentlyLiked;
-        article.likesCount = (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
+        article.likesCount =
+            (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
         articles[index] = article;
         articles.refresh();
       }
@@ -158,7 +162,7 @@ class DashboardController extends GetxController {
       isLiking.value = false;
     }
   }
-  
+
   // Sync method for other controllers to update state
   void updateArticleLikeState(int articleId, bool isLiked) {
     final index = articles.indexWhere((a) => a.id == articleId);
@@ -177,13 +181,22 @@ class DashboardController extends GetxController {
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<ProfileController>()) {
-        Get.find<ProfileController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ProfileController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ExploreController>()) {
-        Get.find<ExploreController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ExploreController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
       if (Get.isRegistered<ArticleSearchController>()) {
-        Get.find<ArticleSearchController>().updateArticleLikeState(articleId, isLiked);
+        Get.find<ArticleSearchController>().updateArticleLikeState(
+          articleId,
+          isLiked,
+        );
       }
     } catch (_) {}
   }
@@ -196,7 +209,8 @@ class DashboardController extends GetxController {
 
   // --- FUNGSI BARU UNTUK MENGUBAH JSON MENJADI TEKS PREVIEW ---
   String getSnippetText(String? content) {
-    if (content == null || content.trim().isEmpty) return 'Tidak ada ringkasan...';
+    if (content == null || content.trim().isEmpty)
+      return 'Tidak ada ringkasan...';
 
     try {
       // Cek apakah ini format JSON dari Quill
@@ -204,7 +218,7 @@ class DashboardController extends GetxController {
         final deltaJson = jsonDecode(content);
         final document = Document.fromJson(deltaJson);
         // Ambil teks asli dan ubah "enter" menjadi "spasi"
-        return document.toPlainText().replaceAll('\n', ' ').trim(); 
+        return document.toPlainText().replaceAll('\n', ' ').trim();
       }
       // Fallback untuk artikel lama yang mungkin pakai HTML
       return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
@@ -220,11 +234,13 @@ class DashboardController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 204) {
         articles.removeWhere((article) => article.id == id);
         Get.snackbar('Sukses', 'Artikel berhasil dihapus');
-        
+
         // SYNC: Update ProfileController if registered
         try {
           if (Get.isRegistered<ProfileController>()) {
-            Get.find<ProfileController>().userArticles.removeWhere((article) => article.id == id);
+            Get.find<ProfileController>().userArticles.removeWhere(
+              (article) => article.id == id,
+            );
             Get.find<ProfileController>().articlesCount.value--;
           }
         } catch (e) {

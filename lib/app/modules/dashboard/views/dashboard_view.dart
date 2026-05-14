@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/loading_widget.dart';
-import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/dashboard_controller.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    hide DefaultStyles;
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/theme_service.dart';
 import '../../../routes/app_routes.dart';
@@ -19,7 +19,8 @@ class DashboardView extends GetView<DashboardController> {
     // Controller untuk mendeteksi scroll mentok ke bawah (untuk load more)
     final ScrollController scrollController = ScrollController();
     scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 50) {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 50) {
         if (controller.activeTab.value == 0) {
           controller.loadMoreArticles();
         }
@@ -47,7 +48,9 @@ class DashboardView extends GetView<DashboardController> {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : const Color(0xFF1056C9),
+                  color: Get.isDarkMode
+                      ? Colors.white
+                      : const Color(0xFF1056C9),
                   letterSpacing: -0.5,
                 ),
               ),
@@ -68,39 +71,55 @@ class DashboardView extends GetView<DashboardController> {
           Container(
             height: 50,
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade300)),
+              border: Border(
+                bottom: BorderSide(
+                  color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade300,
+                ),
+              ),
             ),
-            child: Obx(() => Row(
-              children: [
-                _buildTab('Artikel Terbaru', 0),
-                _buildTab('Artikel Populer', 1),
-              ],
-            )),
+            child: Obx(
+              () => Row(
+                children: [
+                  _buildTab('Artikel Terbaru', 0),
+                  _buildTab('Artikel Populer', 1),
+                ],
+              ),
+            ),
           ),
 
           // --- DAFTAR ARTIKEL (INFINITE SCROLL) ---
           Expanded(
             child: Obx(() {
               final isTerbaru = controller.activeTab.value == 0;
-              final displayList = isTerbaru ? controller.articles : controller.trendingArticles;
+              final displayList = isTerbaru
+                  ? controller.articles
+                  : controller.trendingArticles;
 
               if (controller.isLoading.value && displayList.isEmpty) {
                 return const LoadingWidget();
               }
 
               if (displayList.isEmpty) {
-                return Center(child: Text("Belum ada artikel.", style: GoogleFonts.inter()));
+                return Center(
+                  child: Text("Belum ada artikel.", style: GoogleFonts.inter()),
+                );
               }
 
               return RefreshIndicator(
                 onRefresh: () async {
                   if (isTerbaru) {
-                    controller.changeCategory(controller.selectedCategory.value);
+                    controller.changeCategory(
+                      controller.selectedCategory.value,
+                    );
                   }
                 },
                 child: ListView.builder(
-                  controller: isTerbaru ? scrollController : null, // hanya scroll paging di tab terbaru
-                  itemCount: displayList.length + (isTerbaru && controller.hasMoreData.value ? 1 : 0),
+                  controller: isTerbaru
+                      ? scrollController
+                      : null, // hanya scroll paging di tab terbaru
+                  itemCount:
+                      displayList.length +
+                      (isTerbaru && controller.hasMoreData.value ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (isTerbaru && index == displayList.length) {
                       return const Padding(
@@ -118,7 +137,87 @@ class DashboardView extends GetView<DashboardController> {
           ),
         ],
       ),
-      bottomNavigationBar: const CustomBottomNav(currentIndex: 0),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E8F0),
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Get.isDarkMode
+              ? Colors.blueAccent
+              : const Color(0xFF1056C9),
+          unselectedItemColor: Get.isDarkMode
+              ? Colors.white54
+              : Colors.grey.shade800,
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          currentIndex: 0,
+          onTap: (index) {
+            if (index == 1) {
+              Get.offNamed(Routes.EXPLORE);
+            } else if (index == 2) {
+              Get.offNamed(Routes.SEARCH);
+            } else if (index == 3) {
+              Get.offNamed(Routes.PROFILE);
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.home_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.home_rounded),
+              ),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.explore_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.explore),
+              ),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.search_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.search),
+              ),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.person_outline),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.person),
+              ),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -133,7 +232,9 @@ class DashboardView extends GetView<DashboardController> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isSelected ? (Get.isDarkMode ? Colors.white : Colors.black) : Colors.transparent,
+                color: isSelected
+                    ? (Get.isDarkMode ? Colors.white : Colors.black)
+                    : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -142,8 +243,8 @@ class DashboardView extends GetView<DashboardController> {
           child: Text(
             title,
             style: GoogleFonts.inter(
-              color: isSelected 
-                  ? (Get.isDarkMode ? Colors.white : Colors.black) 
+              color: isSelected
+                  ? (Get.isDarkMode ? Colors.white : Colors.black)
                   : (Get.isDarkMode ? Colors.white54 : Colors.grey.shade600),
               fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
               fontSize: 15,
@@ -155,12 +256,15 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildArticleCard(BuildContext context, dynamic article) {
-    final String imageUrl = article.imageUrl ?? 'https://via.placeholder.com/600x400';
-    final String avatarUrl = article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+    final String imageUrl =
+        article.imageUrl ?? 'https://via.placeholder.com/600x400';
+    final String avatarUrl =
+        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
     final String categoryName = article.category?.name ?? 'Umum';
     final authService = Get.find<AuthService>();
     final currentUserId = authService.currentUser?['id'];
-    final bool isAuthor = article.user?.id != null && article.user?.id == currentUserId;
+    final bool isAuthor =
+        article.user?.id != null && article.user?.id == currentUserId;
 
     return InkWell(
       onTap: () {
@@ -169,7 +273,9 @@ class DashboardView extends GetView<DashboardController> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Get.isDarkMode ? context.theme.scaffoldBackgroundColor : Colors.white,
+          color: Get.isDarkMode
+              ? context.theme.scaffoldBackgroundColor
+              : Colors.white,
           border: Border(
             bottom: BorderSide(
               color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
@@ -182,19 +288,25 @@ class DashboardView extends GetView<DashboardController> {
             // Theme Label
             Row(
               children: [
-                Icon(Icons.grid_view_rounded, size: 16, color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                Icon(
+                  Icons.grid_view_rounded,
+                  size: 16,
+                  color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Theme: $categoryName',
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                    color: Get.isDarkMode
+                        ? Colors.white70
+                        : Colors.grey.shade700,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Author Info
             Row(
               children: [
@@ -216,7 +328,7 @@ class DashboardView extends GetView<DashboardController> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Article Content Preview
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +343,9 @@ class DashboardView extends GetView<DashboardController> {
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           height: 1.3,
-                          color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.grey.shade900,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -255,7 +369,10 @@ class DashboardView extends GetView<DashboardController> {
                         width: 120,
                         height: 80,
                         color: Colors.grey.shade200,
-                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                        ),
                       );
                     },
                   ),
@@ -263,7 +380,7 @@ class DashboardView extends GetView<DashboardController> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Article Meta & Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -272,7 +389,9 @@ class DashboardView extends GetView<DashboardController> {
                   article.formattedDate,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade600,
+                    color: Get.isDarkMode
+                        ? Colors.white54
+                        : Colors.grey.shade600,
                   ),
                 ),
                 Row(
@@ -286,9 +405,15 @@ class DashboardView extends GetView<DashboardController> {
                       child: Row(
                         children: [
                           Icon(
-                            (article.isLiked ?? false) ? Icons.favorite : Icons.favorite_border,
+                            (article.isLiked ?? false)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 20,
-                            color: (article.isLiked ?? false) ? Colors.blueAccent : (Get.isDarkMode ? Colors.white70 : Colors.grey.shade700),
+                            color: (article.isLiked ?? false)
+                                ? Colors.blueAccent
+                                : (Get.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey.shade700),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -296,7 +421,9 @@ class DashboardView extends GetView<DashboardController> {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                              color: Get.isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -308,7 +435,9 @@ class DashboardView extends GetView<DashboardController> {
                         Icon(
                           Icons.chat_bubble_outline_rounded,
                           size: 20,
-                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -316,7 +445,9 @@ class DashboardView extends GetView<DashboardController> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
                           ),
                         ),
                       ],
@@ -328,10 +459,12 @@ class DashboardView extends GetView<DashboardController> {
                         child: Icon(
                           Icons.more_horiz,
                           size: 20,
-                          color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
                         ),
                       ),
-                    ]
+                    ],
                   ],
                 ),
               ],
@@ -381,7 +514,9 @@ class DashboardView extends GetView<DashboardController> {
                 'Edit Artikel',
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                  color: Get.isDarkMode
+                      ? Colors.white
+                      : const Color(0xFF131B2E),
                 ),
               ),
               onTap: () {
@@ -415,7 +550,9 @@ class DashboardView extends GetView<DashboardController> {
     if (id == null) return;
     Get.dialog(
       AlertDialog(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF1E293B)
+            : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Hapus Artikel',
@@ -428,10 +565,7 @@ class DashboardView extends GetView<DashboardController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text(
-              'Batal',
-              style: GoogleFonts.inter(color: Colors.grey),
-            ),
+            child: Text('Batal', style: GoogleFonts.inter(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -442,7 +576,9 @@ class DashboardView extends GetView<DashboardController> {
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Text(
               'Hapus',
@@ -456,7 +592,10 @@ class DashboardView extends GetView<DashboardController> {
 
   Widget _buildSnippetPreview(String? content) {
     if (content == null || content.isEmpty) {
-      return Text('Tidak ada ringkasan...', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey));
+      return Text(
+        'Tidak ada ringkasan...',
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+      );
     }
 
     try {
@@ -483,7 +622,9 @@ class DashboardView extends GetView<DashboardController> {
                     paragraph: DefaultTextBlockStyle(
                       GoogleFonts.inter(
                         fontSize: 14,
-                        color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                        color: Get.isDarkMode
+                            ? Colors.white54
+                            : Colors.grey.shade500,
                         height: 1.4,
                       ),
                       const VerticalSpacing(0, 0),
@@ -515,7 +656,10 @@ class DashboardView extends GetView<DashboardController> {
         );
       }
     } catch (e) {
-      return Text('Tidak ada ringkasan...', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey));
+      return Text(
+        'Tidak ada ringkasan...',
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+      );
     }
   }
 }
