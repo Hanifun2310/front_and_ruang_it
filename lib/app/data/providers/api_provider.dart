@@ -1,11 +1,10 @@
 import 'package:dio/dio.dart';
-// KUNCI PERBAIKAN: Sembunyikan Response, FormData, dan MultipartFile milik GetX
 import 'package:get/get.dart' hide Response, FormData, MultipartFile; 
 import '../services/auth_service.dart';
 import '../models/article_model.dart';
 
 class ApiProvider {
-  late Dio _dio; // <-- _dio didefinisikan di sini
+  late Dio _dio;
   
   static const String baseUrl = 'https://ruang-it.vibedev.my.id/api';
 
@@ -43,10 +42,6 @@ class ApiProvider {
     ));
   }
 
-  // ===========================================================================
-  // AUTHENTICATION ROUTES
-  // ===========================================================================
-  
   Future<Response> login(String email, String password) async {
     return await _dio.post('/login', data: {
       'email': email,
@@ -59,7 +54,7 @@ class ApiProvider {
       'name': name,
       'email': email,
       'password': password,
-      'password_confirmation': password, // Trik Ninja
+      'password_confirmation': password,
       'profession': profession,
     });
   }
@@ -67,10 +62,6 @@ class ApiProvider {
   Future<Response> logout() async {
     return await _dio.post('/logout');
   }
-
-  // ===========================================================================
-  // PUBLIC ROUTES
-  // ===========================================================================
 
   Future<List<ArticleModel>> getArticles({int page = 1, String? category, String? search}) async {
     try {
@@ -105,10 +96,6 @@ class ApiProvider {
     return await _dio.get('/articles/$articleId/comments');
   }
 
-  // ===========================================================================
-  // PROTECTED ROUTES (Membutuhkan Token)
-  // ===========================================================================
-
   Future<Response> toggleLike(int articleId) async {
   return await _dio.post('/articles/$articleId/like');
 }
@@ -124,7 +111,6 @@ class ApiProvider {
     return await _dio.get('/profile');
   }
 
-  // FUNGSI UPDATE PROFILE YANG BARU
   Future<Response> updateProfile({
     required String name,
     required String profession,
@@ -148,17 +134,15 @@ class ApiProvider {
       data['image'] = MultipartFile.fromBytes(
         imageBytes,
         filename: fileName,
-      ); // Backup key
+      );
     } else if (imagePath != null && imagePath.isNotEmpty) {
       data['photo_profile'] = await MultipartFile.fromFile(imagePath);
-      data['image'] = await MultipartFile.fromFile(imagePath); // Backup key
+      data['image'] = await MultipartFile.fromFile(imagePath);
     }
 
-    // Gunakan POST dengan _method=PUT untuk multipart/form-data update di Laravel
     return await _dio.post('/profile', data: FormData.fromMap(data));
   }
 
-  // FUNGSI CREATE ARTICLE
   Future<Response> createArticle({
     required String title,
     required String content,
@@ -182,7 +166,6 @@ class ApiProvider {
     return await _dio.post('/articles', data: FormData.fromMap(data));
   }
 
-  // FUNGSI UPDATE ARTICLE
   Future<Response> updateArticle({
     required int id,
     required String title,
@@ -208,7 +191,6 @@ class ApiProvider {
     return await _dio.post('/articles/$id', data: FormData.fromMap(data));
   }
 
-  // FUNGSI DELETE ARTICLE
   Future<Response> deleteArticle(int id) async {
     return await _dio.delete('/articles/$id');
   }
