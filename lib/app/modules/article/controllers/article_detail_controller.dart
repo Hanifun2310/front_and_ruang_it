@@ -14,7 +14,6 @@ import '../../../data/services/auth_service.dart';
 class ArticleDetailController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   
-  // Ambil identifier (slug/id) dari argument navigasi
   final String identifier = Get.arguments?.toString() ?? "";
 
   var article = ArticleModel().obs;
