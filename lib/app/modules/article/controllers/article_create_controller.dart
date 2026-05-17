@@ -9,7 +9,6 @@ class ArticleCreateController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   
   final titleController = TextEditingController();
-  // Menggunakan QuillController sebagai pengganti TextEditingController
   final QuillController quillController = QuillController.basic();
   
   final Rx<XFile?> selectedImage = Rx<XFile?>(null);
