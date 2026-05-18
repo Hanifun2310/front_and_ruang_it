@@ -123,9 +123,10 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                                 children: [
                                   CircleAvatar(
                                     radius: 32,
-                                    backgroundImage: NetworkImage(
-                                      author.photoProfile ?? 'https://via.placeholder.com/150',
-                                    ),
+                                    backgroundColor: Colors.grey.shade800,
+                                    backgroundImage: (author.photoProfile?.isNotEmpty == true)
+                                        ? NetworkImage(author.photoProfile!) as ImageProvider
+                                        : const AssetImage('assets/images/fallback_pp.png'),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(

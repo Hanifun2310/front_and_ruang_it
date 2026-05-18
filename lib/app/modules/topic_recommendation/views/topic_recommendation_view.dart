@@ -234,12 +234,9 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                                         width: 1,
                                                       ),
                                                       image: DecorationImage(
-                                                        image: NetworkImage(
-                                                          article
-                                                                  .user
-                                                                  ?.photoProfile ??
-                                                              'https://via.placeholder.com/150',
-                                                        ),
+                                                        image: (article.user?.photoProfile?.isNotEmpty == true)
+                                                            ? NetworkImage(article.user!.photoProfile!) as ImageProvider
+                                                            : const AssetImage('assets/images/fallback_pp.png'),
                                                         fit: BoxFit.cover,
                                                       ),
                                                     ),

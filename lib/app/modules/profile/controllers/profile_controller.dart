@@ -40,6 +40,36 @@ class ProfileController extends GetxController {
   var likedArticles = <ArticleModel>[].obs;
   var selectedTab = 0.obs;
 
+  // Search & Filter
+  var articleSearchQuery = ''.obs;
+  var selectedCategoryFilter = Rxn<String>();
+  final articleSearchController = TextEditingController();
+
+  List<String> get availableCategories {
+    final cats = userArticles
+        .map((a) => a.category?.name)
+        .whereType<String>()
+        .toSet()
+        .toList();
+    cats.sort();
+    return cats;
+  }
+
+  List<ArticleModel> get filteredUserArticles {
+    final q = articleSearchQuery.value.trim().toLowerCase();
+    final cat = selectedCategoryFilter.value;
+    return userArticles.where((a) {
+      final matchQuery = q.isEmpty || (a.title ?? '').toLowerCase().contains(q);
+      final matchCategory = cat == null || a.category?.name == cat;
+      return matchQuery && matchCategory;
+    }).toList();
+  }
+
+  void clearArticleSearch() {
+    articleSearchQuery.value = '';
+    articleSearchController.clear();
+  }
+
   // Stats (Mocked or from User data)
   var articlesCount = 0.obs;
   var likesCount = 0.obs;
@@ -373,5 +403,11 @@ class ProfileController extends GetxController {
 
   Future<void> logout() async {
     await _authService.logout();
+  }
+
+  @override
+  void onClose() {
+    articleSearchController.dispose();
+    super.onClose();
   }
 }

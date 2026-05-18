@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../routes/app_routes.dart';
+import 'like_sync_service.dart';
 
 class AuthService extends GetxService {
   final box = GetStorage();
@@ -30,6 +31,13 @@ class AuthService extends GetxService {
     await box.remove('token');
     await box.remove('user');
     isLoggedIn.value = false;
+    
+    // Bersihkan like state persisten agar tidak bocor ke user lain
+    try {
+      if (Get.isRegistered<LikeSyncService>()) {
+        Get.find<LikeSyncService>().clearAll();
+      }
+    } catch (_) {}
     
     Get.offAllNamed(Routes.LOGIN);
   }

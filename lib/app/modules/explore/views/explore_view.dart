@@ -145,7 +145,9 @@ class ExploreView extends GetView<ExploreController> {
     final String imageUrl =
         article.imageUrl ?? 'https://via.placeholder.com/600x400';
     final String avatarUrl =
-        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+        (article.user?.photoProfile?.isNotEmpty == true)
+            ? article.user!.photoProfile!
+            : '';
     final String categoryName = article.category?.name ?? 'Umum';
     final authService = Get.find<AuthService>();
     final currentUserId = authService.currentUser?['id'];

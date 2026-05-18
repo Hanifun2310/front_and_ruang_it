@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
@@ -12,6 +13,36 @@ class AuthorProfileController extends GetxController {
   
   var userArticles = <ArticleModel>[].obs;
   
+  // Search & Filter
+  var articleSearchQuery = ''.obs;
+  var selectedCategoryFilter = Rxn<String>();
+  final articleSearchController = TextEditingController();
+
+  List<String> get availableCategories {
+    final cats = userArticles
+        .map((a) => a.category?.name)
+        .whereType<String>()
+        .toSet()
+        .toList();
+    cats.sort();
+    return cats;
+  }
+
+  List<ArticleModel> get filteredUserArticles {
+    final q = articleSearchQuery.value.trim().toLowerCase();
+    final cat = selectedCategoryFilter.value;
+    return userArticles.where((a) {
+      final matchQuery = q.isEmpty || (a.title ?? '').toLowerCase().contains(q);
+      final matchCategory = cat == null || a.category?.name == cat;
+      return matchQuery && matchCategory;
+    }).toList();
+  }
+
+  void clearArticleSearch() {
+    articleSearchQuery.value = '';
+    articleSearchController.clear();
+  }
+
   var articlesCount = 0.obs;
   var likesCount = 0.obs;
   var commentsCount = 0.obs;
@@ -88,5 +119,11 @@ class AuthorProfileController extends GetxController {
     } catch (e) {
       fetchAuthorArticles(); // Revert on error
     }
+  }
+
+  @override
+  void onClose() {
+    articleSearchController.dispose();
+    super.onClose();
   }
 }

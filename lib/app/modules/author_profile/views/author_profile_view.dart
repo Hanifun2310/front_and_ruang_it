@@ -316,39 +316,167 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
         );
       }
 
-      final currentArticles = controller.userArticles;
+      final currentArticles = controller.filteredUserArticles;
+      final hasActiveFilter = controller.articleSearchQuery.value.isNotEmpty ||
+          controller.selectedCategoryFilter.value != null;
 
-      if (currentArticles.isEmpty) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(48.0),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.article_outlined,
-                  size: 48,
-                  color: Colors.grey.shade300,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: TextField(
+              controller: controller.articleSearchController,
+              onChanged: (v) => controller.articleSearchQuery.value = v,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Get.isDarkMode ? Colors.white : Colors.black87,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Cari artikel penulis ini...',
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Colors.grey.shade400,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  "Penulis belum menerbitkan artikel.",
-                  style: GoogleFonts.inter(color: Colors.grey),
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  color: Colors.grey.shade400,
+                  size: 20,
                 ),
-              ],
+                suffixIcon: Obx(() =>
+                  controller.articleSearchQuery.value.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(Icons.close, size: 18, color: Colors.grey.shade400),
+                          onPressed: controller.clearArticleSearch,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                filled: true,
+                fillColor: Get.isDarkMode
+                    ? Colors.white.withOpacity(0.06)
+                    : Colors.grey.shade100,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16, vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ),
-        );
-      }
+          // Category Chips
+          if (controller.availableCategories.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text('Semua',
+                            style: GoogleFonts.inter(fontSize: 12)),
+                        selected: controller.selectedCategoryFilter.value == null,
+                        onSelected: (_) =>
+                            controller.selectedCategoryFilter.value = null,
+                        selectedColor: const Color(0xFF092BA2),
+                        labelStyle: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: controller.selectedCategoryFilter.value == null
+                              ? Colors.white
+                              : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                        ),
+                        backgroundColor: Get.isDarkMode
+                            ? Colors.white.withOpacity(0.08)
+                            : Colors.grey.shade100,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide.none,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                      ),
+                    ),
+                    ...controller.availableCategories.map((cat) =>
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(cat,
+                              style: GoogleFonts.inter(fontSize: 12)),
+                          selected:
+                              controller.selectedCategoryFilter.value == cat,
+                          onSelected: (_) {
+                            controller.selectedCategoryFilter.value =
+                                controller.selectedCategoryFilter.value == cat
+                                    ? null
+                                    : cat;
+                          },
+                          selectedColor: const Color(0xFF092BA2),
+                          labelStyle: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: controller.selectedCategoryFilter.value == cat
+                                ? Colors.white
+                                : (Get.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black87),
+                          ),
+                          backgroundColor: Get.isDarkMode
+                              ? Colors.white.withOpacity(0.08)
+                              : Colors.grey.shade100,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide.none,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          const SizedBox(height: 8),
 
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
-        itemCount: currentArticles.length,
-        itemBuilder: (context, index) {
-          final article = currentArticles[index];
-          return _buildArticleCard(context, article);
-        },
+          if (currentArticles.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48.0),
+                child: Column(
+                  children: [
+                    Icon(
+                      hasActiveFilter
+                          ? Icons.search_off_rounded
+                          : Icons.article_outlined,
+                      size: 48,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      hasActiveFilter
+                          ? 'Tidak ada artikel yang cocok'
+                          : 'Penulis belum menerbitkan artikel.',
+                      style: GoogleFonts.inter(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+              itemCount: currentArticles.length,
+              itemBuilder: (context, index) {
+                final article = currentArticles[index];
+                return _buildArticleCard(context, article);
+              },
+            ),
+        ],
       );
     });
   }
@@ -357,7 +485,9 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
     final String imageUrl =
         article.imageUrl ?? 'https://via.placeholder.com/600x400';
     final String avatarUrl =
-        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+        (article.user?.photoProfile?.isNotEmpty == true)
+            ? article.user!.photoProfile!
+            : '';
     final String categoryName = article.category?.name ?? 'Umum';
     
     return InkWell(
