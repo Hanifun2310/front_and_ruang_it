@@ -16,21 +16,7 @@ class OnboardingFinishView extends GetView<OnboardingFinishController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // Icon or Illustration (Optional but good for premium feel)
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.auto_awesome,
-                  color: Colors.blueAccent,
-                  size: 50,
-                ),
-              ),
-              const SizedBox(height: 48),
+
               Text(
                 'Selamat membaca',
                 textAlign: TextAlign.center,

@@ -213,7 +213,7 @@ class ProfileView extends GetView<ProfileController> {
 
   Widget _buildAvatarFallback() {
     return Image.asset(
-      'assets/images/fallback_pp.jpeg',
+      'assets/images/fallback_pp.png',
       fit: BoxFit.cover,
     );
   }
@@ -609,7 +609,7 @@ class ProfileView extends GetView<ProfileController> {
                     backgroundColor: Colors.grey.shade200,
                     backgroundImage: avatarUrl.isNotEmpty
                         ? NetworkImage(avatarUrl) as ImageProvider
-                        : const AssetImage('assets/images/fallback_pp.jpeg'),
+                        : const AssetImage('assets/images/fallback_pp.png'),
                   ),
                   const SizedBox(width: 12),
                   Text(

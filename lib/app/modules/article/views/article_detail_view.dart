@@ -81,7 +81,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                             backgroundColor: Colors.grey.shade200,
                             backgroundImage: (art.user?.photoProfile != null && art.user!.photoProfile!.isNotEmpty)
                                 ? NetworkImage(art.user!.photoProfile!) as ImageProvider
-                                : const AssetImage('assets/images/fallback_pp.jpeg'),
+                                : const AssetImage('assets/images/fallback_pp.png'),
                           ),
                           const SizedBox(width: 12),
                           Column(

@@ -51,7 +51,7 @@ class TopicRecommendationController extends GetxController {
     for (var category in selectedCategories) {
       try {
         // Fetch articles for this category
-        final articles = await _apiProvider.getArticles(category: category.name);
+        final articles = await _apiProvider.getArticles(category: category.id.toString());
         
         if (articles.isNotEmpty) {
           // Sort by likesCount descending and take first

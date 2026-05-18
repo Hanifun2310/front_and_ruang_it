@@ -204,7 +204,7 @@ class ExploreView extends GetView<ExploreController> {
                     backgroundColor: Colors.grey.shade200,
                     backgroundImage: avatarUrl.isNotEmpty
                         ? NetworkImage(avatarUrl) as ImageProvider
-                        : const AssetImage('assets/images/fallback_pp.jpeg'),
+                        : const AssetImage('assets/images/fallback_pp.png'),
                   ),
                   const SizedBox(width: 12),
                   Text(
