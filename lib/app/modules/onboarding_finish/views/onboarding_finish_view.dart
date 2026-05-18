@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../controllers/onboarding_finish_controller.dart';
 
 class OnboardingFinishView extends GetView<OnboardingFinishController> {
-  const OnboardingFinishView({Key? key}) : super(key: key);
+  const OnboardingFinishView({super.key});
 
   @override
   Widget build(BuildContext context) {

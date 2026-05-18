@@ -4,7 +4,7 @@ import '../controllers/auth_controller.dart';
 import '../../../widgets/loading_widget.dart';
 
 class RegisterView extends GetView<AuthController> {
-  const RegisterView({Key? key}) : super(key: key);
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +220,7 @@ class RegisterView extends GetView<AuthController> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
+                          child: LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
                         )
                       : const Text(
                           "Daftar Sekarang",

@@ -217,8 +217,9 @@ class DashboardController extends GetxController {
 
   // --- FUNGSI BARU UNTUK MENGUBAH JSON MENJADI TEKS PREVIEW ---
   String getSnippetText(String? content) {
-    if (content == null || content.trim().isEmpty)
+    if (content == null || content.trim().isEmpty) {
       return 'Tidak ada ringkasan...';
+    }
 
     try {
       // Cek apakah ini format JSON dari Quill

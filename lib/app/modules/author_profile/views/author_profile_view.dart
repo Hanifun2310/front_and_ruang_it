@@ -1,52 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/loading_widget.dart';
+import 'dart:convert';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    hide DefaultStyles;
 import '../controllers/author_profile_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/loading_widget.dart';
 
 class AuthorProfileView extends GetView<AuthorProfileController> {
-  const AuthorProfileView({Key? key}) : super(key: key);
+  const AuthorProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: context.theme.appBarTheme.backgroundColor,
+        backgroundColor: context.theme.scaffoldBackgroundColor,
         elevation: 0,
-        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.theme.appBarTheme.foregroundColor),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Get.isDarkMode ? Colors.white : Colors.black87,
+          ),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          'Profil Penulis',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: context.theme.appBarTheme.foregroundColor,
-            letterSpacing: -0.5,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF),
-            height: 1,
-          ),
-        ),
       ),
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: Column(
           children: [
-            // Profile Header
-            _buildProfileHeader(context),
-            // Stats Grid
-            _buildStatsGrid(),
-            const SizedBox(height: 24),
-            // Articles Section
-            _buildArticlesSection(context),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Profile Header Info
+                    _buildProfileHeader(context),
+
+                    // Action Buttons
+                    _buildActionButtons(context),
+
+                    const SizedBox(height: 12),
+
+                    // Navigation Tabs (Only one tab for Author Profile)
+                    _buildNavigationTabs(),
+
+                    // Article Feed
+                    _buildArticlesSection(),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -55,394 +59,639 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
 
   Widget _buildProfileHeader(BuildContext context) {
     final author = controller.author;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-      decoration: BoxDecoration(
-        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 20,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Avatar
           Container(
-            width: 100,
-            height: 100,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFE2E7FF), width: 4),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
+              border: Border.all(color: Colors.blueAccent.shade100, width: 2),
+              color: Colors.grey.shade100,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: (author.photoProfile != null && author.photoProfile!.isNotEmpty)
+                  ? Image.network(
+                      author.photoProfile!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _buildAvatarFallback(),
+                    )
+                  : _buildAvatarFallback(),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (author.name != null && author.name!.isNotEmpty)
+                      ? author.name!
+                      : "Sobat IT",
+                  style: GoogleFonts.inter(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Get.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  (author.profession != null && author.profession!.isNotEmpty)
+                      ? author.profession!
+                      : "Pekerjaan belum diisi",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Get.isDarkMode
+                        ? Colors.white70
+                        : Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  (author.bio != null && author.bio!.isNotEmpty)
+                      ? author.bio!
+                      : "Bio belum diisi.",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Get.isDarkMode
+                        ? Colors.white54
+                        : Colors.grey.shade500,
+                  ),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(50),
-              child: Image.network(
-                author.photoProfile ?? 'https://via.placeholder.com/150',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Image.network(
-                  'https://ui-avatars.com/api/?name=${author.name}',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatarFallback() {
+    return Image.asset(
+      'assets/images/fallback_pp.jpeg',
+      fit: BoxFit.cover,
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _showStatsPopup(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4285F4),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Statistik Penulis',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            author.name ?? 'Penulis',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              color: context.theme.textTheme.bodyLarge?.color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            author.profession ?? "Tech Enthusiast",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            constraints: const BoxConstraints(maxWidth: 300),
-            child: Text(
-              author.bio ?? "Belum ada bio.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Get.isDarkMode ? Colors.grey.shade400 : const Color(0xFF444653),
-                height: 1.5,
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsGrid() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(flex: 1, child: _buildArticlesCard()),
-            const SizedBox(width: 12),
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: [
-                  _buildHorizontalStatCard(
-                    "LIKES",
-                    controller.likesCount,
-                    Icons.favorite,
-                    const Color(0xFFFFEFE2),
-                    const Color(0xFF8B4513),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildHorizontalStatCard(
-                    "COMMENTS",
-                    controller.commentsCount,
-                    Icons.chat_bubble_rounded,
-                    const Color(0xFFEEF2FF),
-                    const Color(0xFF4B5563),
-                  ),
-                ],
-              ),
-            ),
-          ],
+  Widget _buildNavigationTabs() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade200,
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildArticlesCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      decoration: BoxDecoration(
-        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFE2E7FF)),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFEEF2FF),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.article_rounded,
-              color: Color(0xFF092BA2),
-              size: 28,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Obx(
-            () => Text(
-              "${controller.articlesCount.value}",
-              style: GoogleFonts.kulimPark(
-                fontSize: 32,
-                fontWeight: FontWeight.w800,
-                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
-              ),
-            ),
-          ),
-          Text(
-            "ARTICLES",
-            style: GoogleFonts.kulimPark(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
-              letterSpacing: 1,
-            ),
-          ),
+          _buildTab('Artikel Penulis'),
         ],
       ),
     );
   }
 
-  Widget _buildHorizontalStatCard(
-    String label,
-    RxInt count,
-    IconData icon,
-    Color iconBg,
-    Color iconColor,
-  ) {
+  Widget _buildTab(String title) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF)),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 4),
+          border: Border(
+            bottom: BorderSide(
+              color: (Get.isDarkMode ? Colors.white : Colors.black),
+              width: 2,
             ),
-          ],
+          ),
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: GoogleFonts.kulimPark(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF757685),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Obx(
-              () => Text(
-                count.value > 999
-                    ? "${(count.value / 1000).toStringAsFixed(1)}k"
-                    : "${count.value}",
-                style: GoogleFonts.kulimPark(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
-                ),
-              ),
-            ),
-          ],
+        alignment: Alignment.center,
+        child: Text(
+          title,
+          style: GoogleFonts.inter(
+            color: (Get.isDarkMode ? Colors.white : Colors.black),
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildArticlesSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  void _showStatsPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF1E293B)
+            : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Statistik Penulis',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: Get.isDarkMode ? Colors.white : Colors.black87,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildStatRow(
+              Icons.article_outlined,
+              'Artikel',
+              '${controller.articlesCount.value}',
+              Colors.blue,
+            ),
+            const Divider(height: 24),
+            _buildStatRow(
+              Icons.thumb_up,
+              'Total Likes',
+              '${controller.likesCount.value}',
+              Colors.blueAccent,
+            ),
+            const Divider(height: 24),
+            _buildStatRow(
+              Icons.chat_bubble_outline,
+              'Komentar',
+              '${controller.commentsCount.value}',
+              Colors.green,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Tutup',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRow(
+    IconData icon,
+    String label,
+    String value,
+    Color iconColor,
+  ) {
+    return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: iconColor, size: 24),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
           child: Text(
-            "ARTIKEL PENULIS",
-            style: GoogleFonts.kulimPark(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: Colors.grey,
-              letterSpacing: 1.2,
+            label,
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: Get.isDarkMode ? Colors.white70 : Colors.grey.shade700,
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        Obx(() {
-          if (controller.isArticlesLoading.value) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: const LoadingWidget(),
+        Text(
+          value,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Get.isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArticlesSection() {
+    return Obx(() {
+      if (controller.isArticlesLoading.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(32.0),
+            child: LoadingWidget(),
+          ),
+        );
+      }
+
+      final currentArticles = controller.userArticles;
+
+      if (currentArticles.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(48.0),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.article_outlined,
+                  size: 48,
+                  color: Colors.grey.shade300,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Penulis belum menerbitkan artikel.",
+                  style: GoogleFonts.inter(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
+        itemCount: currentArticles.length,
+        itemBuilder: (context, index) {
+          final article = currentArticles[index];
+          return _buildArticleCard(context, article);
+        },
+      );
+    });
+  }
+
+  Widget _buildArticleCard(BuildContext context, dynamic article) {
+    final String imageUrl =
+        article.imageUrl ?? 'https://via.placeholder.com/600x400';
+    final String avatarUrl =
+        article.user?.photoProfile ?? 'https://via.placeholder.com/150';
+    final String categoryName = article.category?.name ?? 'Umum';
+    
+    return InkWell(
+      onTap: () {
+        Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode
+              ? context.theme.scaffoldBackgroundColor
+              : Colors.white,
+          border: Border(
+            bottom: BorderSide(
+              color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade100,
+            ),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (article.isBlocked) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Artikel ini telah diblokir dan tidak tampil di publik.',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          }
-
-          final currentArticles = controller.userArticles;
-
-          if (currentArticles.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(48.0),
-                child: Column(
+            ],
+            // Theme Label
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
                   children: [
                     Icon(
-                      Icons.article_outlined,
-                      size: 48,
-                      color: Colors.grey.shade300,
+                      Icons.grid_view_rounded,
+                      size: 16,
+                      color: Get.isDarkMode
+                          ? Colors.white70
+                          : Colors.grey.shade700,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(width: 8),
                     Text(
-                      "Penulis belum menerbitkan artikel.",
-                      style: GoogleFonts.kulimPark(color: Colors.grey),
+                      'Theme: $categoryName',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Get.isDarkMode
+                            ? Colors.white70
+                            : Colors.grey.shade700,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            );
-          }
+                if (article.status == 'banned')
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.red.withOpacity(0.5)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.report_problem,
+                          size: 12,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Banned',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
 
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: currentArticles.length,
-            itemBuilder: (context, index) {
-              final article = currentArticles[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Get.isDarkMode ? Colors.white10 : const Color(0xFFE2E7FF)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
+            // Author Info
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage: avatarUrl.isNotEmpty
+                      ? NetworkImage(avatarUrl) as ImageProvider
+                      : const AssetImage('assets/images/fallback_pp.jpeg'),
                 ),
-                child: InkWell(
-                  onTap: () => Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Row(
+                const SizedBox(width: 12),
+                Text(
+                  article.user?.name ?? 'Admin',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Article Content Preview
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          bottomLeft: Radius.circular(16),
+                      Text(
+                        article.title ?? 'Tanpa Judul',
+                        style: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.grey.shade900,
                         ),
-                        child: Image.network(
-                          article.imageUrl ?? 'https://via.placeholder.com/150',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            width: 100,
-                            height: 100,
-                            color: Colors.grey.shade100,
-                            child: const Icon(
-                              Icons.image_not_supported,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      article.category?.name?.toUpperCase() ?? "GENERAL",
-                                      style: GoogleFonts.kulimPark(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w800,
-                                        color: Get.isDarkMode ? Colors.blueAccent : const Color(0xFF092BA2),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                article.title ?? "Untitled",
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.kulimPark(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: context.theme.textTheme.bodyLarge?.color,
-                                  height: 1.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 8),
+                      _buildSnippetPreview(article.content),
                     ],
                   ),
                 ),
-              );
-            },
-          );
-        }),
-        const SizedBox(height: 32),
-      ],
+                const SizedBox(width: 16),
+                // Thumbnail Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    width: 120,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 120,
+                        height: 80,
+                        color: Colors.grey.shade200,
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Article Meta & Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  article.formattedDate,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Get.isDarkMode
+                        ? Colors.white54
+                        : Colors.grey.shade600,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          (article.isLiked ?? false)
+                              ? Icons.thumb_up
+                              : Icons.thumb_up_outlined,
+                          size: 20,
+                          color: (article.isLiked ?? false)
+                              ? Colors.blueAccent
+                              : (Get.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey.shade700),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${article.likesCount ?? 0}',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 20,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${article.commentsCount ?? 0}',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _buildSnippetPreview(String? content) {
+    if (content == null || content.isEmpty) {
+      return Text(
+        'Tidak ada ringkasan...',
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+      );
+    }
+
+    try {
+      if (content.trim().startsWith('[')) {
+        final deltaJson = jsonDecode(content);
+        final quillController = QuillController(
+          document: Document.fromJson(deltaJson),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+        return SizedBox(
+          height: 44, // Sekitar 2 baris teks
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: AbsorbPointer(
+              child: QuillEditor.basic(
+                configurations: QuillEditorConfigurations(
+                  controller: quillController,
+                  readOnly: true,
+                  showCursor: false,
+                  autoFocus: false,
+                  expands: false,
+                  padding: EdgeInsets.zero,
+                  customStyles: DefaultStyles(
+                    paragraph: DefaultTextBlockStyle(
+                      GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Get.isDarkMode
+                            ? Colors.white54
+                            : Colors.grey.shade500,
+                        height: 1.4,
+                      ),
+                      const VerticalSpacing(0, 0),
+                      const VerticalSpacing(0, 0),
+                      null,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        return SizedBox(
+          height: 44,
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: AbsorbPointer(
+              child: HtmlWidget(
+                content,
+                textStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      return Text(
+        'Tidak ada ringkasan...',
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+      );
+    }
   }
 }

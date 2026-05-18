@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/loading_widget.dart';
 import '../controllers/article_detail_controller.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../routes/app_routes.dart';
 
 class ArticleDetailView extends GetView<ArticleDetailController> {
-  const ArticleDetailView({Key? key}) : super(key: key);
+  const ArticleDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -68,37 +68,43 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: NetworkImage(
-                            art.user?.photoProfile ??
-                                'https://ui-avatars.com/api/?name=${art.user?.name ?? "User"}',
+                    InkWell(
+                      onTap: () {
+                        if (art.user != null) {
+                          Get.toNamed(Routes.AUTHOR_PROFILE, arguments: art.user);
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: (art.user?.photoProfile != null && art.user!.photoProfile!.isNotEmpty)
+                                ? NetworkImage(art.user!.photoProfile!) as ImageProvider
+                                : const AssetImage('assets/images/fallback_pp.jpeg'),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              art.user?.name ?? 'Penulis Anonim',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                art.user?.name ?? 'Penulis Anonim',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
                               ),
-                            ),
-                            Text(
-                              art.formattedDate,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
+                              Text(
+                                art.formattedDate,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 32),
                     if (controller.quillController != null)

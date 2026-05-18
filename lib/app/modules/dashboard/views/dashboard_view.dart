@@ -9,7 +9,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide DefaultStyles;
 import '../../../data/services/auth_service.dart';
-import '../../../data/services/theme_service.dart';
 import '../../../routes/app_routes.dart';
 
 class DashboardView extends GetView<DashboardController> {
@@ -127,7 +126,7 @@ class DashboardView extends GetView<DashboardController> {
                     if (isTerbaru && index == displayList.length) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: const LoadingWidget(size: 30),
+                        child: LoadingWidget(size: 30),
                       );
                     }
 
@@ -231,24 +230,32 @@ class DashboardView extends GetView<DashboardController> {
             const SizedBox(height: 12),
 
             // Author Info
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundImage: NetworkImage(avatarUrl),
-                  onBackgroundImageError: (_, _) {},
-                  backgroundColor: Colors.grey.shade200,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  article.user?.name ?? 'Admin',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+            InkWell(
+              onTap: () {
+                if (article.user != null) {
+                  Get.toNamed(Routes.AUTHOR_PROFILE, arguments: article.user);
+                }
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Colors.grey.shade200,
+                    backgroundImage: avatarUrl.isNotEmpty
+                        ? NetworkImage(avatarUrl) as ImageProvider
+                        : const AssetImage('assets/images/fallback_pp.jpeg'),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Text(
+                    article.user?.name ?? 'Admin',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
 

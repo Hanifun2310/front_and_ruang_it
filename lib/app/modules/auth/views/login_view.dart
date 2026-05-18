@@ -5,7 +5,7 @@ import '../../../routes/app_routes.dart';
 import '../../../widgets/loading_widget.dart';
 
 class LoginView extends GetView<AuthController> {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +145,7 @@ class LoginView extends GetView<AuthController> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
+                          child: LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
                         )
                       : const Text(
                           "Masuk",

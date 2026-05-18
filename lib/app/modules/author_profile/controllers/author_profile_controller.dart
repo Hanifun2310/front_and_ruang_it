@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../../data/services/like_sync_service.dart';
 
 class AuthorProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
+  final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
 
   late UserModel author;
   var isArticlesLoading = true.obs;
@@ -41,6 +43,8 @@ class AuthorProfileController extends GetxController {
         currentPage++;
       }
 
+      allFetchedArticles = _likeSyncService.applyLikeStateToArticles(allFetchedArticles);
+
       userArticles.value = allFetchedArticles
           .where((a) => a.user?.id == author.id && !a.isBlocked)
           .toList();
@@ -61,6 +65,28 @@ class AuthorProfileController extends GetxController {
       print('Error fetching author articles: $e');
     } finally {
       isArticlesLoading.value = false;
+    }
+  }
+
+  Future<void> toggleLike(int articleId) async {
+    try {
+      final userIndex = userArticles.indexWhere((a) => a.id == articleId);
+      if (userIndex == -1) return;
+
+      final article = userArticles[userIndex];
+      final isCurrentlyLiked = article.isLiked ?? false;
+      final newLikedStatus = !isCurrentlyLiked;
+
+      // Optimistic update
+      article.isLiked = newLikedStatus;
+      article.likesCount = (article.likesCount ?? 0) + (newLikedStatus ? 1 : -1);
+      userArticles[userIndex] = article;
+      userArticles.refresh();
+
+      _likeSyncService.updateLikeStatus(articleId, newLikedStatus);
+      await _apiProvider.toggleLike(articleId);
+    } catch (e) {
+      fetchAuthorArticles(); // Revert on error
     }
   }
 }

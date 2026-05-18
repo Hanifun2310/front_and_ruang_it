@@ -134,9 +134,11 @@ class UserModel {
     name: json['name'] ?? 'User',
     email: json['email'],
     role: json['role'],
-    photoProfile: ArticleModel.formatImageUrl(
-      json['photo_profile'] ?? json['profile_photo'],
-    ),
+    photoProfile: (json['photo_profile'] == null && json['profile_photo'] == null)
+      ? ''
+      : ArticleModel.formatImageUrl(
+          json['photo_profile'] ?? json['profile_photo'],
+        ),
     profession: json['profession'],
     bio: json['bio'],
   );

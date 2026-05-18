@@ -6,7 +6,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide DefaultStyles;
 import '../controllers/profile_controller.dart';
-import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/theme_service.dart';
 import '../../../routes/app_routes.dart';
@@ -16,7 +15,7 @@ import '../../../widgets/loading_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
 
 class ProfileView extends GetView<ProfileController> {
-  const ProfileView({Key? key}) : super(key: key);
+  const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +212,10 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   Widget _buildAvatarFallback() {
-    return Icon(Icons.person, size: 50, color: Colors.grey.shade300);
+    return Image.asset(
+      'assets/images/fallback_pp.jpeg',
+      fit: BoxFit.cover,
+    );
   }
 
   Widget _buildActionButtons(BuildContext context) {
@@ -424,7 +426,7 @@ class ProfileView extends GetView<ProfileController> {
         return const Center(
           child: Padding(
             padding: EdgeInsets.all(32.0),
-            child: const LoadingWidget(),
+            child: LoadingWidget(),
           ),
         );
       }
@@ -594,24 +596,32 @@ class ProfileView extends GetView<ProfileController> {
             const SizedBox(height: 12),
 
             // Author Info
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundImage: NetworkImage(avatarUrl),
-                  onBackgroundImageError: (_, _) {},
-                  backgroundColor: Colors.grey.shade200,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  article.user?.name ?? 'Admin',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+            InkWell(
+              onTap: () {
+                if (article.user != null) {
+                  Get.toNamed(Routes.AUTHOR_PROFILE, arguments: article.user);
+                }
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Colors.grey.shade200,
+                    backgroundImage: avatarUrl.isNotEmpty
+                        ? NetworkImage(avatarUrl) as ImageProvider
+                        : const AssetImage('assets/images/fallback_pp.jpeg'),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Text(
+                    article.user?.name ?? 'Admin',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
 

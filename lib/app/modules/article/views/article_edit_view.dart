@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import Quill
 import '../../../widgets/loading_widget.dart';
 import '../controllers/article_edit_controller.dart';
-import '../../../data/services/theme_service.dart';
 
 class ArticleEditView extends GetView<ArticleEditController> {
   const ArticleEditView({super.key});

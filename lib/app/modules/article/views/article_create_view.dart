@@ -7,8 +7,6 @@ import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
 import '../../../widgets/loading_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/article_create_controller.dart';
-import '../../../routes/app_routes.dart';
-import '../../../data/services/theme_service.dart';
 
 class ArticleCreateView extends GetView<ArticleCreateController> {
   const ArticleCreateView({super.key});

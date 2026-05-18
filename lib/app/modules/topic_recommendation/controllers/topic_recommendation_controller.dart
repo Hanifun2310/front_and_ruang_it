@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../../../data/models/category_model.dart';
 import '../../../data/models/article_model.dart' hide CategoryModel;
 import '../../../data/providers/api_provider.dart';
@@ -42,7 +41,7 @@ class TopicRecommendationController extends GetxController {
   void _assignRandomColors() {
     for (int i = 0; i < selectedCategories.length; i++) {
       final category = selectedCategories[i];
-      backgroundColors[category.id!] = _palette[i % _palette.length];
+      backgroundColors[category.id] = _palette[i % _palette.length];
     }
   }
 
@@ -57,15 +56,15 @@ class TopicRecommendationController extends GetxController {
         if (articles.isNotEmpty) {
           // Sort by likesCount descending and take first
           articles.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
-          topArticles[category.id!] = articles.first;
+          topArticles[category.id] = articles.first;
         } else {
           // Try fetching without category filter if specific filter yields nothing, 
           // but that might be misleading. Better to just stay with null if no match.
-          topArticles[category.id!] = null;
+          topArticles[category.id] = null;
         }
       } catch (e) {
         Get.log("Failed to fetch popular article for category ${category.name}: $e");
-        topArticles[category.id!] = null;
+        topArticles[category.id] = null;
       }
     }
     

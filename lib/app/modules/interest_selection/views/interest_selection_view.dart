@@ -4,7 +4,7 @@ import '../../../widgets/loading_widget.dart';
 import '../controllers/interest_selection_controller.dart';
 
 class InterestSelectionView extends GetView<InterestSelectionController> {
-  const InterestSelectionView({Key? key}) : super(key: key);
+  const InterestSelectionView({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -191,23 +191,32 @@ class ExploreView extends GetView<ExploreController> {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundImage: NetworkImage(avatarUrl),
-                  backgroundColor: Colors.grey.shade200,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  article.user?.name ?? 'Admin',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+            InkWell(
+              onTap: () {
+                if (article.user != null) {
+                  Get.toNamed(Routes.AUTHOR_PROFILE, arguments: article.user);
+                }
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Colors.grey.shade200,
+                    backgroundImage: avatarUrl.isNotEmpty
+                        ? NetworkImage(avatarUrl) as ImageProvider
+                        : const AssetImage('assets/images/fallback_pp.jpeg'),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Text(
+                    article.user?.name ?? 'Admin',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Get.isDarkMode ? Colors.white : Colors.grey.shade900,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             Row(
