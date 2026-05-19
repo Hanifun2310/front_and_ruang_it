@@ -174,10 +174,9 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                             CircleAvatar(
                               radius: 18,
                               backgroundColor: Colors.grey.shade200,
-                              backgroundImage: NetworkImage(
-                                comment.user?.photoProfile ??
-                                    'https://ui-avatars.com/api/?name=${comment.user?.name ?? "User"}',
-                              ),
+                              backgroundImage: (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
+                                  ? NetworkImage(comment.user!.photoProfile!) as ImageProvider
+                                  : const AssetImage('assets/images/fallback_pp.png'),
                             ),
                             const SizedBox(width: 12),
                             Expanded(

@@ -14,9 +14,9 @@ void main() async {
   await GetStorage.init();
 
   // 2. Registrasi Services secara global
-  final authService = Get.put(AuthService());
+  Get.put(AuthService());
   final themeService = Get.put(ThemeService());
-  final likeSyncService = Get.put(LikeSyncService());
+  Get.put(LikeSyncService());
 
   runApp(
     GetMaterialApp(

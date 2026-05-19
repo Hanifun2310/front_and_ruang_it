@@ -74,13 +74,11 @@ class AppPages {
   binding: BindingsBuilder(() {
     Get.lazyPut<ProfileController>(() => ProfileController());
   }),
-  middlewares: [AuthMiddleware()],
 ),
     GetPage(
       name: Routes.ARTICLE_CREATE,
       page: () => const ArticleCreateView(),
       binding: ArticleCreateBinding(),
-      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ARTICLE_EDIT,
@@ -88,7 +86,6 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.put(ArticleEditController());
       }),
-      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.INTEREST_SELECTION,

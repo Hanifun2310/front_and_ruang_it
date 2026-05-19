@@ -13,12 +13,30 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../widgets/loading_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
+import '../../../widgets/guest_prompt_widget.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      return Scaffold(
+        backgroundColor: context.theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          title: Text(
+            'Profil',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          centerTitle: true,
+          elevation: 0,
+        ),
+        body: const GuestPromptWidget(),
+        bottomNavigationBar: const CustomBottomNav(currentIndex: 3),
+      );
+    }
+
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       body: SafeArea(
