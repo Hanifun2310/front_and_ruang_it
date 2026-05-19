@@ -22,9 +22,7 @@ void main() async {
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Ruang IT",
-      initialRoute: authService.isLoggedIn.value
-          ? Routes.DASHBOARD
-          : AppPages.INITIAL,
+      initialRoute: Routes.DASHBOARD,
       getPages: AppPages.routes,
       theme: ThemeService.lightTheme,
       darkTheme: ThemeService.darkTheme,

@@ -10,6 +10,7 @@ import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../routes/app_routes.dart';
 
 class ArticleDetailController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -93,6 +94,13 @@ class ArticleDetailController extends GetxController {
 
   // LOGIKA LIKE
   Future<void> toggleLike() async {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+
     if (isLiking.value) return;
     isLiking.value = true;
     try {
@@ -146,6 +154,13 @@ class ArticleDetailController extends GetxController {
 
   // LOGIKA POST KOMENTAR
   Future<void> sendComment() async {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk berkomentar.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+
     if (commentController.text.isEmpty) return;
 
     try {

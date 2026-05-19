@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
+import '../../../data/services/auth_service.dart';
+import '../../../routes/app_routes.dart';
 
 class AuthorProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -100,6 +102,13 @@ class AuthorProfileController extends GetxController {
   }
 
   Future<void> toggleLike(int articleId) async {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+
     try {
       final userIndex = userArticles.indexWhere((a) => a.id == articleId);
       if (userIndex == -1) return;

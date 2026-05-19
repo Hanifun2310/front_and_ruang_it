@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../routes/app_routes.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
@@ -128,6 +130,13 @@ class DashboardController extends GetxController {
   }
 
   Future<void> toggleLike(int articleId) async {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+
     if (isLiking.value) return;
     isLiking.value = true;
     try {
