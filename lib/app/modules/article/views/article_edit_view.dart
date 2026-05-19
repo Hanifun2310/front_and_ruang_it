@@ -312,8 +312,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
             const SizedBox(height: 40),
           ],
         ),
-      ),
-    );  
+      );
   }
 
   // Widget Helper: Image Container
