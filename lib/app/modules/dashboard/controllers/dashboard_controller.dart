@@ -9,8 +9,8 @@ import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
 
 class DashboardController extends GetxController {
-  // Inisialisasi ApiProvider
-  final ApiProvider _apiProvider = ApiProvider();
+  // SENIOR REFACTOR: Gunakan Get.find agar menggunakan satu instance Dio global yang sama
+  final ApiProvider _apiProvider = Get.find<ApiProvider>();
 
   // Observables
   var articles = <ArticleModel>[].obs;
@@ -42,6 +42,29 @@ class DashboardController extends GetxController {
     super.onInit();
     fetchCategories();
     fetchArticles();
+
+    // SENIOR REFACTOR: WORKER OTOMATIS
+    // Kunci sinkronisasi! Setiap kali ada perubahan status like di LikeSyncService (dari halaman mana pun),
+    // fungsi di bawah ini akan otomatis berjalan menyinkronkan list artikel di dashboard.
+    ever(_likeSyncService.rxLikeEvent, (LikeEvent? event) {
+      if (event != null) {
+        _handleLocalArticleListSync(event.articleId, event.isLiked);
+      }
+    });
+  }
+
+  // Fungsi internal baru khusus untuk meng-update UI internal list dashboard secara reaktif
+  void _handleLocalArticleListSync(int articleId, bool isLiked) {
+    final index = articles.indexWhere((a) => a.id == articleId);
+    if (index != -1) {
+      final article = articles[index];
+      if (article.isLiked != isLiked) {
+        article.isLiked = isLiked;
+        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
+        articles[index] = article; // Perbarui data di dalam list
+        articles.refresh();        // Memicu Obx di View untuk gambar ulang layar
+      }
+    }
   }
 
   Future<void> fetchCategories() async {
@@ -87,7 +110,6 @@ class DashboardController extends GetxController {
     }
 
     try {
-      // Menggunakan ApiProvider yang sesungguhnya!
       List<ArticleModel> newArticles = await _apiProvider.getArticles(
         page: currentPage,
         category: selectedCategory.value?.id.toString(),
@@ -103,9 +125,6 @@ class DashboardController extends GetxController {
           _likeSyncService.applyLikeStateToArticles(publicArticles),
         );
 
-        // Jika semua artikel di halaman ini terblokir, tapi masih ada data di server,
-        // kita mungkin perlu fetch page berikutnya secara otomatis, tapi untuk
-        // simplifikasi kita biarkan pagination berjalan normal.
         if (publicArticles.isEmpty && newArticles.isNotEmpty) {
           currentPage++;
           fetchArticles();
@@ -115,7 +134,6 @@ class DashboardController extends GetxController {
         currentPage++;
       }
     } catch (e) {
-      // Jika terjadi error (misal server mati), tampilkan snackbar
       Get.snackbar(
         'Gagal Memuat',
         'Terjadi kesalahan saat mengambil artikel',
@@ -127,65 +145,41 @@ class DashboardController extends GetxController {
     }
   }
 
+  // SENIOR REFACTOR: Logika toggleLike Baru yang fully Optimistic & Safe
   Future<void> toggleLike(int articleId) async {
-    if (isLiking.value) return;
-    isLiking.value = true;
+    final index = articles.indexWhere((a) => a.id == articleId);
+    if (index == -1) return;
+
+    final article = articles[index];
+    final isCurrentlyLiked = article.isLiked ?? false;
+    final newLikedState = !isCurrentlyLiked;
+
+    // 1. Simpan ke service utama (Ini memicu worker internal dashboard agar UI langsung berubah instan)
+    _likeSyncService.updateLikeStatus(articleId, newLikedState);
+
+    // 2. Jembatan Sementara: Beri tahu controller lain yang BELUM di-refactor agar tidak patah sinkronisasinya
+    _syncLikeState(articleId, newLikedState);
+
     try {
-      final index = articles.indexWhere((a) => a.id == articleId);
-      if (index == -1) return;
-
-      final article = articles[index];
-      final isCurrentlyLiked = article.isLiked ?? false;
-
-      // Optimistic update
-      article.isLiked = !isCurrentlyLiked;
-      article.likesCount =
-          (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
-
-      articles[index] = article; // trigger reactivity
-      articles.refresh();
-
+      // 3. Eksekusi request API di background
       await _apiProvider.toggleLike(articleId);
-
-      _likeSyncService.updateLikeStatus(articleId, !isCurrentlyLiked);
-
-      // SYNC: Update other controllers
-      _syncLikeState(articleId, !isCurrentlyLiked);
     } catch (e) {
-      final index = articles.indexWhere((a) => a.id == articleId);
-      if (index != -1) {
-        final article = articles[index];
-        final isCurrentlyLiked = article.isLiked ?? false;
-        // Revert
-        article.isLiked = !isCurrentlyLiked;
-        article.likesCount =
-            (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
-        articles[index] = article;
-        articles.refresh();
-      }
-      Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini');
-    } finally {
-      isLiking.value = false;
+      // 4. ROLLBACK: Jika internet putus/gagal, kembalikan ke status semula
+      _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
+      _syncLikeState(articleId, isCurrentlyLiked);
+      Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini, periksa koneksi Anda.');
     }
   }
 
-  // Sync method for other controllers to update state
+  // JEMBATAN SEMENTARA: Tetap dipertahankan agar Profile/Explore/Search controller yang lama 
+  // tidak error saat mereka memanggil fungsi ini sebelum mereka di-refactor.
   void updateArticleLikeState(int articleId, bool isLiked) {
-    final index = articles.indexWhere((a) => a.id == articleId);
-    if (index != -1) {
-      final article = articles[index];
-      final bool currentIsLiked = article.isLiked ?? false;
-      if (currentIsLiked != isLiked) {
-        article.isLiked = isLiked;
-        article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
-        articles[index] = article;
-        articles.refresh();
-      }
-    }
-
+    // Alihkan langsung ke pusat data tunggal
     _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
+  // JEMBATAN SEMENTARA: Tetap dipertahankan agar halaman lain yang belum menggunakan worker
+  // tetap bisa ter-update ketika Dashboard melakukan toggle like.
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<ProfileController>()) {
@@ -215,24 +209,20 @@ class DashboardController extends GetxController {
     }
   }
 
-  // --- FUNGSI BARU UNTUK MENGUBAH JSON MENJADI TEKS PREVIEW ---
+  // --- FUNGSI MENGUBAH JSON MENJADI TEKS PREVIEW ---
   String getSnippetText(String? content) {
     if (content == null || content.trim().isEmpty) {
       return 'Tidak ada ringkasan...';
     }
 
     try {
-      // Cek apakah ini format JSON dari Quill
       if (content.trim().startsWith('[')) {
         final deltaJson = jsonDecode(content);
         final document = Document.fromJson(deltaJson);
-        // Ambil teks asli dan ubah "enter" menjadi "spasi"
         return document.toPlainText().replaceAll('\n', ' ').trim();
       }
-      // Fallback untuk artikel lama yang mungkin pakai HTML
       return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
     } catch (e) {
-      // Jika error, bersihkan sebisa mungkin
       return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
     }
   }
@@ -244,7 +234,6 @@ class DashboardController extends GetxController {
         articles.removeWhere((article) => article.id == id);
         Get.snackbar('Sukses', 'Artikel berhasil dihapus');
 
-        // SYNC: Update ProfileController if registered
         try {
           if (Get.isRegistered<ProfileController>()) {
             Get.find<ProfileController>().userArticles.removeWhere(

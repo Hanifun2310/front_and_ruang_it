@@ -2,10 +2,25 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/article_model.dart';
 
-class LikeSyncService {
+// 1. Buat model event sederhana untuk membawa data perubahan
+class LikeEvent {
+  final int articleId;
+  final bool isLiked;
+  LikeEvent({required this.articleId, required this.isLiked});
+}
+
+class LikeSyncService extends GetxService {
   final RxMap<int, bool> likedStatus = <int, bool>{}.obs;
   final _box = GetStorage();
   static const _storageKey = 'liked_article_ids';
+
+  final rxLikeEvent = Rxn<LikeEvent>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadFromStorage();
+  }
 
   LikeSyncService() {
     _loadFromStorage();
@@ -40,6 +55,8 @@ class LikeSyncService {
   void updateLikeStatus(int articleId, bool isLiked) {
     likedStatus[articleId] = isLiked;
     _saveToStorage();
+
+    rxLikeEvent.value = LikeEvent(articleId: articleId, isLiked: isLiked);
   }
 
   bool? getLikeStatus(int articleId) {
@@ -81,6 +98,7 @@ class LikeSyncService {
   /// Hapus semua data like (dipanggil saat logout)
   void clearAll() {
     likedStatus.clear();
+    rxLikeEvent.value = null;
     _box.remove(_storageKey);
   }
 }

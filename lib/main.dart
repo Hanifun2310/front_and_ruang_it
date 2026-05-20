@@ -6,6 +6,7 @@ import 'app/routes/app_routes.dart';
 import 'app/data/services/auth_service.dart';
 import 'app/data/services/theme_service.dart';
 import 'app/data/services/like_sync_service.dart';
+import 'app/data/providers/api_provider.dart'; // <--- Tambahkan ini bro!
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,7 @@ void main() async {
   await GetStorage.init();
 
   // 2. Registrasi Services secara global
+  Get.put(ApiProvider());
   final authService = Get.put(AuthService());
   final themeService = Get.put(ThemeService());
   final likeSyncService = Get.put(LikeSyncService());

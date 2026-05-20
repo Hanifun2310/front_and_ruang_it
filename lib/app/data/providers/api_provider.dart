@@ -3,7 +3,7 @@ import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import '../services/auth_service.dart';
 import '../models/article_model.dart';
 
-class ApiProvider {
+class ApiProvider extends GetxService {
   late Dio _dio;
   
   static const String baseUrl = 'https://ruang-it.vibedev.my.id/api';
