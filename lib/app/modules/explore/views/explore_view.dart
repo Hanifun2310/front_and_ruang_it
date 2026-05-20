@@ -155,6 +155,7 @@ class ExploreView extends GetView<ExploreController> {
             ? article.user!.photoProfile!
             : '';
     final String categoryName = article.category?.name ?? 'Umum';
+    final authService = Get.find<AuthService>();
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);
@@ -281,18 +282,20 @@ class ExploreView extends GetView<ExploreController> {
                         : Colors.grey.shade600,
                   ),
                 ),
-                Row(
+                Obx(() => Row(
                   children: [
                     InkWell(
-                      onTap: () => controller.toggleLike(article.id!),
+                      onTap: authService.isLoggedIn.value
+                          ? () => controller.toggleLike(article.id!)
+                          : null,
                       child: Row(
                         children: [
                           Icon(
-                            (article.isLiked ?? false)
+                            authService.isLoggedIn.value && (article.isLiked ?? false)
                                 ? Icons.thumb_up
                                 : Icons.thumb_up_outlined,
                             size: 20,
-                            color: (article.isLiked ?? false)
+                            color: authService.isLoggedIn.value && (article.isLiked ?? false)
                                 ? Colors.blueAccent
                                 : (Get.isDarkMode
                                       ? Colors.white70
@@ -336,7 +339,7 @@ class ExploreView extends GetView<ExploreController> {
                       ],
                     ),
                   ],
-                ),
+                )),
               ],
             ),
           ],

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -83,6 +84,44 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF8FAFF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFD6E0FF)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sebelum menulis, pastikan mengikuti panduan penulisan artikel agar kontenmu sesuai standar komunitas dan mudah dipahami pembaca.',
+                    style: GoogleFonts.kulimPark(
+                      fontSize: 13,
+                      color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed(Routes.GUIDELINES);
+                    },
+                    child: Text(
+                      'Buka Panduan Penulisan',
+                      style: GoogleFonts.kulimPark(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF092BA2),
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             

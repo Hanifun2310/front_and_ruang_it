@@ -21,6 +21,8 @@ import '../modules/article/bindings/article_create_binding.dart';
 
 import '../modules/article/views/article_edit_view.dart';
 import '../modules/article/controllers/article_edit_controller.dart';
+import '../modules/guidelines/controllers/guidelines_controller.dart';
+import '../modules/guidelines/views/guidelines_view.dart';
 
 import '../modules/interest_selection/bindings/interest_selection_binding.dart';
 import '../modules/interest_selection/views/interest_selection_view.dart';
@@ -79,6 +81,13 @@ class AppPages {
       name: Routes.ARTICLE_CREATE,
       page: () => const ArticleCreateView(),
       binding: ArticleCreateBinding(),
+    ),
+    GetPage(
+      name: Routes.GUIDELINES,
+      page: () => const GuidelinesView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<GuidelinesController>(() => GuidelinesController());
+      }),
     ),
     GetPage(
       name: Routes.ARTICLE_EDIT,

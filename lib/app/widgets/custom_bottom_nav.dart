@@ -44,7 +44,7 @@ class CustomBottomNav extends StatelessWidget {
                 _buildNavItem(
                   icon: Icons.home_outlined,
                   activeIcon: Icons.home_rounded,
-                  label: 'Home',
+                  label: 'Beranda',
                   isSelected: currentIndex == 0,
                   activeColor: activeColor,
                   inactiveColor: inactiveColor,
@@ -55,7 +55,7 @@ class CustomBottomNav extends StatelessWidget {
                 _buildNavItem(
                   icon: Icons.explore_outlined,
                   activeIcon: Icons.explore,
-                  label: 'Explore',
+                  label: 'Jelajah',
                   isSelected: currentIndex == 1,
                   activeColor: activeColor,
                   inactiveColor: inactiveColor,
@@ -68,7 +68,7 @@ class CustomBottomNav extends StatelessWidget {
                 _buildNavItem(
                   icon: Icons.search_outlined,
                   activeIcon: Icons.search,
-                  label: 'Search',
+                  label: 'Cari',
                   isSelected: currentIndex == 2,
                   activeColor: activeColor,
                   inactiveColor: inactiveColor,
@@ -79,7 +79,7 @@ class CustomBottomNav extends StatelessWidget {
                 _buildNavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person,
-                  label: 'Profile',
+                  label: 'Profil',
                   isSelected: currentIndex == 3,
                   activeColor: activeColor,
                   inactiveColor: inactiveColor,

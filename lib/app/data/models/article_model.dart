@@ -10,7 +10,7 @@ class ArticleModel {
   DateTime? createdAt;
   String? status;
 
-  bool get isBlocked => status == 'banned';
+  bool get isBlocked => status == 'banned' || user?.isBanned == true;
 
   String get formattedDate {
     if (createdAt == null) return '';
@@ -115,15 +115,19 @@ class UserModel {
   String? name;
   String? email;
   String? role;
+  String? status;
   String? photoProfile;
   String? profession;
   String? bio;
+
+  bool get isBanned => status == 'banned';
 
   UserModel({
     this.id,
     this.name,
     this.email,
     this.role,
+    this.status,
     this.photoProfile,
     this.profession,
     this.bio,
@@ -134,6 +138,7 @@ class UserModel {
     name: json['name'] ?? 'User',
     email: json['email'],
     role: json['role'],
+    status: json['status']?.toString().toLowerCase(),
     photoProfile: (json['photo_profile'] == null && json['profile_photo'] == null)
       ? ''
       : ArticleModel.formatImageUrl(
@@ -148,6 +153,7 @@ class UserModel {
     'name': name,
     'email': email,
     'role': role,
+    'status': status,
     'photo_profile': photoProfile,
     'profession': profession,
     'bio': bio,

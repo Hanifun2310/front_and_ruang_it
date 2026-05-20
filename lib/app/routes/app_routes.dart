@@ -8,6 +8,7 @@ abstract class Routes {
   static const PROFILE = _Paths.PROFILE;
   static const ARTICLE_CREATE = _Paths.ARTICLE_CREATE;
   static const ARTICLE_EDIT = _Paths.ARTICLE_EDIT;
+  static const GUIDELINES = _Paths.GUIDELINES;
   static const INTEREST_SELECTION = _Paths.INTEREST_SELECTION;
   static const TOPIC_RECOMMENDATION = _Paths.TOPIC_RECOMMENDATION;
   static const CATEGORY_DETAIL = _Paths.CATEGORY_DETAIL;
@@ -26,6 +27,7 @@ abstract class _Paths {
   static const PROFILE = '/profile';
   static const ARTICLE_CREATE = '/article-create';
   static const ARTICLE_EDIT = '/article-edit';
+  static const GUIDELINES = '/guidelines';
   static const INTEREST_SELECTION = '/interest-selection';
   static const TOPIC_RECOMMENDATION = '/topic-recommendation';
   static const CATEGORY_DETAIL = '/category-detail';

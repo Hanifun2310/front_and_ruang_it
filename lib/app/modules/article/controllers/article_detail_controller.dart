@@ -38,15 +38,15 @@ class ArticleDetailController extends GetxController {
       // 1. Ambil Detail Artikel
       article.value = await _apiProvider.getArticleDetail(identifier);
       
-      // Keamanan: Jika artikel diblokir, hanya penulis yang bisa lihat
       if (article.value.isBlocked) {
-        final authService = Get.find<AuthService>();
-        final currentUserId = authService.currentUser?['id'];
-        if (article.value.user?.id != currentUserId) {
-          Get.back();
-          Get.snackbar('Akses Terbatas', 'Artikel ini sedang diblokir.');
-          return;
-        }
+        Get.back();
+        Get.snackbar(
+          'Akses Terbatas',
+          'Artikel ini tidak dapat diakses karena artikel atau penulis telah diblokir.',
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+        return;
       }
 
       // Inisialisasi Quill Controller setelah data artikel didapat

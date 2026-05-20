@@ -748,7 +748,7 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ],
                 ),
-                if (article.status == 'banned')
+                if (article.isBlocked)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,

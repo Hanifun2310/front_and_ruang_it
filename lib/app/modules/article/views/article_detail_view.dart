@@ -298,6 +298,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
   }
 
   Widget _buildBottomAction() {
+    final authService = Get.find<AuthService>();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -307,28 +308,33 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
       child: SafeArea(
         child: Row(
           children: [
-            IconButton(
-              onPressed: controller.toggleLike,
+            Obx(() => IconButton(
+              onPressed: authService.isLoggedIn.value
+                  ? controller.toggleLike
+                  : null,
               icon: Icon(
-                controller.article.value.isLiked == true
+                authService.isLoggedIn.value && controller.article.value.isLiked == true
                     ? Icons.thumb_up
                     : Icons.thumb_up_outlined,
-                color: controller.article.value.isLiked == true
+                color: authService.isLoggedIn.value && controller.article.value.isLiked == true
                     ? Colors.blueAccent
                     : Colors.grey,
               ),
-            ),
-            Text(
+            )),
+            Obx(() => Text(
               "${controller.article.value.likesCount ?? 0}",
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            )),
             const SizedBox(width: 16),
             Expanded(
-              child: TextField(
+              child: Obx(() => TextField(
                 controller: controller.commentController,
+                enabled: authService.isLoggedIn.value,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: "Tulis komentar...",
+                  hintText: authService.isLoggedIn.value
+                      ? "Tulis komentar..."
+                      : "Login untuk komentar...",
                   hintStyle: const TextStyle(fontSize: 14),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   border: OutlineInputBorder(
@@ -338,16 +344,18 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                   filled: true,
                   fillColor: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.grey.shade100,
                 ),
-              ),
+              )),
             ),
             const SizedBox(width: 8),
-            CircleAvatar(
-              backgroundColor: Colors.blueAccent,
+            Obx(() => CircleAvatar(
+              backgroundColor: authService.isLoggedIn.value ? Colors.blueAccent : Colors.grey,
               child: IconButton(
-                onPressed: controller.sendComment,
+                onPressed: authService.isLoggedIn.value
+                    ? controller.sendComment
+                    : null,
                 icon: const Icon(Icons.send, color: Colors.white, size: 18),
               ),
-            ),
+            )),
           ],
         ),
       ),

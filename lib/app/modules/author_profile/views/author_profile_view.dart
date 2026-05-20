@@ -602,7 +602,7 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
                     ),
                   ],
                 ),
-                if (article.status == 'banned')
+                if (article.isBlocked)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
