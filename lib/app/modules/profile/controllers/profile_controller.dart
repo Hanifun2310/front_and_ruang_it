@@ -17,6 +17,11 @@ class ProfileController extends GetxController {
 
   var isLoading = false.obs;
   var isArticlesLoading = false.obs;
+  var isLoadingMoreArticles = false.obs;
+  var hasMoreUserArticles = false.obs;
+  int _currentArticlesPage = 1;
+  static const int _articlesPageSize = 10;
+  final ScrollController scrollController = ScrollController();
 
   // Controllers sesuai field di Laravel
   final nameController = TextEditingController();
@@ -79,7 +84,17 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     loadUserData();
-    fetchUserArticles();
+    scrollController.addListener(_handleScroll);
+    fetchUserArticles(reset: true);
+  }
+
+  void _handleScroll() {
+    if (!hasMoreUserArticles.value || isLoadingMoreArticles.value) return;
+    if (!scrollController.hasClients) return;
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 180) {
+      loadMoreUserArticles();
+    }
   }
 
   void loadUserData() {
@@ -105,43 +120,45 @@ class ProfileController extends GetxController {
     }
   }
 
-  Future<void> fetchUserArticles() async {
-    isArticlesLoading.value = true;
+  Future<void> fetchUserArticles({bool reset = true}) async {
+    if (reset) {
+      _currentArticlesPage = 1;
+      userArticles.clear();
+      likedArticles.clear();
+      hasMoreUserArticles.value = false;
+    }
+
+    if (reset) {
+      isArticlesLoading.value = true;
+    } else {
+      isLoadingMoreArticles.value = true;
+    }
+
     try {
-      List<ArticleModel> allFetchedArticles = [];
-      int currentPage = 1;
+      final fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
+      final updatedArticles = _likeSyncService.applyLikeStateToArticles(fetchedArticles);
 
-      // Fetch all pages to ensure we get all articles for the user
-      while (true) {
-        final articles = await _apiProvider.getArticles(page: currentPage);
-        if (articles.isEmpty) break;
-
-        allFetchedArticles.addAll(articles);
-
-        // Safety limit to prevent infinite loops
-        if (currentPage >= 15) break;
-
-        currentPage++;
+      if (reset) {
+        userArticles.value = updatedArticles;
+      } else {
+        userArticles.addAll(updatedArticles);
       }
 
-      allFetchedArticles = _likeSyncService.applyLikeStateToArticles(
-        allFetchedArticles,
-      );
-
-      // Filter articles by user name if we have it
       if (name.value.isNotEmpty) {
-        userArticles.value = allFetchedArticles
+        userArticles.value = userArticles
             .where((a) => a.user?.name == name.value)
             .toList();
-      } else {
-        userArticles.value = allFetchedArticles;
       }
 
-      likedArticles.value = allFetchedArticles
+      likedArticles.value = userArticles
           .where((a) => a.isLiked == true)
           .toList();
 
-      // Calculate actual likes, comments, and article count from the articles
+      hasMoreUserArticles.value = fetchedArticles.length >= _articlesPageSize;
+      if (hasMoreUserArticles.value) {
+        _currentArticlesPage++;
+      }
+
       int totalLikes = 0;
       int totalComments = 0;
       for (var article in userArticles) {
@@ -155,8 +172,17 @@ class ProfileController extends GetxController {
     } catch (e) {
       print('Error fetching user articles: $e');
     } finally {
-      isArticlesLoading.value = false;
+      if (reset) {
+        isArticlesLoading.value = false;
+      } else {
+        isLoadingMoreArticles.value = false;
+      }
     }
+  }
+
+  Future<void> loadMoreUserArticles() async {
+    if (!hasMoreUserArticles.value || isLoadingMoreArticles.value) return;
+    await fetchUserArticles(reset: false);
   }
 
   Future<void> updateProfile() async {
@@ -408,6 +434,7 @@ class ProfileController extends GetxController {
   @override
   void onClose() {
     articleSearchController.dispose();
+    scrollController.dispose();
     super.onClose();
   }
 }

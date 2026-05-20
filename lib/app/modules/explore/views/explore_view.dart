@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/loading_widget.dart';
+import '../../../widgets/skeleton_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/explore_controller.dart';
 import '../../../routes/app_routes.dart';
-import '../../../data/services/auth_service.dart';
 import 'dart:convert';
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide DefaultStyles;
 
@@ -62,46 +61,53 @@ class ExploreView extends GetView<ExploreController> {
           SizedBox(
             height: 40,
             child: Obx(
-              () => ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.categories.length,
-                itemBuilder: (context, index) {
-                  final category = controller.categories[index];
-                  final isSelected =
-                      controller.selectedCategory.value?.id == category.id;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(category.name ?? ''),
-                      selected: isSelected,
-                      onSelected: (selected) =>
-                          controller.filterByCategory(category),
-                      backgroundColor: Colors.white,
-                      selectedColor: Colors.grey.shade200,
-                      checkmarkColor: Colors.blueAccent,
-                      labelStyle: GoogleFonts.inter(
-                        color: isSelected
-                            ? Colors.blueAccent
-                            : (Get.isDarkMode
-                                  ? Colors.black87
-                                  : Colors.black87),
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: isSelected ? Colors.blueAccent : Colors.black,
-                          width: 1,
+              () {
+                if (controller.isCategoriesLoading.value &&
+                    controller.categories.isEmpty) {
+                  return const SkeletonChips();
+                }
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: controller.categories.length,
+                  itemBuilder: (context, index) {
+                    final category = controller.categories[index];
+                    final isSelected =
+                        controller.selectedCategory.value?.id == category.id;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(category.name ?? ''),
+                        selected: isSelected,
+                        onSelected: (selected) =>
+                            controller.filterByCategory(category),
+                        backgroundColor: Colors.white,
+                        selectedColor: Colors.grey.shade200,
+                        checkmarkColor: Colors.blueAccent,
+                        labelStyle: GoogleFonts.inter(
+                          color: isSelected
+                              ? Colors.blueAccent
+                              : (Get.isDarkMode
+                                    ? Colors.black87
+                                    : Colors.black87),
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(
+                            color: isSelected ? Colors.blueAccent : Colors.black,
+                            width: 1,
+                          ),
+                        ),
+                        side: BorderSide.none,
                       ),
-                      side: BorderSide.none,
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                );
+              },
             ),
           ),
 
@@ -111,7 +117,7 @@ class ExploreView extends GetView<ExploreController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const LoadingWidget();
+                return const SkeletonList(itemCount: 4);
               }
 
               if (controller.articles.isEmpty) {
@@ -149,11 +155,6 @@ class ExploreView extends GetView<ExploreController> {
             ? article.user!.photoProfile!
             : '';
     final String categoryName = article.category?.name ?? 'Umum';
-    final authService = Get.find<AuthService>();
-    final currentUserId = authService.currentUser?['id'];
-    final bool isAuthor =
-        article.user?.id != null && article.user?.id == currentUserId;
-
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.ARTICLE_DETAIL, arguments: article.slug);

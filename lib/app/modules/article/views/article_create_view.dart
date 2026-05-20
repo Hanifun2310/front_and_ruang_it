@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
 import '../../../widgets/loading_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
+import '../../../widgets/guest_prompt_widget.dart';
+import '../../../data/services/auth_service.dart';
 import '../controllers/article_create_controller.dart';
 
 class ArticleCreateView extends GetView<ArticleCreateController> {
@@ -37,7 +39,18 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
           child: Container(color: const Color(0xFFE2E7FF), height: 1),
         ),
       ),
-      body: SingleChildScrollView(
+      body: _buildBody(context),
+      bottomNavigationBar: const CustomBottomNav(currentIndex: -1),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      return const GuestPromptWidget();
+    }
+
+    return SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,8 +332,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             const SizedBox(height: 100), // Extra space untuk bottom nav
           ],
         ),
-      ),
-      bottomNavigationBar: const CustomBottomNav(currentIndex: -1),
-    );
+      );
   }
 }

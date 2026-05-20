@@ -39,7 +39,8 @@ class AuthService extends GetxService {
       }
     } catch (_) {}
     
-    Get.offAllNamed(Routes.LOGIN);
+    // Redirect to homepage (dashboard) after logout
+    Get.offAllNamed(Routes.DASHBOARD);
   }
 
   String? get token => box.read('token');

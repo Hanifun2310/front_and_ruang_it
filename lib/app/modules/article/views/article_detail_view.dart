@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
 import 'package:flutter_quill/flutter_quill.dart';
-import '../../../widgets/loading_widget.dart';
+import '../../../widgets/skeleton_widget.dart';
 import '../controllers/article_detail_controller.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
@@ -16,7 +16,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
       backgroundColor: context.theme.scaffoldBackgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const LoadingWidget();
+          return const SkeletonArticleDetail();
         }
 
         final art = controller.article.value;
@@ -174,10 +174,9 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                             CircleAvatar(
                               radius: 18,
                               backgroundColor: Colors.grey.shade200,
-                              backgroundImage: NetworkImage(
-                                comment.user?.photoProfile ??
-                                    'https://ui-avatars.com/api/?name=${comment.user?.name ?? "User"}',
-                              ),
+                              backgroundImage: (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
+                                  ? NetworkImage(comment.user!.photoProfile!) as ImageProvider
+                                  : const AssetImage('assets/images/fallback_pp.png'),
                             ),
                             const SizedBox(width: 12),
                             Expanded(

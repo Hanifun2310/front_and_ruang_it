@@ -4,6 +4,8 @@ import '../controllers/auth_controller.dart';
 class AuthBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthController>(() => AuthController());
+    // Use Get.put so the controller isn't disposed during route transitions
+    // which can cause TextEditingController to be accessed after dispose.
+    Get.put<AuthController>(AuthController());
   }
 }

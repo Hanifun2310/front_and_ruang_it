@@ -15,18 +15,19 @@ void main() async {
   await GetStorage.init();
 
   // 2. Registrasi Services secara global
+
   Get.put(ApiProvider());
   final authService = Get.put(AuthService());
+  Get.put(AuthService());
+
   final themeService = Get.put(ThemeService());
-  final likeSyncService = Get.put(LikeSyncService());
+  Get.put(LikeSyncService());
 
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Ruang IT",
-      initialRoute: authService.isLoggedIn.value
-          ? Routes.DASHBOARD
-          : AppPages.INITIAL,
+      initialRoute: Routes.DASHBOARD,
       getPages: AppPages.routes,
       theme: ThemeService.lightTheme,
       darkTheme: ThemeService.darkTheme,

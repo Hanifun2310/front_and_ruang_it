@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../routes/app_routes.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
@@ -7,6 +9,7 @@ import '../../../data/services/like_sync_service.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
+import '../../../data/services/auth_service.dart';
 
 class DashboardController extends GetxController {
   // SENIOR REFACTOR: Gunakan Get.find agar menggunakan satu instance Dio global yang sama
@@ -147,6 +150,7 @@ class DashboardController extends GetxController {
 
   // SENIOR REFACTOR: Logika toggleLike Baru yang fully Optimistic & Safe
   Future<void> toggleLike(int articleId) async {
+
     final index = articles.indexWhere((a) => a.id == articleId);
     if (index == -1) return;
 
@@ -156,10 +160,18 @@ class DashboardController extends GetxController {
 
     // 1. Simpan ke service utama (Ini memicu worker internal dashboard agar UI langsung berubah instan)
     _likeSyncService.updateLikeStatus(articleId, newLikedState);
-
     // 2. Jembatan Sementara: Beri tahu controller lain yang BELUM di-refactor agar tidak patah sinkronisasinya
     _syncLikeState(articleId, newLikedState);
 
+
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+    if (isLiking.value) return;
+    isLiking.value = true;
     try {
       // 3. Eksekusi request API di background
       await _apiProvider.toggleLike(articleId);

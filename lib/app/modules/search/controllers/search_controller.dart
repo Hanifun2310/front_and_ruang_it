@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import '../../../data/services/auth_service.dart';
+import '../../../routes/app_routes.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
@@ -101,6 +104,13 @@ class ArticleSearchController extends GetxController {
   }
 
   Future<void> toggleLike(int articleId) async {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+
     try {
       final index = articles.indexWhere((a) => a.id == articleId);
       if (index == -1) return;

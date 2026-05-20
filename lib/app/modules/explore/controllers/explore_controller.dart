@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/article_model.dart';
+import '../../../data/services/auth_service.dart';
+import '../../../routes/app_routes.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
@@ -14,6 +17,7 @@ class ExploreController extends GetxController {
   var categories = <CategoryModel>[].obs;
   var selectedCategory = Rxn<CategoryModel>();
   var isLoading = false.obs;
+  var isCategoriesLoading = false.obs;
 
   @override
   void onInit() {
@@ -23,6 +27,7 @@ class ExploreController extends GetxController {
   }
 
   Future<void> fetchCategories() async {
+    isCategoriesLoading.value = true;
     try {
       final response = await _apiProvider.getCategories();
       if (response.statusCode == 200) {
@@ -30,7 +35,9 @@ class ExploreController extends GetxController {
         categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
       }
     } catch (e) {
-      print('Error fetching categories: $e');
+      Get.log('Error fetching categories: $e');
+    } finally {
+      isCategoriesLoading.value = false;
     }
   }
 
@@ -60,6 +67,13 @@ class ExploreController extends GetxController {
   }
 
   Future<void> toggleLike(int articleId) async {
+    final authService = Get.find<AuthService>();
+    if (!authService.isLoggedIn.value) {
+      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.toNamed(Routes.LOGIN);
+      return;
+    }
+
     try {
       final index = articles.indexWhere((a) => a.id == articleId);
       if (index == -1) return;

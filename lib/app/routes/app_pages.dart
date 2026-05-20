@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'app_routes.dart';
+import 'auth_middleware.dart';
 
 // Import file yang baru saja kita buat
 import '../modules/auth/bindings/auth_binding.dart';
@@ -90,11 +91,13 @@ class AppPages {
       name: Routes.INTEREST_SELECTION,
       page: () => const InterestSelectionView(),
       binding: InterestSelectionBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.TOPIC_RECOMMENDATION,
       page: () => const TopicRecommendationView(),
       binding: TopicRecommendationBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.CATEGORY_DETAIL,
@@ -120,6 +123,7 @@ class AppPages {
       name: Routes.ONBOARDING_FINISH,
       page: () => const OnboardingFinishView(),
       binding: OnboardingFinishBinding(),
+      middlewares: [AuthMiddleware()],
     ),
   ];
   
