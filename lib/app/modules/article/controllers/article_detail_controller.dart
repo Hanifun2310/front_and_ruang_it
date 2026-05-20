@@ -5,15 +5,24 @@ import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../../data/services/like_sync_service.dart'; // Pastikan import service ini ada
+import '../../../data/services/auth_service.dart';
+
+// Import controller lain tidak wajib lagi jika tidak dipakai, tapi biarkan saja agar tidak ada error di file lain
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
+
+
 import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
 
+
 class ArticleDetailController extends GetxController {
-  final ApiProvider _apiProvider = ApiProvider();
+  // SENIOR REFACTOR: Gunakan Get.find untuk performa memory pool Dio yang efisien
+  final ApiProvider _apiProvider = Get.find<ApiProvider>();
+  final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
   
   final String identifier = Get.arguments?.toString() ?? "";
 
@@ -30,6 +39,20 @@ class ArticleDetailController extends GetxController {
   void onInit() {
     super.onInit();
     loadDetail();
+
+    // SENIOR REFACTOR: WORKER SINKRONISASI OTOMATIS
+    // Jika status like diubah dari halaman luar (misal Dashboard) saat halaman detail ini sedang terbuka,
+    // UI detail artikel akan langsung ikut ter-update secara otomatis tanpa bentrok.
+    ever(_likeSyncService.rxLikeEvent, (LikeEvent? event) {
+      if (event != null && article.value.id == event.articleId) {
+        if (article.value.isLiked != event.isLiked) {
+          article.update((val) {
+            val!.isLiked = event.isLiked;
+            val.likesCount = (val.likesCount ?? 0) + (event.isLiked ? 1 : -1);
+          });
+        }
+      }
+    });
   }
 
   Future<void> loadDetail() async {
@@ -92,8 +115,11 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  // LOGIKA LIKE
+  // SENIOR REFACTOR: Logika Like Baru yang fully Optimistic, Instant, & Safe
   Future<void> toggleLike() async {
+
+    if (article.value.id == null || isLiking.value) return;
+
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
       Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
@@ -102,51 +128,23 @@ class ArticleDetailController extends GetxController {
     }
 
     if (isLiking.value) return;
-    isLiking.value = true;
-    try {
-      final response = await _apiProvider.toggleLike(article.value.id!);
-      if (response.statusCode == 200) {
-        // Update UI secara lokal agar responsif
-        bool currentStatus = article.value.isLiked ?? false;
-        article.update((val) {
-          val!.isLiked = !currentStatus;
-          val.likesCount = currentStatus 
-              ? (val.likesCount! - 1) 
-              : (val.likesCount! + 1);
-        });
 
-        // SYNC: Update DashboardController if registered
-        try {
-          if (Get.isRegistered<DashboardController>()) {
-            Get.find<DashboardController>().updateArticleLikeState(
-              article.value.id!, 
-              !currentStatus
-            );
-          }
-          if (Get.isRegistered<ProfileController>()) {
-            Get.find<ProfileController>().updateArticleLikeState(
-              article.value.id!, 
-              !currentStatus
-            );
-          }
-          if (Get.isRegistered<ExploreController>()) {
-            Get.find<ExploreController>().updateArticleLikeState(
-              article.value.id!, 
-              !currentStatus
-            );
-          }
-          if (Get.isRegistered<ArticleSearchController>()) {
-            Get.find<ArticleSearchController>().updateArticleLikeState(
-              article.value.id!, 
-              !currentStatus
-            );
-          }
-        } catch (e) {
-          // Ignore sync errors
-        }
-      }
+    isLiking.value = true;
+
+    final articleId = article.value.id!;
+    final isCurrentlyLiked = article.value.isLiked ?? false;
+    final newLikedState = !isCurrentlyLiked;
+
+    // 1. Langsung update ke service utama (UI lokal detail & UI halaman lain otomatis berubah instant via Worker)
+    _likeSyncService.updateLikeStatus(articleId, newLikedState);
+
+    try {
+      // 2. Kirim request ke backend di latar belakang tanpa me-blocking UI thread
+      await _apiProvider.toggleLike(articleId);
     } catch (e) {
-      Get.snackbar('Oops', 'Gagal memberikan Like');
+      // 3. ROLLBACK: Jika internet putus/gagal, kembalikan status data ke semula
+      _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
+      Get.snackbar('Oops', 'Gagal memperbarui status Like, silakan periksa koneksi internet Anda.');
     } finally {
       isLiking.value = false;
     }
