@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/loading_widget.dart';
+import '../../../widgets/skeleton_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/dashboard_controller.dart';
 import 'dart:convert';
@@ -98,7 +99,7 @@ class DashboardView extends GetView<DashboardController> {
                   : controller.trendingArticles;
 
               if (controller.isLoading.value && displayList.isEmpty) {
-                return const LoadingWidget();
+                return const SkeletonList(itemCount: 5);
               }
 
               if (displayList.isEmpty) {

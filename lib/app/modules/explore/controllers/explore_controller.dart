@@ -17,6 +17,7 @@ class ExploreController extends GetxController {
   var categories = <CategoryModel>[].obs;
   var selectedCategory = Rxn<CategoryModel>();
   var isLoading = false.obs;
+  var isCategoriesLoading = false.obs;
 
   @override
   void onInit() {
@@ -26,6 +27,7 @@ class ExploreController extends GetxController {
   }
 
   Future<void> fetchCategories() async {
+    isCategoriesLoading.value = true;
     try {
       final response = await _apiProvider.getCategories();
       if (response.statusCode == 200) {
@@ -33,7 +35,9 @@ class ExploreController extends GetxController {
         categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
       }
     } catch (e) {
-      print('Error fetching categories: $e');
+      Get.log('Error fetching categories: $e');
+    } finally {
+      isCategoriesLoading.value = false;
     }
   }
 

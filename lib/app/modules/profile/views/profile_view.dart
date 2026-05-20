@@ -12,6 +12,7 @@ import '../../../routes/app_routes.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../widgets/loading_widget.dart';
+import '../../../widgets/skeleton_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
 import '../../../widgets/guest_prompt_widget.dart';
 
@@ -121,6 +122,7 @@ class ProfileView extends GetView<ProfileController> {
 
             Expanded(
               child: SingleChildScrollView(
+                controller: controller.scrollController,
                 child: Column(
                   children: [
                     // Profile Header Info
@@ -169,7 +171,7 @@ class ProfileView extends GetView<ProfileController> {
                     ? Image.network(
                         controller.photoProfile.value,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildAvatarFallback(),
+                        errorBuilder: (context, error, stackTrace) => _buildAvatarFallback(),
                       )
                     : _buildAvatarFallback(),
               ),
@@ -410,7 +412,7 @@ class ProfileView extends GetView<ProfileController> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withAlpha((0.1 * 255).round()),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: iconColor, size: 24),
@@ -441,11 +443,9 @@ class ProfileView extends GetView<ProfileController> {
   Widget _buildArticlesSection() {
     return Obx(() {
       if (controller.isArticlesLoading.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: LoadingWidget(),
-          ),
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: SkeletonList(itemCount: 3, scrollable: false),
         );
       }
 
@@ -491,7 +491,7 @@ class ProfileView extends GetView<ProfileController> {
                   ),
                   filled: true,
                   fillColor: Get.isDarkMode
-                      ? Colors.white.withOpacity(0.06)
+                      ? const Color.fromRGBO(255, 255, 255, 0.06)
                       : Colors.grey.shade100,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 12,
@@ -528,7 +528,7 @@ class ProfileView extends GetView<ProfileController> {
                                 : (Get.isDarkMode ? Colors.white70 : Colors.black87),
                           ),
                           backgroundColor: Get.isDarkMode
-                              ? Colors.white.withOpacity(0.08)
+                              ? const Color.fromRGBO(255, 255, 255, 0.08)
                               : Colors.grey.shade100,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -563,7 +563,7 @@ class ProfileView extends GetView<ProfileController> {
                                           : Colors.black87),
                             ),
                             backgroundColor: Get.isDarkMode
-                                ? Colors.white.withOpacity(0.08)
+                                ? const Color.fromRGBO(255, 255, 255, 0.08)
                                 : Colors.grey.shade100,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -608,15 +608,50 @@ class ProfileView extends GetView<ProfileController> {
               ),
             )
           else
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-              itemCount: currentArticles.length,
-              itemBuilder: (context, index) {
-                final article = currentArticles[index];
-                return _buildArticleCard(context, article);
-              },
+            Column(
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                  itemCount: currentArticles.length,
+                  itemBuilder: (context, index) {
+                    final article = currentArticles[index];
+                    return _buildArticleCard(context, article);
+                  },
+                ),
+                if (isMyArticlesTab && controller.hasMoreUserArticles.value)
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Obx(() => ElevatedButton(
+                          onPressed: controller.isLoadingMoreArticles.value
+                              ? null
+                              : controller.loadMoreUserArticles,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: controller.isLoadingMoreArticles.value
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Muat lebih banyak',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                        )),
+                  ),
+              ],
             ),
         ],
       );
@@ -662,9 +697,9 @@ class ProfileView extends GetView<ProfileController> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: const Color.fromRGBO(255, 0, 0, 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                  border: Border.all(color: const Color.fromRGBO(255, 0, 0, 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -720,9 +755,9 @@ class ProfileView extends GetView<ProfileController> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: const Color.fromRGBO(255, 0, 0, 0.1),
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.red.withOpacity(0.5)),
+                      border: Border.all(color: const Color.fromRGBO(255, 0, 0, 0.5)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1150,7 +1185,7 @@ class ProfileView extends GetView<ProfileController> {
                             : Image.network(
                                 controller.photoProfile.value,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Image.network(
+                                errorBuilder: (context, error, stackTrace) => Image.network(
                                   'https://ui-avatars.com/api/?name=${controller.name.value}',
                                 ),
                               ),

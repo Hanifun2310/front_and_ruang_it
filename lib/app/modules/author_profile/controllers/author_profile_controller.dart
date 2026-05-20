@@ -12,7 +12,12 @@ class AuthorProfileController extends GetxController {
 
   late UserModel author;
   var isArticlesLoading = true.obs;
-  
+  var isLoadingMoreArticles = false.obs;
+  var hasMoreUserArticles = false.obs;
+  int _currentArticlesPage = 1;
+  static const int _articlesPageSize = 10;
+  final ScrollController scrollController = ScrollController();
+
   var userArticles = <ArticleModel>[].obs;
   
   // Search & Filter
@@ -52,37 +57,56 @@ class AuthorProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    scrollController.addListener(_handleScroll);
     if (Get.arguments != null) {
       author = Get.arguments as UserModel;
-      fetchAuthorArticles();
+      fetchAuthorArticles(reset: true);
     } else {
       isArticlesLoading.value = false;
     }
   }
 
-  Future<void> fetchAuthorArticles() async {
-    isArticlesLoading.value = true;
-    try {
-      List<ArticleModel> allFetchedArticles = [];
-      int currentPage = 1;
+  void _handleScroll() {
+    if (!hasMoreUserArticles.value || isLoadingMoreArticles.value) return;
+    if (!scrollController.hasClients) return;
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 180) {
+      loadMoreAuthorArticles();
+    }
+  }
 
-      // Fetch pages to ensure we get articles for this author
-      while (true) {
-        final articles = await _apiProvider.getArticles(page: currentPage);
-        if (articles.isEmpty) break;
-        
-        allFetchedArticles.addAll(articles);
-        if (currentPage >= 10) break; // Safety limit
-        currentPage++;
+  Future<void> fetchAuthorArticles({bool reset = true}) async {
+    if (reset) {
+      _currentArticlesPage = 1;
+      userArticles.clear();
+      hasMoreUserArticles.value = false;
+    }
+
+    if (reset) {
+      isArticlesLoading.value = true;
+    } else {
+      isLoadingMoreArticles.value = true;
+    }
+
+    try {
+      final fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
+      final updatedArticles = _likeSyncService.applyLikeStateToArticles(fetchedArticles);
+
+      if (reset) {
+        userArticles.value = updatedArticles;
+      } else {
+        userArticles.addAll(updatedArticles);
       }
 
-      allFetchedArticles = _likeSyncService.applyLikeStateToArticles(allFetchedArticles);
-
-      userArticles.value = allFetchedArticles
+      userArticles.value = userArticles
           .where((a) => a.user?.id == author.id && !a.isBlocked)
           .toList();
 
-      // Compute stats dynamically
+      hasMoreUserArticles.value = fetchedArticles.length >= _articlesPageSize;
+      if (hasMoreUserArticles.value) {
+        _currentArticlesPage++;
+      }
+
       int totalLikes = 0;
       int totalComments = 0;
       for (var article in userArticles) {
@@ -97,8 +121,17 @@ class AuthorProfileController extends GetxController {
     } catch (e) {
       print('Error fetching author articles: $e');
     } finally {
-      isArticlesLoading.value = false;
+      if (reset) {
+        isArticlesLoading.value = false;
+      } else {
+        isLoadingMoreArticles.value = false;
+      }
     }
+  }
+
+  Future<void> loadMoreAuthorArticles() async {
+    if (isLoadingMoreArticles.value || !hasMoreUserArticles.value) return;
+    await fetchAuthorArticles(reset: false);
   }
 
   Future<void> toggleLike(int articleId) async {
@@ -133,6 +166,7 @@ class AuthorProfileController extends GetxController {
   @override
   void onClose() {
     articleSearchController.dispose();
+    scrollController.dispose();
     super.onClose();
   }
 }
