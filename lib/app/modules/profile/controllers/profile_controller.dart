@@ -50,16 +50,9 @@ class ProfileController extends GetxController {
   var articleSearchQuery = ''.obs;
   var selectedCategoryFilter = Rxn<String>();
   final articleSearchController = TextEditingController();
+  var allUserCategories = <String>[].obs;
 
-  List<String> get availableCategories {
-    final cats = userArticles
-        .map((a) => a.category?.name)
-        .whereType<String>()
-        .toSet()
-        .toList();
-    cats.sort();
-    return cats;
-  }
+  List<String> get availableCategories => allUserCategories;
 
   List<ArticleModel> get filteredUserArticles {
     final q = articleSearchQuery.value.trim().toLowerCase();
@@ -76,7 +69,7 @@ class ProfileController extends GetxController {
     articleSearchController.clear();
   }
 
-  // Stats (Mocked or from User data)
+  // Stats
   var articlesCount = 0.obs;
   var likesCount = 0.obs;
   var commentsCount = 0.obs;
@@ -87,6 +80,7 @@ class ProfileController extends GetxController {
     loadUserData();
     scrollController.addListener(_handleScroll);
     fetchUserArticles(reset: true);
+    fetchAllUserCategories(); // New function to get all categories
   }
 
   void _handleScroll() {
@@ -98,26 +92,69 @@ class ProfileController extends GetxController {
     }
   }
 
-  void loadUserData() {
-    final userData = _authService.currentUser;
-    if (userData != null) {
-      // Use UserModel for consistent parsing and image formatting
-      final user = UserModel.fromJson(userData);
+  Future<void> loadUserData() async {
+    try {
+      final response = await _apiProvider.getProfile();
+      if (response.statusCode == 200) {
+        final userData = response.data['data'] ?? response.data;
+        final user = UserModel.fromJson(userData);
 
-      name.value = user.name ?? "User";
-      nameController.text = user.name ?? "";
-      profession.value = user.profession ?? "";
-      professionController.text = user.profession ?? "";
-      bio.value = user.bio ?? "";
-      bioController.text = user.bio ?? "";
-      email.value = user.email ?? "";
-      photoProfile.value = user.photoProfile ?? '';
-      userId.value = user.id ?? 0;
+        name.value = user.name ?? "User";
+        nameController.text = user.name ?? "";
+        profession.value = user.profession ?? "";
+        professionController.text = user.profession ?? "";
+        bio.value = user.bio ?? "";
+        bioController.text = user.bio ?? "";
+        email.value = user.email ?? "";
+        photoProfile.value = user.photoProfile ?? '';
+        userId.value = user.id ?? 0;
 
-      // Update stats if available in raw user object
-      articlesCount.value = userData['articles_count'] ?? 0;
-      likesCount.value = userData['likes_count'] ?? 0;
-      commentsCount.value = userData['comments_count'] ?? 0;
+        // Stats dari profile response (biasanya backend menyertakan total)
+        articlesCount.value = userData['articles_count'] ?? 0;
+        likesCount.value = userData['likes_count'] ?? 0;
+        commentsCount.value = userData['comments_count'] ?? 0;
+        
+        // Simpan ke storage agar sinkron
+        await _authService.saveSession(_authService.token ?? '', userData);
+      }
+    } catch (e) {
+      // Fallback ke data local jika offline/error
+      final userData = _authService.currentUser;
+      if (userData != null) {
+        final user = UserModel.fromJson(userData);
+        name.value = user.name ?? "User";
+        nameController.text = user.name ?? "";
+        profession.value = user.profession ?? "";
+        professionController.text = user.profession ?? "";
+        bio.value = user.bio ?? "";
+        bioController.text = user.bio ?? "";
+        email.value = user.email ?? "";
+        photoProfile.value = user.photoProfile ?? '';
+        userId.value = user.id ?? 0;
+        articlesCount.value = userData['articles_count'] ?? 0;
+        likesCount.value = userData['likes_count'] ?? 0;
+        commentsCount.value = userData['comments_count'] ?? 0;
+      }
+    }
+  }
+
+  // Fungsi baru untuk mengambil SEMUA kategori milik user tanpa terpengaruh pagination artikel
+  Future<void> fetchAllUserCategories() async {
+    try {
+      // Strategi: Ambil artikel dengan limit besar (misal 100) hanya untuk mengekstrak kategori
+      final allArticles = await _apiProvider.getArticles(page: 1); 
+      // Filter artikel milik user ini saja
+      final myArticles = allArticles.where((a) => a.user?.id == userId.value || a.user?.name == name.value);
+      
+      final cats = myArticles
+          .map((a) => a.category?.name)
+          .whereType<String>()
+          .toSet()
+          .toList();
+      cats.sort();
+      allUserCategories.value = cats;
+    } catch (e) {
+      print('Error fetching categories: $e');
     }
   }
 
@@ -143,16 +180,17 @@ class ProfileController extends GetxController {
         fetchedArticles,
       );
 
-      if (reset) {
-        userArticles.value = updatedArticles;
-      } else {
-        userArticles.addAll(updatedArticles);
-      }
-
+      List<ArticleModel> filteredResults = updatedArticles;
       if (name.value.isNotEmpty) {
-        userArticles.value = userArticles
+        filteredResults = updatedArticles
             .where((a) => a.user?.name == name.value)
             .toList();
+      }
+
+      if (reset) {
+        userArticles.value = filteredResults;
+      } else {
+        userArticles.addAll(filteredResults);
       }
 
       likedArticles.value = userArticles
@@ -166,16 +204,11 @@ class ProfileController extends GetxController {
 
       Get.find<NotificationService>().syncArticleMetrics(userArticles);
 
-      int totalLikes = 0;
-      int totalComments = 0;
-      for (var article in userArticles) {
-        totalLikes += article.likesCount ?? 0;
-        totalComments += article.commentsCount ?? 0;
+      // JANGAN update stats di sini jika ingin stats berdasarkan SELURUH data (sudah dihandle di loadUserData)
+      // Namun jika loadUserData gagal, kita bisa hitung total dari yang ada sebagai fallback minimum
+      if (articlesCount.value == 0) {
+        articlesCount.value = userArticles.length;
       }
-
-      likesCount.value = totalLikes;
-      commentsCount.value = totalComments;
-      articlesCount.value = userArticles.length;
     } catch (e) {
       print('Error fetching user articles: $e');
     } finally {
