@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
@@ -70,6 +71,18 @@ class ArticleDetailController extends GetxController {
           colorText: Colors.white,
         );
         return;
+      }
+
+      // Increment views count locally using GetStorage
+      if (article.value.id != null) {
+        final box = GetStorage();
+        final key = 'article_views_${article.value.id}';
+        int currentViews = box.read<int>(key) ?? article.value.viewsCount ?? 0;
+        currentViews += 1;
+        box.write(key, currentViews);
+        article.update((val) {
+          val!.viewsCount = currentViews;
+        });
       }
 
       // Inisialisasi Quill Controller setelah data artikel didapat

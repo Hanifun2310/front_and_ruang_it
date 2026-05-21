@@ -521,6 +521,7 @@ class ProfileView extends GetView<ProfileController> {
                           onSelected: (_) =>
                               controller.selectedCategoryFilter.value = null,
                           selectedColor: const Color(0xFF092BA2),
+                          checkmarkColor: Colors.white,
                           labelStyle: GoogleFonts.inter(
                             fontSize: 12,
                             color: controller.selectedCategoryFilter.value == null
@@ -553,6 +554,7 @@ class ProfileView extends GetView<ProfileController> {
                                       : cat;
                             },
                             selectedColor: const Color(0xFF092BA2),
+                            checkmarkColor: Colors.white,
                             labelStyle: GoogleFonts.inter(
                               fontSize: 12,
                               color:

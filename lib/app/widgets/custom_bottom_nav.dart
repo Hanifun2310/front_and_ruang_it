@@ -15,7 +15,7 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Get.isDarkMode;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color backgroundColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8F9FF); // Matching stitch bg 'surface'
     final Color activeColor = isDark ? Colors.blueAccent : const Color(0xFF0058BE);
     final Color inactiveColor = isDark ? Colors.white54 : const Color(0xFF424754);

@@ -1,3 +1,5 @@
+import 'package:get_storage/get_storage.dart';
+
 class ArticleModel {
   int? id;
   String? title;
@@ -69,13 +71,23 @@ class ArticleModel {
   }
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
+    final articleId = json['id'];
+    int localViews = json['views_count'] ?? json['view_count'] ?? json['views'] ?? 0;
+    try {
+      final box = GetStorage();
+      final key = 'article_views_$articleId';
+      if (box.hasData(key)) {
+        localViews = box.read<int>(key) ?? localViews;
+      }
+    } catch (_) {}
+
     return ArticleModel(
-      id: json['id'],
+      id: articleId,
       title: json['title'],
       slug: json['slug'],
       content: json['content'],
       imageUrl: formatImageUrl(json['image_url'] ?? json['image']),
-      viewsCount: json['views_count'] ?? json['view_count'] ?? json['views'] ?? 0,
+      viewsCount: localViews,
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
       isLiked: json['is_liked'] == true || 

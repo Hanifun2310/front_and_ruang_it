@@ -1,0 +1,8 @@
+﻿Analyzing views...                                              
+
+   info - Parameter 'key' could be a super parameter - article_detail_view.dart:9:9 - use_super_parameters
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - article_detail_view.dart:107:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - article_detail_view.dart:259:33 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - article_edit_view.dart:134:41 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - article_edit_view.dart:134:45 - unnecessary_underscores
+

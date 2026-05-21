@@ -259,7 +259,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
           ],
         );
       }),
-      bottomNavigationBar: Obx(() => _buildBottomAction()),
+      bottomNavigationBar: _buildBottomAction(),
     );
   }
 
