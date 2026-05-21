@@ -10,7 +10,7 @@ class LikeEvent {
 }
 
 class LikeSyncService extends GetxService {
-  final RxMap<int, bool> likedStatus = <int, bool>{}.obs;
+  final RxSet<int> likedArticleIds = <int>{}.obs;
   final _box = GetStorage();
   static const _storageKey = 'liked_article_ids';
 
@@ -35,8 +35,8 @@ class LikeSyncService extends GetxService {
         if (item is Map) {
           final id = item['id'] as int?;
           final liked = item['liked'] as bool?;
-          if (id != null && liked != null) {
-            likedStatus[id] = liked;
+          if (id != null && liked == true) {
+            likedArticleIds.add(id);
           }
         }
       }
@@ -44,8 +44,8 @@ class LikeSyncService extends GetxService {
   }
 
   void _saveToStorage() {
-    final List<Map<String, dynamic>> data = likedStatus.entries
-        .map((e) => {'id': e.key, 'liked': e.value})
+    final List<Map<String, dynamic>> data = likedArticleIds
+        .map((id) => {'id': id, 'liked': true})
         .toList();
     _box.write(_storageKey, data);
   }
@@ -53,40 +53,43 @@ class LikeSyncService extends GetxService {
   // ─── Public API ──────────────────────────────────────────────────────────────
 
   void updateLikeStatus(int articleId, bool isLiked) {
-    likedStatus[articleId] = isLiked;
+    if (isLiked) {
+      likedArticleIds.add(articleId);
+    } else {
+      likedArticleIds.remove(articleId);
+    }
     _saveToStorage();
 
     rxLikeEvent.value = LikeEvent(articleId: articleId, isLiked: isLiked);
   }
 
   bool? getLikeStatus(int articleId) {
-    return likedStatus[articleId];
+    return likedArticleIds.contains(articleId) ? true : null;
   }
 
   /// Terapkan state like lokal ke artikel.
   ///
   /// Prioritas:
-  /// 1. Cache lokal (dari toggle user dalam sesi ini / sesi sebelumnya)
-  /// 2. Data dari API (jika tidak ada cache sama sekali — biasanya tidak terjadi)
+  /// 1. Cache lokal (hanya like yang sudah pasti diubah oleh user)
+  /// 2. Data dari API
   ArticleModel applyLikeStateToArticle(ArticleModel article) {
     if (article.id == null) return article;
 
-    final cachedStatus = likedStatus[article.id!];
+    final locallyLiked = likedArticleIds.contains(article.id!);
 
-    if (cachedStatus == null) {
-      // Belum ada di cache lokal sama sekali (artikel baru dilihat pertama kali).
-      // Gunakan data dari API dan seed ke cache.
-      if (article.isLiked != null) {
-        likedStatus[article.id!] = article.isLiked!;
+    if (!locallyLiked) {
+      if (article.isLiked == true) {
+        likedArticleIds.add(article.id!);
         _saveToStorage();
       }
       return article;
     }
 
-    // Ada cache lokal → pakai cache, override nilai dari API.
-    if (article.isLiked != cachedStatus) {
-      article.likesCount = (article.likesCount ?? 0) + (cachedStatus ? 1 : -1);
-      article.isLiked = cachedStatus;
+    // Jika cache lokal menunjukkan artikel sudah liked, gunakan status tersebut,
+    // tetapi jangan override API false dengan nilai negative yang tersimpan.
+    if (article.isLiked != true) {
+      article.likesCount = (article.likesCount ?? 0) + 1;
+      article.isLiked = true;
     }
     return article;
   }
@@ -97,7 +100,7 @@ class LikeSyncService extends GetxService {
 
   /// Hapus semua data like (dipanggil saat logout)
   void clearAll() {
-    likedStatus.clear();
+    likedArticleIds.clear();
     rxLikeEvent.value = null;
     _box.remove(_storageKey);
   }

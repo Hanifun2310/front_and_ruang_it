@@ -1,4 +1,3 @@
-
 abstract class Routes {
   Routes._();
   static const DASHBOARD = _Paths.DASHBOARD;
@@ -6,6 +5,7 @@ abstract class Routes {
   static const REGISTER = _Paths.REGISTER;
   static const ARTICLE_DETAIL = _Paths.ARTICLE_DETAIL;
   static const PROFILE = _Paths.PROFILE;
+  static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
   static const ARTICLE_CREATE = _Paths.ARTICLE_CREATE;
   static const ARTICLE_EDIT = _Paths.ARTICLE_EDIT;
   static const GUIDELINES = _Paths.GUIDELINES;
@@ -25,6 +25,7 @@ abstract class _Paths {
   static const REGISTER = '/register';
   static const ARTICLE_DETAIL = '/article-detail';
   static const PROFILE = '/profile';
+  static const NOTIFICATIONS = '/notifications';
   static const ARTICLE_CREATE = '/article-create';
   static const ARTICLE_EDIT = '/article-edit';
   static const GUIDELINES = '/guidelines';

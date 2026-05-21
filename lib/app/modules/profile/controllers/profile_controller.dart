@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/like_sync_service.dart';
+import '../../../data/services/notification_service.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -135,8 +136,12 @@ class ProfileController extends GetxController {
     }
 
     try {
-      final fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
-      final updatedArticles = _likeSyncService.applyLikeStateToArticles(fetchedArticles);
+      final fetchedArticles = await _apiProvider.getArticles(
+        page: _currentArticlesPage,
+      );
+      final updatedArticles = _likeSyncService.applyLikeStateToArticles(
+        fetchedArticles,
+      );
 
       if (reset) {
         userArticles.value = updatedArticles;
@@ -158,6 +163,8 @@ class ProfileController extends GetxController {
       if (hasMoreUserArticles.value) {
         _currentArticlesPage++;
       }
+
+      Get.find<NotificationService>().syncArticleMetrics(userArticles);
 
       int totalLikes = 0;
       int totalComments = 0;

@@ -6,6 +6,7 @@ import 'package:device_preview/device_preview.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/data/services/auth_service.dart';
+import 'app/data/services/notification_service.dart';
 import 'app/data/services/theme_service.dart';
 import 'app/data/services/like_sync_service.dart';
 import 'app/data/providers/api_provider.dart';
@@ -19,8 +20,8 @@ void main() async {
   // 2. Registrasi Services secara global
 
   Get.put(ApiProvider());
-  final authService = Get.put(AuthService());
   Get.put(AuthService());
+  Get.put(NotificationService());
 
   final themeService = Get.put(ThemeService());
   Get.put(LikeSyncService());
