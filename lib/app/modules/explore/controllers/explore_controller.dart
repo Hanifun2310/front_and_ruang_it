@@ -5,6 +5,7 @@ import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
+import '../../../data/services/notification_service.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../search/controllers/search_controller.dart';
@@ -47,6 +48,10 @@ class ExploreController extends GetxController {
       final fetchedArticles = await _apiProvider.getArticles(
         category: selectedCategory.value?.id.toString(),
       );
+      
+      // SYNC: Perbarui baseline notifikasi
+      Get.find<NotificationService>().syncArticleMetrics(fetchedArticles);
+
       // FILTER: Jangan tampilkan artikel terblokir di Explore
       final filtered = fetchedArticles.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filtered);

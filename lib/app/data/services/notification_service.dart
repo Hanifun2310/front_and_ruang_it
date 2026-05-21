@@ -11,7 +11,7 @@ class NotificationService extends GetxService {
   static const _storageKey = 'app_notifications';
   static const _baselineKey = 'notification_article_baseline';
 
-  final Map<int, Map<String, int>> _articleBaseline = {};
+  final Map<int, Map<String, dynamic>> _articleBaseline = {};
 
   @override
   void onInit() {
@@ -34,10 +34,12 @@ class NotificationService extends GetxService {
         final id = item['id'] as int?;
         final likes = item['likes'] as int?;
         final comments = item['comments'] as int?;
+        final status = item['status'] as String?;
         if (id != null) {
           _articleBaseline[id] = {
             'likes': likes ?? 0,
             'comments': comments ?? 0,
+            'status': status ?? 'published',
           };
         }
       }
@@ -58,6 +60,7 @@ class NotificationService extends GetxService {
             'id': entry.key,
             'likes': entry.value['likes'],
             'comments': entry.value['comments'],
+            'status': entry.value['status'],
           },
         )
         .toList();
@@ -96,13 +99,21 @@ class NotificationService extends GetxService {
 
   void syncArticleMetrics(List<ArticleModel> articles) {
     final authService = Get.find<AuthService>();
-    final currentUserId = authService.currentUser?['id'] as int?;
+    final userData = authService.currentUser;
+    if (userData == null) return;
+    
+    // Safety parsing for userId
+    final int? currentUserId = userData['id'] is int 
+        ? userData['id'] as int 
+        : int.tryParse(userData['id']?.toString() ?? '');
+        
     if (currentUserId == null) return;
 
     var shouldSaveBaseline = false;
 
     for (final article in articles) {
       if (article.id == null) continue;
+      // Only notify if the article belongs to the current user
       if (article.user?.id != currentUserId) continue;
 
       final previous =
@@ -110,12 +121,20 @@ class NotificationService extends GetxService {
           {
             'likes': article.likesCount ?? 0,
             'comments': article.commentsCount ?? 0,
+            'status': article.status ?? 'published',
           };
-      final currentLikes = article.likesCount ?? 0;
-      final currentComments = article.commentsCount ?? 0;
+      
+      final int currentLikes = article.likesCount ?? 0;
+      final int currentComments = article.commentsCount ?? 0;
+      final String currentStatus = article.status?.toLowerCase() ?? 'published';
+      final String previousStatus = (previous['status'] as String?)?.toLowerCase() ?? 'published';
 
-      final likeDiff = currentLikes - (previous['likes'] ?? 0);
-      final commentDiff = currentComments - (previous['comments'] ?? 0);
+      // Safety parsing for previous metrics
+      final int prevLikes = previous['likes'] is int ? previous['likes'] as int : 0;
+      final int prevComments = previous['comments'] is int ? previous['comments'] as int : 0;
+
+      final int likeDiff = currentLikes - prevLikes;
+      final int commentDiff = currentComments - prevComments;
 
       if (likeDiff > 0) {
         addNotification(
@@ -145,9 +164,39 @@ class NotificationService extends GetxService {
         );
       }
 
+      final bool isNowBlocked = currentStatus == 'banned' || currentStatus == 'blocked';
+      final bool wasBlocked = previousStatus == 'banned' || previousStatus == 'blocked';
+
+      if (isNowBlocked && !wasBlocked) {
+        addNotification(
+          NotificationItem(
+            id: DateTime.now().microsecondsSinceEpoch + 2,
+            articleId: article.id!,
+            articleTitle: article.title ?? 'Artikel Anda',
+            message:
+                'Artikel "${article.title ?? 'artikel Anda'}" telah diblokir oleh admin karena melanggar ketentuan.',
+            type: 'blocked',
+            createdAt: DateTime.now(),
+          ),
+        );
+      } else if (!isNowBlocked && wasBlocked) {
+        addNotification(
+          NotificationItem(
+            id: DateTime.now().microsecondsSinceEpoch + 3,
+            articleId: article.id!,
+            articleTitle: article.title ?? 'Artikel Anda',
+            message:
+                'Artikel "${article.title ?? 'artikel Anda'}" telah diaktifkan kembali oleh admin.',
+            type: 'notifications', // Use general notification type
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+
       _articleBaseline[article.id!] = {
         'likes': currentLikes,
         'comments': currentComments,
+        'status': currentStatus,
       };
       shouldSaveBaseline = true;
     }

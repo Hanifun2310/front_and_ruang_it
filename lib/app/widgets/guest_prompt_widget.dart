@@ -90,6 +90,18 @@ class GuestPromptWidget extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: () => Get.toNamed(Routes.GUIDELINES),
+              child: Text(
+                'Lihat Panduan Penulisan',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Colors.grey,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -16,9 +16,9 @@ import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
 
 
+import '../../../data/services/notification_service.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
-
 
 class ArticleDetailController extends GetxController {
   // SENIOR REFACTOR: Gunakan Get.find untuk performa memory pool Dio yang efisien
@@ -61,6 +61,9 @@ class ArticleDetailController extends GetxController {
       isLoading.value = true;
       // 1. Ambil Detail Artikel
       article.value = await _apiProvider.getArticleDetail(identifier);
+      
+      // SYNC: Perbarui baseline notifikasi
+      Get.find<NotificationService>().syncArticleMetrics([article.value]);
       
       if (article.value.isBlocked) {
         Get.back();

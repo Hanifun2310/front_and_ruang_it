@@ -20,6 +20,8 @@ class NotificationView extends StatelessWidget {
         return Icons.comment;
       case 'like':
         return Icons.favorite;
+      case 'blocked':
+        return Icons.block;
       default:
         return Icons.notifications;
     }
@@ -31,6 +33,8 @@ class NotificationView extends StatelessWidget {
         return Colors.green;
       case 'like':
         return Colors.redAccent;
+      case 'blocked':
+        return Colors.orange.shade800;
       default:
         return Colors.blueAccent;
     }
@@ -44,13 +48,6 @@ class NotificationView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Notifikasi'),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mark_email_read),
-            tooltip: 'Tandai semua telah dibaca',
-            onPressed: notificationService.markAllRead,
-          ),
-        ],
       ),
       body: Obx(() {
         final notifications = notificationService.notifications;

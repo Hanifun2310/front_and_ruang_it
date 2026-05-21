@@ -9,6 +9,7 @@ import '../../../data/services/like_sync_service.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
+import '../../../data/services/notification_service.dart';
 import '../../../data/services/auth_service.dart';
 
 class DashboardController extends GetxController {
@@ -122,15 +123,20 @@ class DashboardController extends GetxController {
       if (newArticles.isEmpty) {
         hasMoreData.value = false;
       } else {
+        // SYNC: Perbarui baseline notifikasi jika ada perubahan status/metrik
+        Get.find<NotificationService>().syncArticleMetrics(newArticles);
+
         // FILTER: Jangan tampilkan artikel terblokir di Dashboard
         final publicArticles = newArticles.where((a) => !a.isBlocked).toList();
+        
         articles.addAll(
           _likeSyncService.applyLikeStateToArticles(publicArticles),
         );
 
         if (publicArticles.isEmpty && newArticles.isNotEmpty) {
           currentPage++;
-          fetchArticles();
+          // Wait for the recursive call to finish to maintain correct loading state
+          await fetchArticles();
           return;
         }
 

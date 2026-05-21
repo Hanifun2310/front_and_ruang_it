@@ -6,6 +6,7 @@ import '../../../routes/app_routes.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
+import '../../../data/services/notification_service.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
@@ -76,6 +77,10 @@ class ArticleSearchController extends GetxController {
     isLoading.value = true;
     try {
       final fetched = await _apiProvider.getArticles(search: searchQuery.value);
+      
+      // SYNC: Perbarui baseline notifikasi
+      Get.find<NotificationService>().syncArticleMetrics(fetched);
+
       // FILTER: Jangan tampilkan artikel terblokir di Hasil Pencarian
       final filtered = fetched.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filtered);

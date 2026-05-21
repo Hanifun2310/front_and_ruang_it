@@ -116,7 +116,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       style: GoogleFonts.kulimPark(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF092BA2),
+                        color: Get.isDarkMode ? const Color(0xFF6366F1) : const Color(0xFF092BA2),
                         decoration: TextDecoration.underline,
                       ),
                     ),

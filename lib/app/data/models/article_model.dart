@@ -13,7 +13,16 @@ class ArticleModel {
   DateTime? createdAt;
   String? status;
 
-  bool get isBlocked => status == 'banned' || user?.isBanned == true;
+  bool get isBlocked {
+    // Robust check for banned status (support both 'banned' and 'blocked')
+    final String? articleStatus = status?.toLowerCase();
+    final String? userStatus = user?.status?.toLowerCase();
+    
+    final bool articleIsBanned = articleStatus == 'banned' || articleStatus == 'blocked';
+    final bool userIsBanned = userStatus == 'banned' || userStatus == 'blocked' || user?.isBanned == true;
+    
+    return articleIsBanned || userIsBanned;
+  }
 
   String get formattedDate {
     if (createdAt == null) return '';
