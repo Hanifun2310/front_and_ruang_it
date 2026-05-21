@@ -936,6 +936,29 @@ class ProfileView extends GetView<ProfileController> {
                         ),
                       ],
                     ),
+                    const SizedBox(width: 20),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.visibility,
+                          size: 20,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${article.viewsCount ?? 0}',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
                     if (isAuthor) ...[
                       const SizedBox(width: 20),
                       GestureDetector(

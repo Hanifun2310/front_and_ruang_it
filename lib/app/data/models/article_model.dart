@@ -4,6 +4,7 @@ class ArticleModel {
   String? slug;
   String? content;
   String? imageUrl;
+  int? viewsCount;
   int? likesCount;
   int? commentsCount;
   bool? isLiked;
@@ -40,6 +41,7 @@ class ArticleModel {
     this.slug,
     this.content,
     this.imageUrl,
+    this.viewsCount,
     this.likesCount,
     this.commentsCount,
     this.isLiked,
@@ -73,6 +75,7 @@ class ArticleModel {
       slug: json['slug'],
       content: json['content'],
       imageUrl: formatImageUrl(json['image_url'] ?? json['image']),
+      viewsCount: json['views_count'] ?? json['view_count'] ?? json['views'] ?? 0,
       likesCount: json['likes_count'] ?? 0,
       commentsCount: json['comments_count'] ?? 0,
       isLiked: json['is_liked'] == true || 
@@ -98,6 +101,7 @@ class ArticleModel {
       'slug': slug,
       'content': content,
       'image_url': imageUrl,
+      'views_count': viewsCount,
       'likes_count': likesCount,
       'comments_count': commentsCount,
       'is_liked': isLiked,

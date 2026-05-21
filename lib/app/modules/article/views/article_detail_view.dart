@@ -94,12 +94,34 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                                   fontSize: 14,
                                 ),
                               ),
-                              Text(
-                                art.formattedDate,
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    art.formattedDate,
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.visibility,
+                                        size: 14,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${art.viewsCount ?? 0} kali dibaca',
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ],
                           ),

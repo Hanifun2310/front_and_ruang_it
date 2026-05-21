@@ -6,7 +6,7 @@ import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/search_controller.dart';
 import '../../../routes/app_routes.dart';
 import 'dart:convert';
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide DefaultStyles;
 
@@ -403,6 +403,29 @@ class SearchView extends GetView<ArticleSearchController> {
                         const SizedBox(width: 6),
                         Text(
                           '${article.commentsCount ?? 0}',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Get.isDarkMode
+                                ? Colors.white70
+                                : Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.visibility,
+                          size: 20,
+                          color: Get.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${article.viewsCount ?? 0}',
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

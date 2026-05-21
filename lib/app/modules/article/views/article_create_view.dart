@@ -10,6 +10,7 @@ import '../../../widgets/custom_bottom_nav.dart';
 import '../../../widgets/guest_prompt_widget.dart';
 import '../../../data/services/auth_service.dart';
 import '../controllers/article_create_controller.dart';
+import '../../../routes/app_routes.dart';
 
 class ArticleCreateView extends GetView<ArticleCreateController> {
   const ArticleCreateView({super.key});
@@ -335,8 +336,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       decoration: BoxDecoration(
                         color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
                         borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12)),
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -350,6 +352,10 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         controller: controller.quillController,
                         placeholder: 'Mulai menulis intisari teknologi Anda di sini...',
                         scrollable: true,
+                        autoFocus: false,
+                        readOnly: false,
+                        expands: false,
+                        padding: EdgeInsets.zero,
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
                             GoogleFonts.kulimPark(
