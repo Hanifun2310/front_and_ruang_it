@@ -69,9 +69,17 @@ class ArticleDetailController extends GetxController {
         Get.back();
         Get.snackbar(
           'Akses Terbatas',
-          'Artikel ini tidak dapat diakses karena artikel atau penulis telah diblokir.',
+          'Artikel ini tidak dapat diakses karena artikel atau penulis telah diblokir. Silakan baca panduan penulisan kami.',
           backgroundColor: Colors.redAccent,
           colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+          mainButton: TextButton(
+            onPressed: () => Get.toNamed(Routes.GUIDELINES),
+            child: const Text(
+              'PANDUAN',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
         );
         return;
       }
@@ -93,6 +101,8 @@ class ArticleDetailController extends GetxController {
       // 2. Ambil Komentar
       if (article.value.id != null) {
         await fetchComments();
+        // SYNC: Cek perubahan status komentar user
+        Get.find<NotificationService>().syncCommentStatus(comments);
       }
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat detail artikel');

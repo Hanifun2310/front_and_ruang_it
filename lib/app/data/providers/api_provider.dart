@@ -3,6 +3,9 @@ import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import '../services/auth_service.dart';
 import '../models/article_model.dart';
 
+import '../../routes/app_routes.dart';
+import 'package:flutter/material.dart';
+
 class ApiProvider extends GetxService {
   late Dio _dio;
   
@@ -32,7 +35,20 @@ class ApiProvider extends GetxService {
       onError: (DioException e, handler) {
         if (e.response?.statusCode == 403) {
           Get.find<AuthService>().logout();
-          Get.snackbar('Akses Ditolak', 'Akun Anda telah ditangguhkan.');
+          Get.snackbar(
+            'Akses Ditolak', 
+            'Akun Anda telah ditangguhkan. Silakan baca panduan penulisan kami.',
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+            mainButton: TextButton(
+              onPressed: () => Get.toNamed(Routes.GUIDELINES),
+              child: const Text(
+                'PANDUAN',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
         } else if (e.response?.statusCode == 401) {
           Get.find<AuthService>().logout();
           Get.snackbar('Sesi Habis', 'Silakan login kembali.');

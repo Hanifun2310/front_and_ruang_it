@@ -213,16 +213,43 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    comment.isHidden == true
-                                        ? 'Komentar ini telah disembunyikan oleh moderator'
-                                        : (comment.content ?? ''),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Get.isDarkMode ? Colors.white70 : Colors.black87,
-                                      height: 1.5,
+                                  if (comment.isHidden == true)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Komentar ini telah disembunyikan oleh moderator karena melanggar ketentuan.',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        GestureDetector(
+                                          onTap: () => Get.toNamed(Routes.GUIDELINES),
+                                          child: const Text(
+                                            'Pelajari Panduan Penulisan',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.blueAccent,
+                                              fontWeight: FontWeight.bold,
+                                              decoration: TextDecoration.underline,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Text(
+                                      comment.content ?? '',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Get.isDarkMode ? Colors.white70 : Colors.black87,
+                                        height: 1.5,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

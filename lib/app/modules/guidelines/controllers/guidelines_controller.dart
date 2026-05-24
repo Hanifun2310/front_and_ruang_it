@@ -55,7 +55,7 @@ class GuidelinesController extends GetxController {
   <p><strong>Prosedur:</strong></p>
   <ul>
     <li>Pengguna yang terblokir tidak bisa login ke akunnya sampai admin mencabut status blokirnya.</li>
-    <li>Pengguna yang terblokir silahkan menghubungi admin untuk membicarakan status blokirnya.</li>
+    <li>Pengguna yang terblokir silahkan menghubungi admin via WhatsApp (089607045476) untuk membicarakan status blokirnya.</li>
   </ul>
 
   <p><strong>2. Blokir Artikel</strong></p>
@@ -69,7 +69,7 @@ class GuidelinesController extends GetxController {
   <ul>
     <li>Artikel akan disembunyikan dari publik.</li>
     <li>Jika pelanggaran berulang, penulis dapat diblokir sementara atau permanen.</li>
-    <li>Pengguna yang artikelnya terblokir silahkan menghubungi admin untuk membicarakan status blokirnya.</li>
+    <li>Pengguna yang artikelnya terblokir silahkan menghubungi admin via WhatsApp (089607045476) untuk membicarakan status blokirnya.</li>
   </ul>
 
   <p><strong>3. Blokir Komentar</strong></p>
@@ -84,8 +84,14 @@ class GuidelinesController extends GetxController {
     <li>Komentar akan disembunyikan.</li>
     <li>Pengguna yang melanggar dapat diberikan peringatan.</li>
     <li>Pelanggaran berulang dapat menyebabkan akun diblokir sementara atau permanen dari memberi komentar.</li>
-    <li>Pengguna yang terblokir silahkan menghubungi admin untuk membicarakan status blokirnya.</li>
+    <li>Pengguna yang terblokir silahkan menghubungi admin via WhatsApp (089607045476) untuk membicarakan status blokirnya.</li>
   </ul>
+
+  <div style="margin-top: 32px; padding: 16px; background-color: #F0F4FF; border-radius: 8px; border: 1px solid #D6E0FF;">
+    <p><strong>Info Lebih Lanjut:</strong></p>
+    <p>Jika Anda memiliki pertanyaan atau butuh bantuan lebih lanjut mengenai panduan ini, silakan hubungi Admin via WhatsApp:</p>
+    <p><a href="https://wa.me/6289607045476" style="color: #092BA2; font-weight: bold; text-decoration: none;">+62 896-0704-5476</a></p>
+  </div>
 </div>
 '''.obs;
   var errorMessage = ''.obs;

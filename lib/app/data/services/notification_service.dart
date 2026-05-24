@@ -4,14 +4,18 @@ import '../models/article_model.dart';
 import '../models/notification_model.dart';
 import 'auth_service.dart';
 
+import '../models/comment_model.dart';
+
 class NotificationService extends GetxService {
   final notifications = <NotificationItem>[].obs;
   final unreadCount = 0.obs;
   final _box = GetStorage();
   static const _storageKey = 'app_notifications';
   static const _baselineKey = 'notification_article_baseline';
+  static const _commentBaselineKey = 'notification_comment_baseline';
 
   final Map<int, Map<String, dynamic>> _articleBaseline = {};
+  final Map<int, Map<String, dynamic>> _commentBaseline = {};
 
   @override
   void onInit() {
@@ -45,6 +49,19 @@ class NotificationService extends GetxService {
       }
     }
 
+    final rawCommentBaseline = _box.read<List<dynamic>>(_commentBaselineKey);
+    if (rawCommentBaseline != null) {
+      for (final item in rawCommentBaseline.whereType<Map<String, dynamic>>()) {
+        final id = item['id'] as int?;
+        final isHidden = item['is_hidden'] as bool?;
+        if (id != null) {
+          _commentBaseline[id] = {
+            'is_hidden': isHidden ?? false,
+          };
+        }
+      }
+    }
+
     _recalculateUnreadCount();
   }
 
@@ -65,6 +82,16 @@ class NotificationService extends GetxService {
         )
         .toList();
     _box.write(_baselineKey, data);
+
+    final commentData = _commentBaseline.entries
+        .map(
+          (entry) => {
+            'id': entry.key,
+            'is_hidden': entry.value['is_hidden'],
+          },
+        )
+        .toList();
+    _box.write(_commentBaselineKey, commentData);
   }
 
   void _recalculateUnreadCount() {
@@ -174,7 +201,7 @@ class NotificationService extends GetxService {
             articleId: article.id!,
             articleTitle: article.title ?? 'Artikel Anda',
             message:
-                'Artikel "${article.title ?? 'artikel Anda'}" telah diblokir oleh admin karena melanggar ketentuan.',
+                'Artikel "${article.title ?? 'artikel Anda'}" telah diblokir oleh admin karena melanggar ketentuan. Silakan baca panduan penulisan untuk info lebih lanjut.',
             type: 'blocked',
             createdAt: DateTime.now(),
           ),
@@ -197,6 +224,68 @@ class NotificationService extends GetxService {
         'likes': currentLikes,
         'comments': currentComments,
         'status': currentStatus,
+      };
+      shouldSaveBaseline = true;
+    }
+
+    if (shouldSaveBaseline) {
+      _saveBaseline();
+    }
+  }
+
+  void syncCommentStatus(List<CommentModel> comments) {
+    final authService = Get.find<AuthService>();
+    final userData = authService.currentUser;
+    if (userData == null) return;
+
+    final int? currentUserId = userData['id'] is int
+        ? userData['id'] as int
+        : int.tryParse(userData['id']?.toString() ?? '');
+
+    if (currentUserId == null) return;
+
+    var shouldSaveBaseline = false;
+
+    for (final comment in comments) {
+      if (comment.id == null) continue;
+      // Hanya proses komentar milik user saat ini
+      if (comment.user?.id != currentUserId) continue;
+
+      final previous = _commentBaseline[comment.id!] ??
+          {
+            'is_hidden': false,
+          };
+
+      final bool currentIsHidden = comment.isHidden ?? false;
+      final bool previousIsHidden = previous['is_hidden'] as bool? ?? false;
+
+      if (currentIsHidden && !previousIsHidden) {
+        addNotification(
+          NotificationItem(
+            id: DateTime.now().microsecondsSinceEpoch,
+            articleId: comment.articleId ?? 0,
+            articleTitle: 'Komentar Anda',
+            message:
+                'Komentar Anda telah disembunyikan oleh moderator karena melanggar ketentuan. Silakan baca panduan penulisan.',
+            type: 'blocked',
+            createdAt: DateTime.now(),
+          ),
+        );
+      } else if (!currentIsHidden && previousIsHidden) {
+        addNotification(
+          NotificationItem(
+            id: DateTime.now().microsecondsSinceEpoch + 1,
+            articleId: comment.articleId ?? 0,
+            articleTitle: 'Komentar Anda',
+            message: 'Komentar Anda telah diaktifkan kembali oleh moderator.',
+            type: 'notifications',
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+
+      _commentBaseline[comment.id!] = {
+        'is_hidden': currentIsHidden,
       };
       shouldSaveBaseline = true;
     }

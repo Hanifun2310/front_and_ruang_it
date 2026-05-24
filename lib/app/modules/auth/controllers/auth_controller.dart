@@ -56,7 +56,26 @@ class AuthController extends GetxController {
     } on DioException catch (e) {
       print("DIO ERROR: ${e.response?.data}");
       String message = _parseError(e, 'Gagal melakukan login. Silakan periksa kredensial Anda.');
-      Get.snackbar('Login Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
+      
+      // Check if user is banned/blocked
+      bool isBanned = message.toLowerCase().contains('banned') || 
+                      message.toLowerCase().contains('blocked') || 
+                      message.toLowerCase().contains('ditangguhkan');
+
+      Get.snackbar(
+        'Login Gagal', 
+        isBanned ? '$message Silakan baca panduan penulisan kami.' : message, 
+        backgroundColor: Colors.redAccent, 
+        colorText: Colors.white, 
+        duration: Duration(seconds: isBanned ? 6 : 4),
+        mainButton: isBanned ? TextButton(
+          onPressed: () => Get.toNamed(Routes.GUIDELINES),
+          child: const Text(
+            'PANDUAN',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ) : null,
+      );
     } catch (e) {
       print("ERROR SISTEM/CODE: $e");
       Get.snackbar(
