@@ -16,6 +16,7 @@ abstract class Routes {
   static const EXPLORE = _Paths.EXPLORE;
   static const SEARCH = _Paths.SEARCH;
   static const ONBOARDING_FINISH = _Paths.ONBOARDING_FINISH;
+  static const SPLASH = _Paths.SPLASH;
 }
 
 abstract class _Paths {
@@ -36,4 +37,5 @@ abstract class _Paths {
   static const EXPLORE = '/explore';
   static const SEARCH = '/search';
   static const ONBOARDING_FINISH = '/onboarding-finish';
+  static const SPLASH = '/splash';
 }

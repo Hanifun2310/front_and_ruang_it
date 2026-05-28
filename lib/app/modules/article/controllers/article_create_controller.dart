@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/providers/api_provider.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class ArticleCreateController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -44,7 +45,7 @@ class ArticleCreateController extends GetxController {
   Future<void> publishArticle() async {
     // Memeriksa apakah dokumen quill kosong
     if (titleController.text.isEmpty || quillController.document.isEmpty() || selectedCategoryId.value == 0) {
-      Get.snackbar('Error', 'Judul, konten, dan kategori harus diisi');
+      showCustomSnackbar('Error', 'Judul, konten, dan kategori harus diisi');
       return;
     }
 
@@ -71,12 +72,12 @@ class ArticleCreateController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.back();
-        Get.snackbar('Sukses', 'Artikel berhasil diterbitkan');
+        showCustomSnackbar('Sukses', 'Artikel berhasil diterbitkan');
       } else {
-        Get.snackbar('Gagal', 'Gagal menerbitkan artikel: ${response.statusMessage}');
+        showCustomSnackbar('Gagal', 'Gagal menerbitkan artikel: ${response.statusMessage}');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: $e');
+      showCustomSnackbar('Error', 'Terjadi kesalahan: $e');
     } finally {
       isLoading.value = false;
     }

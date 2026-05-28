@@ -5,12 +5,14 @@ import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class AuthorProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
 
   late UserModel author;
+  var rxAuthor = UserModel().obs;
   var isArticlesLoading = true.obs;
   var isLoadingMoreArticles = false.obs;
   var hasMoreUserArticles = false.obs;
@@ -38,10 +40,18 @@ class AuthorProfileController extends GetxController {
   List<ArticleModel> get filteredUserArticles {
     final q = articleSearchQuery.value.trim().toLowerCase();
     final cat = selectedCategoryFilter.value;
+    
+    // Safety check: ensure userArticles is not empty and author data is consistent
+    if (userArticles.isEmpty) return [];
+
     return userArticles.where((a) {
       final matchQuery = q.isEmpty || (a.title ?? '').toLowerCase().contains(q);
       final matchCategory = cat == null || a.category?.name == cat;
-      return matchQuery && matchCategory;
+      
+      // Secondary safety: ensure we only show articles for THIS author
+      final bool isCorrectAuthor = a.user?.id == author.id || a.user?.name == author.name;
+      
+      return matchQuery && matchCategory && isCorrectAuthor;
     }).toList();
   }
 
@@ -60,7 +70,24 @@ class AuthorProfileController extends GetxController {
     scrollController.addListener(_handleScroll);
     if (Get.arguments != null) {
       author = Get.arguments as UserModel;
+      rxAuthor.value = author;
+
+      // Centralized banned user enforcement! If author is banned, block profile viewing.
+      if (author.isBanned) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showCustomSnackbar(
+            'Akses Ditolak',
+            'Akun penulis ini telah dinonaktifkan.',
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+          );
+          Get.back();
+        });
+        return;
+      }
+
       fetchAuthorArticles(reset: true);
+      fetchDetailedAuthorInfo();
     } else {
       isArticlesLoading.value = false;
     }
@@ -72,6 +99,33 @@ class AuthorProfileController extends GetxController {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent - 180) {
       loadMoreAuthorArticles();
+    }
+  }
+
+  Future<void> fetchDetailedAuthorInfo() async {
+    try {
+      final response = await _apiProvider.getAuthorProfile(author.id!);
+      if (response.statusCode == 200) {
+        final userData = response.data['data'] ?? response.data;
+        final detailedUser = UserModel.fromJson(userData);
+        
+        // Re-enforce banned check with latest data from server
+        if (detailedUser.isBanned) {
+          showCustomSnackbar(
+            'Akses Ditolak',
+            'Akun penulis ini telah dinonaktifkan.',
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+          );
+          Get.back();
+          return;
+        }
+
+        rxAuthor.value = detailedUser;
+        rxAuthor.refresh();
+      }
+    } catch (e) {
+      print('Error fetching detailed author info: $e');
     }
   }
 
@@ -90,6 +144,7 @@ class AuthorProfileController extends GetxController {
 
     try {
       final fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
+      
       final updatedArticles = _likeSyncService.applyLikeStateToArticles(fetchedArticles);
 
       if (reset) {
@@ -137,7 +192,7 @@ class AuthorProfileController extends GetxController {
   Future<void> toggleLike(int articleId) async {
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
-      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      showCustomSnackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
       Get.toNamed(Routes.LOGIN);
       return;
     }

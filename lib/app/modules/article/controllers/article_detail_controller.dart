@@ -15,10 +15,9 @@ import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
 
-
 import '../../../data/services/notification_service.dart';
-import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class ArticleDetailController extends GetxController {
   // SENIOR REFACTOR: Gunakan Get.find untuk performa memory pool Dio yang efisien
@@ -67,7 +66,7 @@ class ArticleDetailController extends GetxController {
       
       if (article.value.isBlocked) {
         Get.back();
-        Get.snackbar(
+        showCustomSnackbar(
           'Akses Terbatas',
           'Artikel ini tidak dapat diakses karena artikel atau penulis telah diblokir. Silakan baca panduan penulisan kami.',
           backgroundColor: Colors.redAccent,
@@ -105,7 +104,7 @@ class ArticleDetailController extends GetxController {
         Get.find<NotificationService>().syncCommentStatus(comments);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat detail artikel');
+      showCustomSnackbar('Error', 'Gagal memuat detail artikel');
     } finally {
       isLoading.value = false;
     }
@@ -143,12 +142,11 @@ class ArticleDetailController extends GetxController {
 
   // SENIOR REFACTOR: Logika Like Baru yang fully Optimistic, Instant, & Safe
   Future<void> toggleLike() async {
-
     if (article.value.id == null || isLiking.value) return;
 
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
-      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      showCustomSnackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
       Get.toNamed(Routes.LOGIN);
       return;
     }
@@ -170,7 +168,7 @@ class ArticleDetailController extends GetxController {
     } catch (e) {
       // 3. ROLLBACK: Jika internet putus/gagal, kembalikan status data ke semula
       _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
-      Get.snackbar('Oops', 'Gagal memperbarui status Like, silakan periksa koneksi internet Anda.');
+      showCustomSnackbar('Oops', 'Gagal memperbarui status Like, silakan periksa koneksi internet Anda.');
     } finally {
       isLiking.value = false;
     }
@@ -180,7 +178,7 @@ class ArticleDetailController extends GetxController {
   Future<void> sendComment() async {
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
-      Get.snackbar('Akses Ditolak', 'Anda harus login untuk berkomentar.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      showCustomSnackbar('Akses Ditolak', 'Anda harus login untuk berkomentar.', backgroundColor: Colors.redAccent, colorText: Colors.white);
       Get.toNamed(Routes.LOGIN);
       return;
     }
@@ -196,10 +194,10 @@ class ArticleDetailController extends GetxController {
       if (response.statusCode == 201 || response.statusCode == 200) {
         commentController.clear();
         fetchComments(); // Refresh list komentar
-        Get.snackbar('Sukses', 'Komentar terkirim');
+        showCustomSnackbar('Sukses', 'Komentar terkirim');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal mengirim komentar');
+      showCustomSnackbar('Error', 'Gagal mengirim komentar');
     }
   }
 
@@ -209,10 +207,10 @@ class ArticleDetailController extends GetxController {
       final response = await _apiProvider.updateComment(commentId, content);
       if (response.statusCode == 200) {
         fetchComments(); // Refresh list komentar
-        Get.snackbar('Sukses', 'Komentar berhasil diperbarui');
+        showCustomSnackbar('Sukses', 'Komentar berhasil diperbarui');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memperbarui komentar');
+      showCustomSnackbar('Error', 'Gagal memperbarui komentar');
     }
   }
 
@@ -222,10 +220,10 @@ class ArticleDetailController extends GetxController {
       final response = await _apiProvider.deleteComment(commentId);
       if (response.statusCode == 200) {
         fetchComments(); // Refresh list komentar
-        Get.snackbar('Sukses', 'Komentar berhasil dihapus');
+        showCustomSnackbar('Sukses', 'Komentar berhasil dihapus');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menghapus komentar');
+      showCustomSnackbar('Error', 'Gagal menghapus komentar');
     }
   }
 }

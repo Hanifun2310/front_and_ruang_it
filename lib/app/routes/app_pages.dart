@@ -41,6 +41,8 @@ import '../modules/search/views/search_view.dart';
 import '../modules/search/bindings/search_binding.dart';
 import '../modules/onboarding_finish/bindings/onboarding_finish_binding.dart';
 import '../modules/onboarding_finish/views/onboarding_finish_view.dart';
+import '../modules/splash/bindings/splash_binding.dart';
+import '../modules/splash/views/splash_view.dart';
 
 class AppPages {
   AppPages._();
@@ -136,6 +138,11 @@ class AppPages {
       page: () => const OnboardingFinishView(),
       binding: OnboardingFinishBinding(),
       middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.SPLASH,
+      page: () => const SplashView(),
+      binding: SplashBinding(),
     ),
   ];
 }

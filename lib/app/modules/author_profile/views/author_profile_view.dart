@@ -36,7 +36,7 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
                 child: Column(
                   children: [
                     // Profile Header Info
-                    _buildProfileHeader(context),
+                    Obx(() => _buildProfileHeader(context)),
 
                     // Action Buttons
                     _buildActionButtons(context),
@@ -59,7 +59,7 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
   }
 
   Widget _buildProfileHeader(BuildContext context) {
-    final author = controller.author;
+    final author = controller.rxAuthor.value;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       child: Row(

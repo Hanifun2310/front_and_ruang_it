@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class AuthController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -24,7 +25,7 @@ class AuthController extends GetxController {
 
   Future<void> login() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      Get.snackbar('Error', 'Email dan password tidak boleh kosong!');
+      showCustomSnackbar('Error', 'Email dan password tidak boleh kosong!');
       return;
     }
 
@@ -46,11 +47,11 @@ class AuthController extends GetxController {
 
         if (token != null && token.isNotEmpty) {
           await _authService.saveSession(token, user);
-          Get.snackbar('Sukses', 'Login berhasil!');
+          showCustomSnackbar('Sukses', 'Login berhasil!');
           FocusManager.instance.primaryFocus?.unfocus();
           Get.offAllNamed(Routes.DASHBOARD); 
         } else {
-          Get.snackbar('Format Error', 'Login berhasil, tapi token tidak ditemukan di response API.', backgroundColor: Colors.orange, colorText: Colors.white);
+          showCustomSnackbar('Format Error', 'Login berhasil, tapi token tidak ditemukan di response API.', backgroundColor: Colors.orange, colorText: Colors.white);
         }
       }
     } on DioException catch (e) {
@@ -62,7 +63,7 @@ class AuthController extends GetxController {
                       message.toLowerCase().contains('blocked') || 
                       message.toLowerCase().contains('ditangguhkan');
 
-      Get.snackbar(
+      showCustomSnackbar(
         'Login Gagal', 
         isBanned ? '$message Silakan baca panduan penulisan kami.' : message, 
         backgroundColor: Colors.redAccent, 
@@ -78,7 +79,7 @@ class AuthController extends GetxController {
       );
     } catch (e) {
       print("ERROR SISTEM/CODE: $e");
-      Get.snackbar(
+      showCustomSnackbar(
         'Terjadi Kesalahan', 
         'Terjadi kesalahan sistem, silakan coba lagi nanti.', 
         backgroundColor: Colors.amber, 
@@ -91,12 +92,12 @@ class AuthController extends GetxController {
     }
   }
 
-Future<void> register() async {
+  Future<void> register() async {
     if (nameController.text.isEmpty || 
         emailController.text.isEmpty || 
         passwordController.text.isEmpty || 
         professionController.text.isEmpty) {
-      Get.snackbar('Error', 'Semua kolom wajib diisi!');
+      showCustomSnackbar('Error', 'Semua kolom wajib diisi!');
       return;
     }
 
@@ -116,22 +117,22 @@ Future<void> register() async {
         if (token != null && token.isNotEmpty) {
           await _authService.saveSession(token, user);
           
-          Get.snackbar('Sukses', 'Akun berhasil dibuat dan otomatis masuk!');
+          showCustomSnackbar('Sukses', 'Akun berhasil dibuat dan otomatis masuk!');
           
           FocusManager.instance.primaryFocus?.unfocus();
           Get.offAllNamed(Routes.INTEREST_SELECTION); 
         } else {
-          Get.snackbar('Sukses', 'Akun dibuat, silakan login manual.');
+          showCustomSnackbar('Sukses', 'Akun dibuat, silakan login manual.');
           Get.offNamed(Routes.LOGIN);
         }
       }
     } on DioException catch (e) {
       print("ERROR REGISTRASI: ${e.response?.data}");
       String message = _parseError(e, 'Gagal memproses pendaftaran. Pastikan data yang dimasukkan benar.');
-      Get.snackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
+      showCustomSnackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
     } catch (e) {
       print("ERROR SISTEM REGIS: $e");
-      Get.snackbar('Terjadi Kesalahan', 'Gagal memproses pendaftaran.');
+      showCustomSnackbar('Terjadi Kesalahan', 'Gagal memproses pendaftaran.');
     } finally {
       if (!isClosed) {
         isLoading.value = false;

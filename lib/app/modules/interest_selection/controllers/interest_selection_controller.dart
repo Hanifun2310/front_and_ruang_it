@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../data/models/category_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class InterestSelectionController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -26,7 +27,7 @@ class InterestSelectionController extends GetxController {
         categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
       }
     } catch (e) {
-      Get.snackbar(
+      showCustomSnackbar(
         'Error', 
         'Gagal memuat kategori.',
         backgroundColor: Colors.redAccent,
@@ -47,7 +48,7 @@ class InterestSelectionController extends GetxController {
 
   void lanjutkan() {
     if (selectedCategoryIds.length < 3) {
-      Get.snackbar(
+      showCustomSnackbar(
         'Perhatian', 
         'Pilih minimal 3 topik atau lebih',
         backgroundColor: Colors.orange,

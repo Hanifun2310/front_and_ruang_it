@@ -35,7 +35,7 @@ void main() async {
         builder: DevicePreview.appBuilder,
         debugShowCheckedModeBanner: false,
         title: "Ruang IT",
-        initialRoute: Routes.DASHBOARD,
+        initialRoute: Routes.SPLASH,
         getPages: AppPages.routes,
         theme: ThemeService.lightTheme,
         darkTheme: ThemeService.darkTheme,

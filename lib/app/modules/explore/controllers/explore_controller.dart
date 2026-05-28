@@ -9,6 +9,7 @@ import '../../../data/services/notification_service.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../search/controllers/search_controller.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class ExploreController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -52,11 +53,11 @@ class ExploreController extends GetxController {
       // SYNC: Perbarui baseline notifikasi
       Get.find<NotificationService>().syncArticleMetrics(fetchedArticles);
 
-      // FILTER: Jangan tampilkan artikel terblokir di Explore
+      // FILTER: Jangan tampilkan artikel dari user yang dibanned atau artikel yang dibanned
       final filtered = fetchedArticles.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filtered);
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat artikel');
+      showCustomSnackbar('Error', 'Gagal memuat artikel');
     } finally {
       isLoading.value = false;
     }
@@ -74,7 +75,7 @@ class ExploreController extends GetxController {
   Future<void> toggleLike(int articleId) async {
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
-      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      showCustomSnackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
       Get.toNamed(Routes.LOGIN);
       return;
     }

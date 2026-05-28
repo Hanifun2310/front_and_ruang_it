@@ -5,6 +5,7 @@ import '../models/article_model.dart';
 
 import '../../routes/app_routes.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/custom_snackbar.dart';
 
 class ApiProvider extends GetxService {
   late Dio _dio;
@@ -35,7 +36,7 @@ class ApiProvider extends GetxService {
       onError: (DioException e, handler) {
         if (e.response?.statusCode == 403) {
           Get.find<AuthService>().logout();
-          Get.snackbar(
+          showCustomSnackbar(
             'Akses Ditolak', 
             'Akun Anda telah ditangguhkan. Silakan baca panduan penulisan kami.',
             backgroundColor: Colors.redAccent,
@@ -51,7 +52,7 @@ class ApiProvider extends GetxService {
           );
         } else if (e.response?.statusCode == 401) {
           Get.find<AuthService>().logout();
-          Get.snackbar('Sesi Habis', 'Silakan login kembali.');
+          showCustomSnackbar('Sesi Habis', 'Silakan login kembali.');
         }
         return handler.next(e);
       },
@@ -219,5 +220,9 @@ class ApiProvider extends GetxService {
 
   Future<Response> deleteArticle(int id) async {
     return await _dio.delete('/articles/$id');
+  }
+
+  Future<Response> getAuthorProfile(int userId) async {
+    return await _dio.get('/users/$userId');
   }
 }

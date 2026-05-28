@@ -131,7 +131,7 @@ class LoginView extends GetView<AuthController> {
                 
                 // --- Login Button ---
                 Obx(() => ElevatedButton(
-                  onPressed: controller.isLoading.value ? null : controller.login,
+                  onPressed: controller.isLoading.value ? () {} : controller.login,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     backgroundColor: Colors.blueAccent,
@@ -145,7 +145,10 @@ class LoginView extends GetView<AuthController> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : const Text(
                           "Masuk",

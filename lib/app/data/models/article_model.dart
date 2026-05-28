@@ -145,7 +145,10 @@ class UserModel {
   String? profession;
   String? bio;
 
-  bool get isBanned => status == 'banned';
+  bool get isBanned {
+    final s = status?.toLowerCase();
+    return s == 'banned';
+  }
 
   UserModel({
     this.id,

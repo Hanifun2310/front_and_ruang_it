@@ -206,7 +206,7 @@ class RegisterView extends GetView<AuthController> {
 
                 // --- Register Button ---
                 Obx(() => ElevatedButton(
-                  onPressed: controller.isLoading.value ? null : controller.register,
+                  onPressed: controller.isLoading.value ? () {} : controller.register,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     backgroundColor: Colors.blueAccent,
@@ -220,7 +220,10 @@ class RegisterView extends GetView<AuthController> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : const Text(
                           "Daftar Sekarang",

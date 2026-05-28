@@ -195,14 +195,57 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   Widget _buildProfileHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Avatar
-          Obx(
-            () => Container(
+    return Obx(() {
+      if (controller.isProfileLoading.value) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Avatar Shimmer
+              const SkeletonBox(
+                width: 80,
+                height: 80,
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+              ),
+              const SizedBox(width: 16),
+              // Text Details Shimmer
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    SkeletonBox(
+                      width: 150,
+                      height: 24,
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
+                    ),
+                    SizedBox(height: 8),
+                    SkeletonBox(
+                      width: 120,
+                      height: 14,
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    SizedBox(height: 8),
+                    SkeletonBox(
+                      width: 200,
+                      height: 12,
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Avatar
+            Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
@@ -222,15 +265,13 @@ class ProfileView extends GetView<ProfileController> {
                     : _buildAvatarFallback(),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Obx(
-                  () => Text(
+            const SizedBox(width: 16),
+            // Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     controller.name.value.isNotEmpty
                         ? controller.name.value
                         : "Sobat IT",
@@ -240,10 +281,8 @@ class ProfileView extends GetView<ProfileController> {
                       color: Get.isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Obx(
-                  () => Text(
+                  const SizedBox(height: 4),
+                  Text(
                     controller.profession.value.isNotEmpty
                         ? controller.profession.value
                         : "Pekerjaan belum diisi",
@@ -254,10 +293,8 @@ class ProfileView extends GetView<ProfileController> {
                           : Colors.grey.shade600,
                     ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Obx(
-                  () => Text(
+                  const SizedBox(height: 4),
+                  Text(
                     controller.bio.value.isNotEmpty
                         ? controller.bio.value
                         : "Bio belum diisi.",
@@ -268,13 +305,13 @@ class ProfileView extends GetView<ProfileController> {
                           : Colors.grey.shade500,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildAvatarFallback() {

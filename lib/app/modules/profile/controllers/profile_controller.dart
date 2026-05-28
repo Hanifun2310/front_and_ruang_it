@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -17,6 +18,7 @@ class ProfileController extends GetxController {
   final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
 
   var isLoading = false.obs;
+  var isProfileLoading = false.obs;
   var isArticlesLoading = false.obs;
   var isLoadingMoreArticles = false.obs;
   var hasMoreUserArticles = false.obs;
@@ -77,10 +79,14 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadUserData();
     scrollController.addListener(_handleScroll);
-    fetchUserArticles(reset: true);
-    fetchAllUserCategories(); // New function to get all categories
+    initProfile();
+  }
+
+  Future<void> initProfile() async {
+    await loadUserData();
+    await fetchUserArticles(reset: true);
+    await fetchAllUserCategories();
   }
 
   void _handleScroll() {
@@ -93,6 +99,7 @@ class ProfileController extends GetxController {
   }
 
   Future<void> loadUserData() async {
+    isProfileLoading.value = true;
     try {
       final response = await _apiProvider.getProfile();
       if (response.statusCode == 200) {
@@ -135,24 +142,42 @@ class ProfileController extends GetxController {
         likesCount.value = userData['likes_count'] ?? 0;
         commentsCount.value = userData['comments_count'] ?? 0;
       }
+    } finally {
+      isProfileLoading.value = false;
     }
   }
 
   // Fungsi baru untuk mengambil SEMUA kategori milik user tanpa terpengaruh pagination artikel
   Future<void> fetchAllUserCategories() async {
     try {
-      // Strategi: Ambil artikel dengan limit besar (misal 100) hanya untuk mengekstrak kategori
-      final allArticles = await _apiProvider.getArticles(page: 1); 
-      // Filter artikel milik user ini saja
-      final myArticles = allArticles.where((a) => a.user?.id == userId.value || a.user?.name == name.value);
+      final Set<String> cats = {};
+      int page = 1;
+      bool hasMore = true;
       
-      final cats = myArticles
-          .map((a) => a.category?.name)
-          .whereType<String>()
-          .toSet()
-          .toList();
-      cats.sort();
-      allUserCategories.value = cats;
+      while (hasMore && page <= 5) {
+        final fetched = await _apiProvider.getArticles(page: page);
+        if (fetched.isEmpty) {
+          hasMore = false;
+          break;
+        }
+        
+        final myArticles = fetched.where((a) => a.user?.id == userId.value || a.user?.name == name.value);
+        for (var a in myArticles) {
+          if (a.category?.name != null) {
+            cats.add(a.category!.name!);
+          }
+        }
+        
+        if (fetched.length < 10) {
+          hasMore = false;
+        }
+        
+        page++;
+      }
+      
+      final sortedCats = cats.toList();
+      sortedCats.sort();
+      allUserCategories.value = sortedCats;
     } catch (e) {
       print('Error fetching categories: $e');
     }
@@ -273,7 +298,7 @@ class ProfileController extends GetxController {
           selectedImageBytes.clear();
           selectedFileName.value = "";
 
-          Get.snackbar('Sukses', 'Profil berhasil diperbarui');
+          showCustomSnackbar('Sukses', 'Profil berhasil diperbarui');
 
           // AUTO CLOSE BOTTOM SHEET ON SUCCESS
           if (Get.isBottomSheetOpen ?? false) {
@@ -285,7 +310,7 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       print('Error update profile: $e');
-      Get.snackbar(
+      showCustomSnackbar(
         'Error',
         'Gagal memperbarui profil. Pastikan semua data valid.',
       );
@@ -304,7 +329,7 @@ class ProfileController extends GetxController {
         selectedFileName.value = image.name;
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memilih gambar');
+      showCustomSnackbar('Error', 'Gagal memilih gambar');
     }
   }
 
@@ -314,10 +339,10 @@ class ProfileController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 204) {
         userArticles.removeWhere((article) => article.id == id);
         articlesCount.value--;
-        Get.snackbar('Sukses', 'Artikel berhasil dihapus');
+        showCustomSnackbar('Sukses', 'Artikel berhasil dihapus');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menghapus artikel');
+      showCustomSnackbar('Error', 'Gagal menghapus artikel');
     }
   }
 

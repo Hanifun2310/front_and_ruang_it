@@ -11,6 +11,7 @@ import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
 import '../../../data/services/notification_service.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class DashboardController extends GetxController {
   // SENIOR REFACTOR: Gunakan Get.find agar menggunakan satu instance Dio global yang sama
@@ -126,12 +127,16 @@ class DashboardController extends GetxController {
         // SYNC: Perbarui baseline notifikasi jika ada perubahan status/metrik
         Get.find<NotificationService>().syncArticleMetrics(newArticles);
 
-        // FILTER: Jangan tampilkan artikel terblokir di Dashboard
+        // FILTER: Jangan tampilkan artikel dari user yang dibanned atau artikel yang dibanned
         final publicArticles = newArticles.where((a) => !a.isBlocked).toList();
         
-        articles.addAll(
-          _likeSyncService.applyLikeStateToArticles(publicArticles),
-        );
+        final processedArticles = _likeSyncService.applyLikeStateToArticles(publicArticles);
+        
+        if (currentPage == 1) {
+          articles.assignAll(processedArticles);
+        } else {
+          articles.addAll(processedArticles);
+        }
 
         if (publicArticles.isEmpty && newArticles.isNotEmpty) {
           currentPage++;
@@ -143,7 +148,7 @@ class DashboardController extends GetxController {
         currentPage++;
       }
     } catch (e) {
-      Get.snackbar(
+      showCustomSnackbar(
         'Gagal Memuat',
         'Terjadi kesalahan saat mengambil artikel',
         snackPosition: SnackPosition.BOTTOM,
@@ -172,7 +177,7 @@ class DashboardController extends GetxController {
 
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
-      Get.snackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      showCustomSnackbar('Akses Ditolak', 'Anda harus login untuk menyukai artikel.', backgroundColor: Colors.redAccent, colorText: Colors.white);
       Get.toNamed(Routes.LOGIN);
       return;
     }
@@ -185,7 +190,9 @@ class DashboardController extends GetxController {
       // 4. ROLLBACK: Jika internet putus/gagal, kembalikan ke status semula
       _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
       _syncLikeState(articleId, isCurrentlyLiked);
-      Get.snackbar('Gagal', 'Tidak dapat menyukai artikel saat ini, periksa koneksi Anda.');
+      showCustomSnackbar('Gagal', 'Tidak dapat menyukai artikel saat ini, periksa koneksi Anda.');
+    } finally {
+      isLiking.value = false;
     }
   }
 
@@ -250,7 +257,8 @@ class DashboardController extends GetxController {
       final response = await _apiProvider.deleteArticle(id);
       if (response.statusCode == 200 || response.statusCode == 204) {
         articles.removeWhere((article) => article.id == id);
-        Get.snackbar('Sukses', 'Artikel berhasil dihapus');
+        articles.refresh();
+        showCustomSnackbar('Sukses', 'Artikel berhasil dihapus');
 
         try {
           if (Get.isRegistered<ProfileController>()) {
@@ -264,7 +272,7 @@ class DashboardController extends GetxController {
         }
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menghapus artikel');
+      showCustomSnackbar('Error', 'Gagal menghapus artikel');
     }
   }
 }

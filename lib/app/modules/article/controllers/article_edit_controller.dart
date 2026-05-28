@@ -6,6 +6,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:dio/dio.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class ArticleEditController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -79,7 +80,7 @@ class ArticleEditController extends GetxController {
 
   Future<void> updateArticle() async {
     if (titleController.text.isEmpty || quillController.document.isEmpty() || selectedCategoryId.value == 0) {
-      Get.snackbar('Error', 'Judul, konten, dan kategori harus diisi');
+      showCustomSnackbar('Error', 'Judul, konten, dan kategori harus diisi');
       return;
     }
 
@@ -106,15 +107,15 @@ class ArticleEditController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.back(result: true);
-        Get.snackbar('Sukses', 'Artikel berhasil diperbarui');
+        showCustomSnackbar('Sukses', 'Artikel berhasil diperbarui');
       } else {
-        Get.snackbar('Gagal', 'Gagal memperbarui artikel: ${response.statusMessage}');
+        showCustomSnackbar('Gagal', 'Gagal memperbarui artikel: ${response.statusMessage}');
       }
     } on DioException catch (e) {
       String message = _parseError(e, 'Gagal memperbarui artikel.');
-      Get.snackbar('Error', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
+      showCustomSnackbar('Error', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan sistem: $e');
+      showCustomSnackbar('Error', 'Terjadi kesalahan sistem: $e');
     } finally {
       isLoading.value = false;
     }
