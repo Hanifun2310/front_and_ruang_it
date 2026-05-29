@@ -144,6 +144,9 @@ class UserModel {
   String? photoProfile;
   String? profession;
   String? bio;
+  int? articlesCount;
+  int? likesCount;
+  int? commentsCount;
 
   bool get isBanned {
     final s = status?.toLowerCase();
@@ -159,6 +162,9 @@ class UserModel {
     this.photoProfile,
     this.profession,
     this.bio,
+    this.articlesCount,
+    this.likesCount,
+    this.commentsCount,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -174,6 +180,9 @@ class UserModel {
         ),
     profession: json['profession'],
     bio: json['bio'],
+    articlesCount: json['articles_count'] ?? json['posts_count'] ?? json['articles'] ?? 0,
+    likesCount: json['likes_count'] ?? json['total_likes'] ?? json['likes'] ?? 0,
+    commentsCount: json['comments_count'] ?? json['total_comments'] ?? json['comments'] ?? 0,
   );
 
   Map<String, dynamic> toJson() => {
@@ -185,6 +194,9 @@ class UserModel {
     'photo_profile': photoProfile,
     'profession': profession,
     'bio': bio,
+    'articles_count': articlesCount,
+    'likes_count': likesCount,
+    'comments_count': commentsCount,
   };
 }
 

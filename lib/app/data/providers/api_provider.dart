@@ -225,4 +225,18 @@ class ApiProvider extends GetxService {
   Future<Response> getAuthorProfile(int userId) async {
     return await _dio.get('/users/$userId');
   }
+
+  Future<List<UserModel>> searchUsers(String query) async {
+    try {
+      final response = await _dio.get('/users', queryParameters: {'search': query});
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['data'] ?? response.data;
+        return data.map((json) => UserModel.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      // If search endpoint doesn't exist, return empty list and fallback to discovery logic
+      return [];
+    }
+  }
 }

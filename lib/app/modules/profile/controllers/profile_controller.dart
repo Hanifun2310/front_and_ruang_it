@@ -117,12 +117,32 @@ class ProfileController extends GetxController {
         userId.value = user.id ?? 0;
 
         // Stats dari profile response (biasanya backend menyertakan total)
-        articlesCount.value = userData['articles_count'] ?? 0;
-        likesCount.value = userData['likes_count'] ?? 0;
-        commentsCount.value = userData['comments_count'] ?? 0;
+        articlesCount.value = user.articlesCount ?? userData['articles_count'] ?? userData['posts_count'] ?? userData['articles'] ?? 0;
+        likesCount.value = user.likesCount ?? userData['likes_count'] ?? userData['total_likes'] ?? userData['likes'] ?? 0;
+        commentsCount.value = user.commentsCount ?? userData['comments_count'] ?? userData['total_comments'] ?? userData['comments'] ?? 0;
         
         // Simpan ke storage agar sinkron
         await _authService.saveSession(_authService.token ?? '', userData);
+
+        // Ambil info detail dari /users/$userId untuk mendapatkan total keseluruhan yang akurat
+        if (userId.value != 0) {
+          try {
+            final userDetailResponse = await _apiProvider.getAuthorProfile(userId.value);
+            if (userDetailResponse.statusCode == 200) {
+              final rawDetailData = userDetailResponse.data['data'] ?? userDetailResponse.data;
+              final userDetailData = (rawDetailData is Map<String, dynamic> && rawDetailData.containsKey('user'))
+                  ? rawDetailData['user']
+                  : rawDetailData;
+              final detailedUser = UserModel.fromJson(userDetailData);
+              
+              articlesCount.value = detailedUser.articlesCount ?? rawDetailData['articles_count'] ?? rawDetailData['posts_count'] ?? rawDetailData['articles'] ?? articlesCount.value;
+              likesCount.value = detailedUser.likesCount ?? rawDetailData['likes_count'] ?? rawDetailData['total_likes'] ?? rawDetailData['likes'] ?? likesCount.value;
+              commentsCount.value = detailedUser.commentsCount ?? rawDetailData['comments_count'] ?? rawDetailData['total_comments'] ?? rawDetailData['comments'] ?? commentsCount.value;
+            }
+          } catch (e) {
+            print('Error fetching detailed user profile for stats: $e');
+          }
+        }
       }
     } catch (e) {
       // Fallback ke data local jika offline/error
@@ -138,9 +158,9 @@ class ProfileController extends GetxController {
         email.value = user.email ?? "";
         photoProfile.value = user.photoProfile ?? '';
         userId.value = user.id ?? 0;
-        articlesCount.value = userData['articles_count'] ?? 0;
-        likesCount.value = userData['likes_count'] ?? 0;
-        commentsCount.value = userData['comments_count'] ?? 0;
+        articlesCount.value = user.articlesCount ?? userData['articles_count'] ?? userData['posts_count'] ?? userData['articles'] ?? 0;
+        likesCount.value = user.likesCount ?? userData['likes_count'] ?? userData['total_likes'] ?? userData['likes'] ?? 0;
+        commentsCount.value = user.commentsCount ?? userData['comments_count'] ?? userData['total_comments'] ?? userData['comments'] ?? 0;
       }
     } finally {
       isProfileLoading.value = false;
@@ -230,9 +250,17 @@ class ProfileController extends GetxController {
       Get.find<NotificationService>().syncArticleMetrics(userArticles);
 
       // JANGAN update stats di sini jika ingin stats berdasarkan SELURUH data (sudah dihandle di loadUserData)
-      // Namun jika loadUserData gagal, kita bisa hitung total dari yang ada sebagai fallback minimum
-      if (articlesCount.value == 0) {
+      // Namun jika loadUserData/getAuthorProfile gagal dan semua stats bernilai 0, kita bisa hitung total dari yang ada sebagai fallback minimum
+      if (articlesCount.value == 0 && likesCount.value == 0 && commentsCount.value == 0) {
+        int totalLikes = 0;
+        int totalComments = 0;
+        for (var article in userArticles) {
+          totalLikes += article.likesCount ?? 0;
+          totalComments += article.commentsCount ?? 0;
+        }
         articlesCount.value = userArticles.length;
+        likesCount.value = totalLikes;
+        commentsCount.value = totalComments;
       }
     } catch (e) {
       print('Error fetching user articles: $e');

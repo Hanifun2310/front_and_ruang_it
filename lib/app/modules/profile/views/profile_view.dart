@@ -1263,217 +1263,225 @@ class ProfileView extends GetView<ProfileController> {
           right: 24,
           top: 24,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Edit Profil",
-              style: GoogleFonts.inter(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+              const SizedBox(height: 24),
+              Text(
+                "Edit Profil",
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-
-            // Edit Photo Section
-            Center(
-              child: Stack(
-                children: [
-                  Obx(
-                    () => Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Get.isDarkMode
-                              ? Colors.white24
-                              : const Color(0xFFE2E7FF),
-                          width: 4,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(50),
-                        child: controller.selectedImagePath.value.isNotEmpty
-                            ? (kIsWeb
-                                  ? Image.network(
-                                      controller.selectedImagePath.value,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.file(
-                                      File(controller.selectedImagePath.value),
-                                      fit: BoxFit.cover,
-                                    ))
-                            : Image.network(
-                                controller.photoProfile.value,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Image.network(
-                                      'https://ui-avatars.com/api/?name=${controller.name.value}',
-                                    ),
-                              ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: controller.pickImage,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF092BA2),
+              const SizedBox(height: 24),
+  
+              // Edit Photo Section
+              Center(
+                child: Stack(
+                  children: [
+                    Obx(
+                      () => Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            TextField(
-              controller: controller.nameController,
-              style: GoogleFonts.inter(
-                color: Get.isDarkMode ? Colors.white : Colors.black87,
-              ),
-              decoration: InputDecoration(
-                labelText: "Nama Lengkap",
-                labelStyle: GoogleFonts.inter(color: Colors.grey),
-                prefixIcon: const Icon(
-                  Icons.person_outline,
-                  color: Colors.grey,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Get.isDarkMode
-                        ? Colors.white24
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Get.isDarkMode
-                        ? Colors.white24
-                        : Colors.grey.shade300,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller.professionController,
-              style: GoogleFonts.inter(
-                color: Get.isDarkMode ? Colors.white : Colors.black87,
-              ),
-              decoration: InputDecoration(
-                labelText: "Pekerjaan",
-                labelStyle: GoogleFonts.inter(color: Colors.grey),
-                prefixIcon: const Icon(Icons.work_outline, color: Colors.grey),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Get.isDarkMode
-                        ? Colors.white24
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Get.isDarkMode
-                        ? Colors.white24
-                        : Colors.grey.shade300,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller.bioController,
-              style: GoogleFonts.inter(
-                color: Get.isDarkMode ? Colors.white : Colors.black87,
-              ),
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: "Bio",
-                labelStyle: GoogleFonts.inter(color: Colors.grey),
-                alignLabelWithHint: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Get.isDarkMode
-                        ? Colors.white24
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Get.isDarkMode
-                        ? Colors.white24
-                        : Colors.grey.shade300,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: Obx(
-                () => ElevatedButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : controller.updateProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF092BA2),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: controller.isLoading.value
-                      ? const LoadingWidget(
-                          size: 20,
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        )
-                      : Text(
-                          "SIMPAN PERUBAHAN",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
+                          border: Border.all(
+                            color: Get.isDarkMode
+                                ? Colors.white24
+                                : const Color(0xFFE2E7FF),
+                            width: 4,
                           ),
                         ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: controller.selectedImagePath.value.isNotEmpty
+                              ? (kIsWeb
+                                    ? Image.network(
+                                        controller.selectedImagePath.value,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        File(controller.selectedImagePath.value),
+                                        fit: BoxFit.cover,
+                                      ))
+                              : (controller.photoProfile.value.isNotEmpty
+                                  ? Image.network(
+                                      controller.photoProfile.value,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Image.asset(
+                                            'assets/images/fallback_pp.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                    )
+                                  : Image.asset(
+                                      'assets/images/fallback_pp.png',
+                                      fit: BoxFit.cover,
+                                    )),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: controller.pickImage,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF092BA2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 32),
+  
+              TextField(
+                controller: controller.nameController,
+                style: GoogleFonts.inter(
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Nama Lengkap",
+                  labelStyle: GoogleFonts.inter(color: Colors.grey),
+                  prefixIcon: const Icon(
+                    Icons.person_outline,
+                    color: Colors.grey,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Get.isDarkMode
+                          ? Colors.white24
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Get.isDarkMode
+                          ? Colors.white24
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller.professionController,
+                style: GoogleFonts.inter(
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Pekerjaan",
+                  labelStyle: GoogleFonts.inter(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.work_outline, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Get.isDarkMode
+                          ? Colors.white24
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Get.isDarkMode
+                          ? Colors.white24
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller.bioController,
+                style: GoogleFonts.inter(
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: "Bio",
+                  labelStyle: GoogleFonts.inter(color: Colors.grey),
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Get.isDarkMode
+                          ? Colors.white24
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Get.isDarkMode
+                          ? Colors.white24
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: Obx(
+                  () => ElevatedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.updateProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF092BA2),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: controller.isLoading.value
+                        ? const LoadingWidget(
+                            size: 20,
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          )
+                        : Text(
+                            "SIMPAN PERUBAHAN",
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

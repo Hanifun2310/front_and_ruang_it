@@ -81,62 +81,49 @@ class ArticleSearchController extends GetxController {
 
     isLoading.value = true;
     try {
-      final List<Future<List<ArticleModel>>> futures = [
+      // 1. Fetch Articles and Users concurrently
+      final results = await Future.wait([
         _apiProvider.getArticles(search: currentQuery, page: 1),
         _apiProvider.getArticles(search: currentQuery, page: 2),
-        _apiProvider.getArticles(search: currentQuery, page: 3),
-      ];
-      
-      // Concurrently fetch general articles to discover all active authors in the system
-      futures.addAll([
+        _apiProvider.searchUsers(currentQuery),
+        // Discovery fallbacks
         _apiProvider.getArticles(page: 1),
-        _apiProvider.getArticles(page: 2),
-        _apiProvider.getArticles(page: 3),
       ]);
-
-      final results = await Future.wait(futures);
       
-      // Prevent race conditions: discard responses if the query has changed in the meantime
-      if (searchQuery.value.trim() != currentQuery) {
-        return;
-      }
+      if (searchQuery.value.trim() != currentQuery) return;
 
-      // Combine search-specific articles for the Articles tab
-      final List<ArticleModel> searchArticlesFetched = [];
-      for (int i = 0; i < 3; i++) {
-        searchArticlesFetched.addAll(results[i]);
-      }
-
-      // Combine ALL fetched articles (search + general) for user extraction
-      final List<ArticleModel> fetched = [];
-      for (var pageResult in results) {
-        fetched.addAll(pageResult);
-      }
+      final searchArticlesFetched = (results[0] as List<ArticleModel>) + (results[1] as List<ArticleModel>);
+      final directUsers = results[2] as List<UserModel>;
+      final discoveryArticles = results[3] as List<ArticleModel>;
 
       // SYNC: Perbarui baseline notifikasi
-      Get.find<NotificationService>().syncArticleMetrics(fetched);
+      Get.find<NotificationService>().syncArticleMetrics(searchArticlesFetched);
 
-      // FILTER ARTIKEL: Hanya tampilkan artikel yang TIDAK diblokir (status artikel atau status user)
+      // FILTER ARTIKEL: Hanya tampilkan artikel yang TIDAK diblokir
       final filteredArticles = searchArticlesFetched.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filteredArticles);
 
-      // EXTRACT USERS: Cari user yang cocok dari SEMUA artikel yang ditarik (bahkan jika artikelnya sendiri diblokir)
-      final List<UserModel> uniqueUsers = [];
-      final Set<int> userIds = {};
+      // USER DISCOVERY: Combine direct search results and discovery from articles
+      final List<UserModel> uniqueUsers = List.from(directUsers);
+      final Set<int> userIds = directUsers.map((u) => u.id!).toSet();
 
-      for (var article in fetched) { 
+      // Fallback discovery from search results and general articles
+      final allArticles = searchArticlesFetched + discoveryArticles;
+      for (var article in allArticles) {
         if (article.user != null && article.user!.id != null) {
-          final user = article.user!;
-          if (!userIds.contains(user.id!)) {
-            userIds.add(user.id!);
-            uniqueUsers.add(user);
+          if (!userIds.contains(article.user!.id!)) {
+            userIds.add(article.user!.id!);
+            uniqueUsers.add(article.user!);
           }
         }
       }
 
-      // ENRICH USERS: Concurrently fetch detailed user info (for bio/profession) from API or single article details
+      // ENRICH USERS: Fetch detailed info for users found via discovery (if they don't have bio/profession)
       final List<UserModel> enrichedUsers = await Future.wait(
         uniqueUsers.map((u) async {
+          // If we already have detailed info from direct search, skip
+          if (u.bio != null && u.profession != null) return u;
+          
           try {
             final res = await _apiProvider.getAuthorProfile(u.id!);
             if (res.statusCode == 200) {
@@ -144,95 +131,59 @@ class ArticleSearchController extends GetxController {
               final userData = (rawData is Map<String, dynamic> && rawData.containsKey('user'))
                   ? rawData['user']
                   : rawData;
-              final detailedUser = UserModel.fromJson(userData);
-              return detailedUser;
+              return UserModel.fromJson(userData);
             }
-          } catch (_) {
-            // Fallback: Fetch a single article's detail written by this author, which contains the bio field!
-            try {
-              final userArticle = fetched.firstWhereOrNull((a) => a.user?.id == u.id);
-              if (userArticle != null && userArticle.slug != null) {
-                final detail = await _apiProvider.getArticleDetail(userArticle.slug!);
-                if (detail.user != null) {
-                  final du = detail.user!;
-                  return UserModel(
-                    id: u.id,
-                    name: du.name ?? u.name,
-                    email: du.email ?? u.email,
-                    role: du.role ?? u.role,
-                    status: du.status ?? u.status,
-                    photoProfile: du.photoProfile?.isNotEmpty == true ? du.photoProfile : u.photoProfile,
-                    profession: du.profession ?? u.profession,
-                    bio: du.bio ?? u.bio,
-                  );
-                }
-              }
-            } catch (_) {}
-          }
+          } catch (_) {}
           return u;
         }).toList()
       );
 
-      // Split the search query into clean lowercase words/tokens for fuzzy matching
+      // Split query for fuzzy matching (same as before)
       final queryTokens = currentQuery.toLowerCase()
           .split(RegExp(r'[,\s\.]+'))
           .map((t) => t.trim())
-          .where((t) => t.length >= 2) // Only match tokens with 2+ characters
+          .where((t) => t.length >= 2)
           .toList();
 
       final List<UserModel> matchingUsers = [];
       for (var user in enrichedUsers) {
-        // Sembunyikan user dari hasil pencarian jika mereka dibanned (Aturan Baru)
         if (user.isBanned) continue;
 
         final nameLower = (user.name ?? '').toLowerCase();
         final professionLower = (user.profession ?? '').toLowerCase();
-        final bioLower = (user.bio ?? '').toLowerCase();
-
+        
         bool matches = false;
-        // A user matches if their profile contains any of the search tokens
         if (queryTokens.isEmpty) {
           final q = currentQuery.toLowerCase();
-          if (nameLower.contains(q) || professionLower.contains(q) || bioLower.contains(q)) {
-            matches = true;
-          }
+          if (nameLower.contains(q) || professionLower.contains(q)) matches = true;
         } else {
           for (var token in queryTokens) {
-            if (nameLower.contains(token) || 
-                professionLower.contains(token) || 
-                bioLower.contains(token)) {
+            if (nameLower.contains(token) || professionLower.contains(token)) {
               matches = true;
               break;
             }
           }
         }
-
-        if (matches) {
-          matchingUsers.add(user);
-        }
+        if (matches) matchingUsers.add(user);
       }
 
-      // Sort users: exact name matches first
+      // Sort users
       matchingUsers.sort((a, b) {
         final aName = (a.name ?? '').toLowerCase();
         final bName = (b.name ?? '').toLowerCase();
         final q = currentQuery.toLowerCase();
-        
         if (aName == q && bName != q) return -1;
         if (bName == q && aName != q) return 1;
-        if (aName.startsWith(q) && !bName.startsWith(q)) return -1;
-        if (bName.startsWith(q) && !aName.startsWith(q)) return 1;
         return aName.compareTo(bName);
       });
       
       users.value = matchingUsers;
 
-      // History management
-      if (searchArticlesFetched.isNotEmpty || matchingUsers.isNotEmpty) {
+      if (filteredArticles.isNotEmpty || matchingUsers.isNotEmpty) {
         saveToHistory(currentQuery);
       }
     } catch (e) {
-      print('Error searching articles: $e');
+      print('Error searching: $e');
     } finally {
       if (searchQuery.value.trim() == currentQuery) {
         isLoading.value = false;

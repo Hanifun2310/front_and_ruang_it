@@ -128,18 +128,36 @@ class AuthorProfileController extends GetxController {
 
         rxAuthor.value = detailedUser;
         rxAuthor.refresh();
+
+        // Update stats from the rich profile data
+        articlesCount.value = detailedUser.articlesCount ?? rawData['articles_count'] ?? rawData['posts_count'] ?? rawData['articles'] ?? articlesCount.value;
+        likesCount.value = detailedUser.likesCount ?? rawData['likes_count'] ?? rawData['total_likes'] ?? rawData['likes'] ?? likesCount.value;
+        commentsCount.value = detailedUser.commentsCount ?? rawData['comments_count'] ?? rawData['total_comments'] ?? rawData['comments'] ?? commentsCount.value;
       }
     } catch (e) {
       print('Error fetching detailed author info: $e');
       
       // Fallback: If getAuthorProfile fails (e.g. 404), try to find a rich user object from one of their articles
       try {
-        final userArticle = userArticles.firstWhereOrNull((a) => a.user?.id == author.id);
+        var userArticle = userArticles.firstWhereOrNull((a) => a.user?.id == author.id);
+        if (userArticle == null) {
+          // Jika list lokal masih kosong (karena pemanggilan async paralel belum selesai),
+          // coba ambil artikel terbaru dari API secara langsung untuk mencari artikel milik author ini
+          final fetched = await _apiProvider.getArticles(page: 1);
+          userArticle = fetched.firstWhereOrNull((a) => a.user?.id == author.id);
+        }
         if (userArticle != null && userArticle.slug != null) {
           final detail = await _apiProvider.getArticleDetail(userArticle.slug!);
           if (detail.user != null) {
             rxAuthor.value = detail.user!;
             rxAuthor.refresh();
+
+            // Perbarui stats juga dari detail author yang kaya ini jika belum terisi
+            if (articlesCount.value == 0 && likesCount.value == 0 && commentsCount.value == 0) {
+              articlesCount.value = detail.user!.articlesCount ?? articlesCount.value;
+              likesCount.value = detail.user!.likesCount ?? likesCount.value;
+              commentsCount.value = detail.user!.commentsCount ?? commentsCount.value;
+            }
           }
         }
       } catch (err) {
@@ -181,16 +199,18 @@ class AuthorProfileController extends GetxController {
         _currentArticlesPage++;
       }
 
-      int totalLikes = 0;
-      int totalComments = 0;
-      for (var article in userArticles) {
-        totalLikes += article.likesCount ?? 0;
-        totalComments += article.commentsCount ?? 0;
+      // Only set stats locally if overall counts aren't loaded yet from fetchDetailedAuthorInfo
+      if (likesCount.value == 0 && commentsCount.value == 0 && articlesCount.value == 0) {
+        int totalLikes = 0;
+        int totalComments = 0;
+        for (var article in userArticles) {
+          totalLikes += article.likesCount ?? 0;
+          totalComments += article.commentsCount ?? 0;
+        }
+        likesCount.value = totalLikes;
+        commentsCount.value = totalComments;
+        articlesCount.value = userArticles.length;
       }
-      
-      likesCount.value = totalLikes;
-      commentsCount.value = totalComments;
-      articlesCount.value = userArticles.length;
       
     } catch (e) {
       print('Error fetching author articles: $e');
