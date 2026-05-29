@@ -106,18 +106,23 @@ class AuthorProfileController extends GetxController {
     try {
       final response = await _apiProvider.getAuthorProfile(author.id!);
       if (response.statusCode == 200) {
-        final userData = response.data['data'] ?? response.data;
+        final rawData = response.data['data'] ?? response.data;
+        final userData = (rawData is Map<String, dynamic> && rawData.containsKey('user'))
+            ? rawData['user']
+            : rawData;
         final detailedUser = UserModel.fromJson(userData);
         
         // Re-enforce banned check with latest data from server
         if (detailedUser.isBanned) {
-          showCustomSnackbar(
-            'Akses Ditolak',
-            'Akun penulis ini telah dinonaktifkan.',
-            backgroundColor: Colors.redAccent,
-            colorText: Colors.white,
-          );
-          Get.back();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showCustomSnackbar(
+              'Akses Ditolak',
+              'Akun penulis ini telah dinonaktifkan.',
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white,
+            );
+            Get.back();
+          });
           return;
         }
 
@@ -126,6 +131,20 @@ class AuthorProfileController extends GetxController {
       }
     } catch (e) {
       print('Error fetching detailed author info: $e');
+      
+      // Fallback: If getAuthorProfile fails (e.g. 404), try to find a rich user object from one of their articles
+      try {
+        final userArticle = userArticles.firstWhereOrNull((a) => a.user?.id == author.id);
+        if (userArticle != null && userArticle.slug != null) {
+          final detail = await _apiProvider.getArticleDetail(userArticle.slug!);
+          if (detail.user != null) {
+            rxAuthor.value = detail.user!;
+            rxAuthor.refresh();
+          }
+        }
+      } catch (err) {
+        print('Error fetching user fallback from article detail: $err');
+      }
     }
   }
 

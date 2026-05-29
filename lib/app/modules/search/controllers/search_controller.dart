@@ -81,20 +81,33 @@ class ArticleSearchController extends GetxController {
 
     isLoading.value = true;
     try {
-      // Parallel fetch of multiple pages to discover more authors and older articles
-      // without adding latency. This significantly improves search discovery.
-      final results = await Future.wait([
+      final List<Future<List<ArticleModel>>> futures = [
         _apiProvider.getArticles(search: currentQuery, page: 1),
         _apiProvider.getArticles(search: currentQuery, page: 2),
         _apiProvider.getArticles(search: currentQuery, page: 3),
+      ];
+      
+      // Concurrently fetch general articles to discover all active authors in the system
+      futures.addAll([
+        _apiProvider.getArticles(page: 1),
+        _apiProvider.getArticles(page: 2),
+        _apiProvider.getArticles(page: 3),
       ]);
+
+      final results = await Future.wait(futures);
       
       // Prevent race conditions: discard responses if the query has changed in the meantime
       if (searchQuery.value.trim() != currentQuery) {
         return;
       }
 
-      // Combine all pages of articles
+      // Combine search-specific articles for the Articles tab
+      final List<ArticleModel> searchArticlesFetched = [];
+      for (int i = 0; i < 3; i++) {
+        searchArticlesFetched.addAll(results[i]);
+      }
+
+      // Combine ALL fetched articles (search + general) for user extraction
       final List<ArticleModel> fetched = [];
       for (var pageResult in results) {
         fetched.addAll(pageResult);
@@ -104,13 +117,62 @@ class ArticleSearchController extends GetxController {
       Get.find<NotificationService>().syncArticleMetrics(fetched);
 
       // FILTER ARTIKEL: Hanya tampilkan artikel yang TIDAK diblokir (status artikel atau status user)
-      final filteredArticles = fetched.where((a) => !a.isBlocked).toList();
+      final filteredArticles = searchArticlesFetched.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filteredArticles);
 
       // EXTRACT USERS: Cari user yang cocok dari SEMUA artikel yang ditarik (bahkan jika artikelnya sendiri diblokir)
       final List<UserModel> uniqueUsers = [];
       final Set<int> userIds = {};
-      
+
+      for (var article in fetched) { 
+        if (article.user != null && article.user!.id != null) {
+          final user = article.user!;
+          if (!userIds.contains(user.id!)) {
+            userIds.add(user.id!);
+            uniqueUsers.add(user);
+          }
+        }
+      }
+
+      // ENRICH USERS: Concurrently fetch detailed user info (for bio/profession) from API or single article details
+      final List<UserModel> enrichedUsers = await Future.wait(
+        uniqueUsers.map((u) async {
+          try {
+            final res = await _apiProvider.getAuthorProfile(u.id!);
+            if (res.statusCode == 200) {
+              final rawData = res.data['data'] ?? res.data;
+              final userData = (rawData is Map<String, dynamic> && rawData.containsKey('user'))
+                  ? rawData['user']
+                  : rawData;
+              final detailedUser = UserModel.fromJson(userData);
+              return detailedUser;
+            }
+          } catch (_) {
+            // Fallback: Fetch a single article's detail written by this author, which contains the bio field!
+            try {
+              final userArticle = fetched.firstWhereOrNull((a) => a.user?.id == u.id);
+              if (userArticle != null && userArticle.slug != null) {
+                final detail = await _apiProvider.getArticleDetail(userArticle.slug!);
+                if (detail.user != null) {
+                  final du = detail.user!;
+                  return UserModel(
+                    id: u.id,
+                    name: du.name ?? u.name,
+                    email: du.email ?? u.email,
+                    role: du.role ?? u.role,
+                    status: du.status ?? u.status,
+                    photoProfile: du.photoProfile?.isNotEmpty == true ? du.photoProfile : u.photoProfile,
+                    profession: du.profession ?? u.profession,
+                    bio: du.bio ?? u.bio,
+                  );
+                }
+              }
+            } catch (_) {}
+          }
+          return u;
+        }).toList()
+      );
+
       // Split the search query into clean lowercase words/tokens for fuzzy matching
       final queryTokens = currentQuery.toLowerCase()
           .split(RegExp(r'[,\s\.]+'))
@@ -118,43 +180,40 @@ class ArticleSearchController extends GetxController {
           .where((t) => t.length >= 2) // Only match tokens with 2+ characters
           .toList();
 
-      for (var article in fetched) { 
-        if (article.user != null && article.user!.id != null) {
-          final user = article.user!;
-          
-          // Sembunyikan user dari hasil pencarian jika mereka dibanned (Aturan Baru)
-          if (user.isBanned) continue;
+      final List<UserModel> matchingUsers = [];
+      for (var user in enrichedUsers) {
+        // Sembunyikan user dari hasil pencarian jika mereka dibanned (Aturan Baru)
+        if (user.isBanned) continue;
 
-          if (!userIds.contains(user.id!)) {
-            final nameLower = (user.name ?? '').toLowerCase();
-            final professionLower = (user.profession ?? '').toLowerCase();
-            final bioLower = (user.bio ?? '').toLowerCase();
+        final nameLower = (user.name ?? '').toLowerCase();
+        final professionLower = (user.profession ?? '').toLowerCase();
+        final bioLower = (user.bio ?? '').toLowerCase();
 
-            bool matches = false;
-            // A user matches if their profile contains any of the search tokens
-            if (queryTokens.isEmpty) {
+        bool matches = false;
+        // A user matches if their profile contains any of the search tokens
+        if (queryTokens.isEmpty) {
+          final q = currentQuery.toLowerCase();
+          if (nameLower.contains(q) || professionLower.contains(q) || bioLower.contains(q)) {
+            matches = true;
+          }
+        } else {
+          for (var token in queryTokens) {
+            if (nameLower.contains(token) || 
+                professionLower.contains(token) || 
+                bioLower.contains(token)) {
               matches = true;
-            } else {
-              for (var token in queryTokens) {
-                if (nameLower.contains(token) || 
-                    professionLower.contains(token) || 
-                    bioLower.contains(token)) {
-                  matches = true;
-                  break;
-                }
-              }
-            }
-
-            if (matches) {
-              userIds.add(user.id!);
-              uniqueUsers.add(user);
+              break;
             }
           }
         }
+
+        if (matches) {
+          matchingUsers.add(user);
+        }
       }
-      
+
       // Sort users: exact name matches first
-      uniqueUsers.sort((a, b) {
+      matchingUsers.sort((a, b) {
         final aName = (a.name ?? '').toLowerCase();
         final bName = (b.name ?? '').toLowerCase();
         final q = currentQuery.toLowerCase();
@@ -166,10 +225,10 @@ class ArticleSearchController extends GetxController {
         return aName.compareTo(bName);
       });
       
-      users.value = uniqueUsers;
+      users.value = matchingUsers;
 
       // History management
-      if (fetched.isNotEmpty || uniqueUsers.isNotEmpty) {
+      if (searchArticlesFetched.isNotEmpty || matchingUsers.isNotEmpty) {
         saveToHistory(currentQuery);
       }
     } catch (e) {

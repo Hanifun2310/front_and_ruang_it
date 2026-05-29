@@ -52,11 +52,12 @@ class TopicRecommendationController extends GetxController {
       try {
         // Fetch articles for this category
         final articles = await _apiProvider.getArticles(category: category.id.toString());
+        final publicArticles = articles.where((a) => !a.isBlocked).toList();
         
-        if (articles.isNotEmpty) {
+        if (publicArticles.isNotEmpty) {
           // Sort by likesCount descending and take first
-          articles.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
-          topArticles[category.id] = articles.first;
+          publicArticles.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
+          topArticles[category.id] = publicArticles.first;
         } else {
           // Try fetching without category filter if specific filter yields nothing, 
           // but that might be misleading. Better to just stay with null if no match.

@@ -147,7 +147,7 @@ class UserModel {
 
   bool get isBanned {
     final s = status?.toLowerCase();
-    return s == 'banned';
+    return s == 'banned' || s == 'blocked' || s == 'suspended';
   }
 
   UserModel({
