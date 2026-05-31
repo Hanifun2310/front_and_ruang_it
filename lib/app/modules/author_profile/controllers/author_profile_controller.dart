@@ -106,10 +106,35 @@ class AuthorProfileController extends GetxController {
     try {
       final response = await _apiProvider.getAuthorProfile(author.id!);
       if (response.statusCode == 200) {
-        final rawData = response.data['data'] ?? response.data;
-        final userData = (rawData is Map<String, dynamic> && rawData.containsKey('user'))
-            ? rawData['user']
-            : rawData;
+        // Coba berbagai kemungkinan struktur response dari backend
+        final responseBody = response.data;
+        Map<String, dynamic>? userData;
+
+        if (responseBody is Map<String, dynamic>) {
+          // Kemungkinan 1: { data: { user: {...} } }
+          if (responseBody['data'] is Map && (responseBody['data'] as Map).containsKey('user')) {
+            userData = Map<String, dynamic>.from((responseBody['data'] as Map)['user']);
+          }
+          // Kemungkinan 2: { data: {...} } (langsung user)
+          else if (responseBody['data'] is Map<String, dynamic>) {
+            userData = Map<String, dynamic>.from(responseBody['data']);
+          }
+          // Kemungkinan 3: { user: {...} }
+          else if (responseBody.containsKey('user') && responseBody['user'] is Map) {
+            userData = Map<String, dynamic>.from(responseBody['user']);
+          }
+          // Kemungkinan 4: response langsung adalah user object
+          else if (responseBody.containsKey('id') || responseBody.containsKey('name')) {
+            userData = Map<String, dynamic>.from(responseBody);
+          }
+          // Fallback: rawData
+          else {
+            userData = Map<String, dynamic>.from(responseBody['data'] ?? responseBody);
+          }
+        }
+
+        if (userData == null) return;
+
         final detailedUser = UserModel.fromJson(userData);
         
         // Re-enforce banned check with latest data from server
@@ -126,37 +151,71 @@ class AuthorProfileController extends GetxController {
           return;
         }
 
-        rxAuthor.value = detailedUser;
+        // Merge: pertahankan data lama jika data baru null/kosong (profession, bio, dll)
+        final currentAuthor = rxAuthor.value;
+        final mergedUser = UserModel(
+          id: detailedUser.id ?? currentAuthor.id,
+          name: (detailedUser.name?.isNotEmpty == true) ? detailedUser.name : currentAuthor.name,
+          email: detailedUser.email ?? currentAuthor.email,
+          role: detailedUser.role ?? currentAuthor.role,
+          status: detailedUser.status ?? currentAuthor.status,
+          photoProfile: (detailedUser.photoProfile?.isNotEmpty == true) ? detailedUser.photoProfile : currentAuthor.photoProfile,
+          profession: (detailedUser.profession?.isNotEmpty == true) ? detailedUser.profession : currentAuthor.profession,
+          bio: (detailedUser.bio?.isNotEmpty == true) ? detailedUser.bio : currentAuthor.bio,
+          articlesCount: detailedUser.articlesCount ?? userData['articles_count'] ?? userData['posts_count'] ?? currentAuthor.articlesCount,
+          likesCount: detailedUser.likesCount ?? userData['likes_count'] ?? userData['total_likes'] ?? currentAuthor.likesCount,
+          commentsCount: detailedUser.commentsCount ?? userData['comments_count'] ?? userData['total_comments'] ?? currentAuthor.commentsCount,
+        );
+
+        rxAuthor.value = mergedUser;
         rxAuthor.refresh();
 
         // Update stats from the rich profile data
-        articlesCount.value = detailedUser.articlesCount ?? rawData['articles_count'] ?? rawData['posts_count'] ?? rawData['articles'] ?? articlesCount.value;
-        likesCount.value = detailedUser.likesCount ?? rawData['likes_count'] ?? rawData['total_likes'] ?? rawData['likes'] ?? likesCount.value;
-        commentsCount.value = detailedUser.commentsCount ?? rawData['comments_count'] ?? rawData['total_comments'] ?? rawData['comments'] ?? commentsCount.value;
+        if (mergedUser.articlesCount != null && mergedUser.articlesCount! > 0) {
+          articlesCount.value = mergedUser.articlesCount!;
+        }
+        if (mergedUser.likesCount != null && mergedUser.likesCount! > 0) {
+          likesCount.value = mergedUser.likesCount!;
+        }
+        if (mergedUser.commentsCount != null && mergedUser.commentsCount! > 0) {
+          commentsCount.value = mergedUser.commentsCount!;
+        }
       }
     } catch (e) {
       print('Error fetching detailed author info: $e');
       
-      // Fallback: If getAuthorProfile fails (e.g. 404), try to find a rich user object from one of their articles
+      // Fallback: If getAuthorProfile fails, try to find a rich user object from one of their articles
       try {
         var userArticle = userArticles.firstWhereOrNull((a) => a.user?.id == author.id);
         if (userArticle == null) {
-          // Jika list lokal masih kosong (karena pemanggilan async paralel belum selesai),
-          // coba ambil artikel terbaru dari API secara langsung untuk mencari artikel milik author ini
           final fetched = await _apiProvider.getArticles(page: 1);
           userArticle = fetched.firstWhereOrNull((a) => a.user?.id == author.id);
         }
         if (userArticle != null && userArticle.slug != null) {
           final detail = await _apiProvider.getArticleDetail(userArticle.slug!);
           if (detail.user != null) {
-            rxAuthor.value = detail.user!;
+            // Merge dengan data yang ada
+            final currentAuthor = rxAuthor.value;
+            final mergedUser = UserModel(
+              id: detail.user!.id ?? currentAuthor.id,
+              name: (detail.user!.name?.isNotEmpty == true) ? detail.user!.name : currentAuthor.name,
+              email: detail.user!.email ?? currentAuthor.email,
+              role: detail.user!.role ?? currentAuthor.role,
+              status: detail.user!.status ?? currentAuthor.status,
+              photoProfile: (detail.user!.photoProfile?.isNotEmpty == true) ? detail.user!.photoProfile : currentAuthor.photoProfile,
+              profession: (detail.user!.profession?.isNotEmpty == true) ? detail.user!.profession : currentAuthor.profession,
+              bio: (detail.user!.bio?.isNotEmpty == true) ? detail.user!.bio : currentAuthor.bio,
+              articlesCount: detail.user!.articlesCount ?? currentAuthor.articlesCount,
+              likesCount: detail.user!.likesCount ?? currentAuthor.likesCount,
+              commentsCount: detail.user!.commentsCount ?? currentAuthor.commentsCount,
+            );
+            rxAuthor.value = mergedUser;
             rxAuthor.refresh();
 
-            // Perbarui stats juga dari detail author yang kaya ini jika belum terisi
             if (articlesCount.value == 0 && likesCount.value == 0 && commentsCount.value == 0) {
-              articlesCount.value = detail.user!.articlesCount ?? articlesCount.value;
-              likesCount.value = detail.user!.likesCount ?? likesCount.value;
-              commentsCount.value = detail.user!.commentsCount ?? commentsCount.value;
+              articlesCount.value = mergedUser.articlesCount ?? articlesCount.value;
+              likesCount.value = mergedUser.likesCount ?? likesCount.value;
+              commentsCount.value = mergedUser.commentsCount ?? commentsCount.value;
             }
           }
         }
@@ -180,19 +239,49 @@ class AuthorProfileController extends GetxController {
     }
 
     try {
-      final fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
+      List<ArticleModel> fetchedArticles = [];
+      bool useUserEndpoint = false;
+
+      // Coba endpoint /users/$userId/articles terlebih dahulu (lebih akurat)
+      try {
+        final userSpecificArticles = await _apiProvider.getUserArticles(
+          author.id!,
+          page: _currentArticlesPage,
+        );
+        if (userSpecificArticles.isNotEmpty || _currentArticlesPage > 1) {
+          fetchedArticles = userSpecificArticles;
+          useUserEndpoint = true;
+        }
+      } catch (_) {}
+
+      // Fallback: ambil artikel umum dan filter lokal
+      if (!useUserEndpoint) {
+        fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
+      }
       
       final updatedArticles = _likeSyncService.applyLikeStateToArticles(fetchedArticles);
 
-      if (reset) {
-        userArticles.value = updatedArticles;
-      } else {
-        userArticles.addAll(updatedArticles);
-      }
+      // Filter: hanya artikel dari author ini yang TIDAK diblokir/banned
+      final authorArticles = useUserEndpoint
+          ? updatedArticles.where((a) {
+              final articleStatus = a.status?.toLowerCase();
+              final isArticleBanned = articleStatus == 'banned' || articleStatus == 'blocked';
+              final isUserBanned = a.user?.isBanned == true;
+              return !isArticleBanned && !isUserBanned;
+            }).toList()
+          : updatedArticles.where((a) {
+              final isThisAuthor = a.user?.id == author.id;
+              final articleStatus = a.status?.toLowerCase();
+              final isArticleBanned = articleStatus == 'banned' || articleStatus == 'blocked';
+              final isUserBanned = a.user?.isBanned == true;
+              return isThisAuthor && !isArticleBanned && !isUserBanned;
+            }).toList();
 
-      userArticles.value = userArticles
-          .where((a) => a.user?.id == author.id && !a.isBlocked)
-          .toList();
+      if (reset) {
+        userArticles.value = authorArticles;
+      } else {
+        userArticles.addAll(authorArticles);
+      }
 
       hasMoreUserArticles.value = fetchedArticles.length >= _articlesPageSize;
       if (hasMoreUserArticles.value) {

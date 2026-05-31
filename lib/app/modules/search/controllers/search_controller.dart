@@ -81,99 +81,129 @@ class ArticleSearchController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 1. Fetch Articles and Users concurrently
+      // 1. Fetch Articles dan Users secara paralel
       final results = await Future.wait([
         _apiProvider.getArticles(search: currentQuery, page: 1),
-        _apiProvider.getArticles(search: currentQuery, page: 2),
         _apiProvider.searchUsers(currentQuery),
-        // Discovery fallbacks
-        _apiProvider.getArticles(page: 1),
       ]);
       
       if (searchQuery.value.trim() != currentQuery) return;
 
-      final searchArticlesFetched = (results[0] as List<ArticleModel>) + (results[1] as List<ArticleModel>);
-      final directUsers = results[2] as List<UserModel>;
-      final discoveryArticles = results[3] as List<ArticleModel>;
+      final searchArticlesFetched = results[0] as List<ArticleModel>;
+      final directUsers = results[1] as List<UserModel>;
 
       // SYNC: Perbarui baseline notifikasi
       Get.find<NotificationService>().syncArticleMetrics(searchArticlesFetched);
 
-      // FILTER ARTIKEL: Hanya tampilkan artikel yang TIDAK diblokir
+      // FILTER ARTIKEL: Hanya tampilkan artikel yang TIDAK diblokir/banned
       final filteredArticles = searchArticlesFetched.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filteredArticles);
 
-      // USER DISCOVERY: Combine direct search results and discovery from articles
-      final List<UserModel> uniqueUsers = List.from(directUsers);
-      final Set<int> userIds = directUsers.map((u) => u.id!).toSet();
+      // Split query untuk fuzzy matching
+      final queryLower = currentQuery.toLowerCase();
+      final queryTokens = queryLower
+          .split(RegExp(r'[,\s\.]+'))
+          .map((t) => t.trim())
+          .where((t) => t.length >= 2)
+          .toList();
 
-      // Fallback discovery from search results and general articles
-      final allArticles = searchArticlesFetched + discoveryArticles;
-      for (var article in allArticles) {
-        if (article.user != null && article.user!.id != null) {
-          if (!userIds.contains(article.user!.id!)) {
-            userIds.add(article.user!.id!);
-            uniqueUsers.add(article.user!);
+      bool userMatchesQuery(UserModel user) {
+        final nameLower = (user.name ?? '').toLowerCase();
+        final professionLower = (user.profession ?? '').toLowerCase();
+        final emailLower = (user.email ?? '').toLowerCase();
+        if (queryTokens.isEmpty) {
+          return nameLower.contains(queryLower) ||
+              professionLower.contains(queryLower) ||
+              emailLower.contains(queryLower);
+        }
+        for (var token in queryTokens) {
+          if (nameLower.contains(token) ||
+              professionLower.contains(token) ||
+              emailLower.contains(token)) {
+            return true;
           }
         }
+        return false;
       }
 
-      // ENRICH USERS: Fetch detailed info for users found via discovery (if they don't have bio/profession)
-      final List<UserModel> enrichedUsers = await Future.wait(
-        uniqueUsers.map((u) async {
-          // If we already have detailed info from direct search, skip
-          if (u.bio != null && u.profession != null) return u;
-          
+      // USER SEARCH: Gunakan hasil langsung dari API /users?search= sebagai sumber utama
+      // Enrich data user dari direct search jika belum lengkap
+      final List<UserModel> enrichedDirectUsers = await Future.wait(
+        directUsers.map((u) async {
+          if (u.isBanned) return u; // skip enrichment untuk yang banned
+          if (u.bio != null || u.profession != null) return u;
           try {
             final res = await _apiProvider.getAuthorProfile(u.id!);
             if (res.statusCode == 200) {
-              final rawData = res.data['data'] ?? res.data;
-              final userData = (rawData is Map<String, dynamic> && rawData.containsKey('user'))
-                  ? rawData['user']
-                  : rawData;
-              return UserModel.fromJson(userData);
+              final responseBody = res.data;
+              Map<String, dynamic>? userData;
+              if (responseBody is Map<String, dynamic>) {
+                if (responseBody['data'] is Map && (responseBody['data'] as Map).containsKey('user')) {
+                  userData = Map<String, dynamic>.from((responseBody['data'] as Map)['user']);
+                } else if (responseBody['data'] is Map<String, dynamic>) {
+                  userData = Map<String, dynamic>.from(responseBody['data']);
+                } else if (responseBody.containsKey('user') && responseBody['user'] is Map) {
+                  userData = Map<String, dynamic>.from(responseBody['user']);
+                } else if (responseBody.containsKey('id') || responseBody.containsKey('name')) {
+                  userData = Map<String, dynamic>.from(responseBody);
+                }
+              }
+              if (userData != null) {
+                final enriched = UserModel.fromJson(userData);
+                // Preserve data dari direct search jika enriched tidak punya
+                return UserModel(
+                  id: enriched.id ?? u.id,
+                  name: enriched.name ?? u.name,
+                  email: enriched.email ?? u.email,
+                  role: enriched.role ?? u.role,
+                  status: enriched.status ?? u.status,
+                  photoProfile: (enriched.photoProfile?.isNotEmpty == true) ? enriched.photoProfile : u.photoProfile,
+                  profession: (enriched.profession?.isNotEmpty == true) ? enriched.profession : u.profession,
+                  bio: (enriched.bio?.isNotEmpty == true) ? enriched.bio : u.bio,
+                  articlesCount: enriched.articlesCount ?? u.articlesCount,
+                  likesCount: enriched.likesCount ?? u.likesCount,
+                  commentsCount: enriched.commentsCount ?? u.commentsCount,
+                );
+              }
             }
           } catch (_) {}
           return u;
         }).toList()
       );
 
-      // Split query for fuzzy matching (same as before)
-      final queryTokens = currentQuery.toLowerCase()
-          .split(RegExp(r'[,\s\.]+'))
-          .map((t) => t.trim())
-          .where((t) => t.length >= 2)
-          .toList();
-
+      final Set<int> addedUserIds = {};
       final List<UserModel> matchingUsers = [];
-      for (var user in enrichedUsers) {
-        if (user.isBanned) continue;
 
-        final nameLower = (user.name ?? '').toLowerCase();
-        final professionLower = (user.profession ?? '').toLowerCase();
-        
-        bool matches = false;
-        if (queryTokens.isEmpty) {
-          final q = currentQuery.toLowerCase();
-          if (nameLower.contains(q) || professionLower.contains(q)) matches = true;
-        } else {
-          for (var token in queryTokens) {
-            if (nameLower.contains(token) || professionLower.contains(token)) {
-              matches = true;
-              break;
-            }
-          }
+      // PERTAMA: Tambahkan semua hasil direct search yang tidak banned
+      for (var user in enrichedDirectUsers) {
+        if (user.isBanned) continue;
+        if (user.id == null) continue;
+        if (!addedUserIds.contains(user.id!)) {
+          addedUserIds.add(user.id!);
+          matchingUsers.add(user);
         }
-        if (matches) matchingUsers.add(user);
       }
 
-      // Sort users
+      // KEDUA: Cari user dari artikel hasil pencarian (sebagai suplemen)
+      // Hanya tambahkan jika belum ada di hasil direct search DAN cocok dengan query
+      for (var article in searchArticlesFetched) {
+        final u = article.user;
+        if (u == null || u.id == null || u.isBanned) continue;
+        if (addedUserIds.contains(u.id!)) continue;
+        if (userMatchesQuery(u)) {
+          addedUserIds.add(u.id!);
+          matchingUsers.add(u);
+        }
+      }
+
+      // Sort: exact match di atas, prefix match, lalu alphabetical
       matchingUsers.sort((a, b) {
         final aName = (a.name ?? '').toLowerCase();
         final bName = (b.name ?? '').toLowerCase();
-        final q = currentQuery.toLowerCase();
-        if (aName == q && bName != q) return -1;
-        if (bName == q && aName != q) return 1;
+        if (aName == queryLower && bName != queryLower) return -1;
+        if (bName == queryLower && aName != queryLower) return 1;
+        if (aName.startsWith(queryLower) && !bName.startsWith(queryLower)) return -1;
+        if (bName.startsWith(queryLower) && !aName.startsWith(queryLower)) return 1;
         return aName.compareTo(bName);
       });
       

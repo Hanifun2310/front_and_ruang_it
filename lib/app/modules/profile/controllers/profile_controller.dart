@@ -129,15 +129,44 @@ class ProfileController extends GetxController {
           try {
             final userDetailResponse = await _apiProvider.getAuthorProfile(userId.value);
             if (userDetailResponse.statusCode == 200) {
-              final rawDetailData = userDetailResponse.data['data'] ?? userDetailResponse.data;
-              final userDetailData = (rawDetailData is Map<String, dynamic> && rawDetailData.containsKey('user'))
-                  ? rawDetailData['user']
-                  : rawDetailData;
-              final detailedUser = UserModel.fromJson(userDetailData);
-              
-              articlesCount.value = detailedUser.articlesCount ?? rawDetailData['articles_count'] ?? rawDetailData['posts_count'] ?? rawDetailData['articles'] ?? articlesCount.value;
-              likesCount.value = detailedUser.likesCount ?? rawDetailData['likes_count'] ?? rawDetailData['total_likes'] ?? rawDetailData['likes'] ?? likesCount.value;
-              commentsCount.value = detailedUser.commentsCount ?? rawDetailData['comments_count'] ?? rawDetailData['total_comments'] ?? rawDetailData['comments'] ?? commentsCount.value;
+              final responseBody = userDetailResponse.data;
+              Map<String, dynamic>? userDetailData;
+
+              if (responseBody is Map<String, dynamic>) {
+                // Kemungkinan 1: { data: { user: {...} } }
+                if (responseBody['data'] is Map && (responseBody['data'] as Map).containsKey('user')) {
+                  userDetailData = Map<String, dynamic>.from((responseBody['data'] as Map)['user']);
+                }
+                // Kemungkinan 2: { data: {...} } (langsung user)
+                else if (responseBody['data'] is Map<String, dynamic>) {
+                  userDetailData = Map<String, dynamic>.from(responseBody['data']);
+                }
+                // Kemungkinan 3: { user: {...} }
+                else if (responseBody.containsKey('user') && responseBody['user'] is Map) {
+                  userDetailData = Map<String, dynamic>.from(responseBody['user']);
+                }
+                // Kemungkinan 4: response langsung adalah user object
+                else if (responseBody.containsKey('id') || responseBody.containsKey('name')) {
+                  userDetailData = Map<String, dynamic>.from(responseBody);
+                }
+                // Fallback
+                else {
+                  userDetailData = Map<String, dynamic>.from(responseBody['data'] ?? responseBody);
+                }
+              }
+
+              if (userDetailData != null) {
+                final detailedUser = UserModel.fromJson(userDetailData);
+                
+                // Update stats hanya jika nilai dari API > 0 (hindari overwrite dengan 0)
+                final newArticlesCount = detailedUser.articlesCount ?? userDetailData['articles_count'] ?? userDetailData['posts_count'] ?? userDetailData['articles'];
+                final newLikesCount = detailedUser.likesCount ?? userDetailData['likes_count'] ?? userDetailData['total_likes'] ?? userDetailData['likes'];
+                final newCommentsCount = detailedUser.commentsCount ?? userDetailData['comments_count'] ?? userDetailData['total_comments'] ?? userDetailData['comments'];
+                
+                if (newArticlesCount != null) articlesCount.value = newArticlesCount;
+                if (newLikesCount != null) likesCount.value = newLikesCount;
+                if (newCommentsCount != null) commentsCount.value = newCommentsCount;
+              }
             }
           } catch (e) {
             print('Error fetching detailed user profile for stats: $e');

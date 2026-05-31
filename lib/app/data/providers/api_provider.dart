@@ -228,14 +228,39 @@ class ApiProvider extends GetxService {
 
   Future<List<UserModel>> searchUsers(String query) async {
     try {
+      // Coba dengan parameter 'search' terlebih dahulu (paling umum)
       final response = await _dio.get('/users', queryParameters: {'search': query});
       if (response.statusCode == 200) {
-        List<dynamic> data = response.data['data'] ?? response.data;
+        final responseData = response.data;
+        List<dynamic> data = [];
+        if (responseData is Map) {
+          data = responseData['data'] ?? responseData['users'] ?? responseData['results'] ?? [];
+        } else if (responseData is List) {
+          data = responseData;
+        }
         return data.map((json) => UserModel.fromJson(json)).toList();
       }
       return [];
     } catch (e) {
-      // If search endpoint doesn't exist, return empty list and fallback to discovery logic
+      // Jika search endpoint tidak ada atau error, kembalikan list kosong
+      // Discovery dari artikel akan menjadi fallback di search controller
+      return [];
+    }
+  }
+
+  Future<List<ArticleModel>> getUserArticles(int userId, {int page = 1}) async {
+    try {
+      final response = await _dio.get(
+        '/users/$userId/articles',
+        queryParameters: {'page': page},
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['data'] ?? response.data;
+        return data.map((json) => ArticleModel.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      // Endpoint mungkin tidak ada — fallback ke getArticles dengan filter lokal
       return [];
     }
   }
