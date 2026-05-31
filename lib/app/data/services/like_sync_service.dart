@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/article_model.dart';
 
-// 1. Buat model event sederhana untuk membawa data perubahan
 class LikeEvent {
   final int articleId;
   final bool isLiked;
@@ -26,7 +25,6 @@ class LikeSyncService extends GetxService {
     _loadFromStorage();
   }
 
-  // ─── Persistence ────────────────────────────────────────────────────────────
 
   void _loadFromStorage() {
     final List<dynamic>? stored = _box.read<List<dynamic>>(_storageKey);
@@ -50,7 +48,6 @@ class LikeSyncService extends GetxService {
     _box.write(_storageKey, data);
   }
 
-  // ─── Public API ──────────────────────────────────────────────────────────────
 
   void updateLikeStatus(int articleId, bool isLiked) {
     if (isLiked) {
@@ -85,8 +82,6 @@ class LikeSyncService extends GetxService {
       return article;
     }
 
-    // Jika cache lokal menunjukkan artikel sudah liked, gunakan status tersebut,
-    // tetapi jangan override API false dengan nilai negative yang tersimpan.
     if (article.isLiked != true) {
       article.likesCount = (article.likesCount ?? 0) + 1;
       article.isLiked = true;

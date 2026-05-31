@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // Import Quill
+import 'package:flutter_quill/flutter_quill.dart';
 import '../../../widgets/loading_widget.dart';
 import '../../../widgets/guest_prompt_widget.dart';
 import '../../../data/services/auth_service.dart';
@@ -53,7 +53,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,7 +76,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
             ),
             const SizedBox(height: 16),
             
-            // Simpan Perubahan Button
             Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value
                       ? null
@@ -110,7 +108,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
                 )),
             const SizedBox(height: 24),
 
-            // Cover Image Upload
             GestureDetector(
               onTap: () => controller.pickImage(),
               child: Obx(() {
@@ -141,7 +138,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
             ),
             const SizedBox(height: 24),
 
-            // Title Field
             TextField(
               controller: controller.titleController,
               style: GoogleFonts.kulimPark(
@@ -165,7 +161,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
             ),
             const SizedBox(height: 24),
 
-            // Category Selection
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -213,7 +208,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
             ),
             const SizedBox(height: 24),
 
-            // Quill Content Area
             Text(
               'Isi Konten',
               style: GoogleFonts.kulimPark(
@@ -231,7 +225,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
               ),
               child: Column(
                 children: [
-                  // Quill Toolbar
                     QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
@@ -278,9 +271,8 @@ class ArticleEditView extends GetView<ArticleEditController> {
                     ),
                   ),
                   const Divider(height: 1, color: Color(0xFFC5C5D6)),
-                  // Quill Editor
                   Container(
-                    height: 400, // Memberi ruang cukup untuk menulis di HP
+                    height: 400,
                     padding: const EdgeInsets.all(16),
                     child: QuillEditor.basic(
                       configurations: QuillEditorConfigurations(
@@ -315,7 +307,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
       );
   }
 
-  // Widget Helper: Image Container
   Widget _buildImageContainer({required Widget child}) {
     return Container(
       width: double.infinity,
@@ -332,7 +323,6 @@ class ArticleEditView extends GetView<ArticleEditController> {
     );
   }
 
-  // Widget Helper: Placeholder
   Widget _buildPlaceholder() {
     return Container(
       width: double.infinity,

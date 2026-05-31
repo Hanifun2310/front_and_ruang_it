@@ -14,14 +14,13 @@ class TopicRecommendationController extends GetxController {
   var currentIndex = 0.obs;
   final PageController pageController = PageController();
 
-  // Predefined pastel colors matching the design system
   final List<Color> _palette = [
-    const Color(0xFFFFEB3B), // Yellow
-    const Color(0xFFFF8A80), // Red
-    const Color(0xFF98FB98), // Green
-    const Color(0xFF80D8FF), // Light Blue
-    const Color(0xFFB388FF), // Purple
-    const Color(0xFFFF8A65), // Orange
+    const Color(0xFFFFEB3B),
+    const Color(0xFFFF8A80),
+    const Color(0xFF98FB98),
+    const Color(0xFF80D8FF),
+    const Color(0xFFB388FF),
+    const Color(0xFFFF8A65),
   ];
   
   var backgroundColors = <int, Color>{}.obs;
@@ -50,17 +49,13 @@ class TopicRecommendationController extends GetxController {
     
     for (var category in selectedCategories) {
       try {
-        // Fetch articles for this category
         final articles = await _apiProvider.getArticles(category: category.id.toString());
         final publicArticles = articles.where((a) => !a.isBlocked).toList();
         
         if (publicArticles.isNotEmpty) {
-          // Sort by likesCount descending and take first
           publicArticles.sort((a, b) => (b.likesCount ?? 0).compareTo(a.likesCount ?? 0));
           topArticles[category.id] = publicArticles.first;
         } else {
-          // Try fetching without category filter if specific filter yields nothing, 
-          // but that might be misleading. Better to just stay with null if no match.
           topArticles[category.id] = null;
         }
       } catch (e) {

@@ -18,7 +18,6 @@ class SearchView extends GetView<ArticleSearchController> {
   Widget build(BuildContext context) {
     final TextEditingController textController = TextEditingController();
 
-    // Sync text controller with observable query (for history selection)
     ever(controller.searchQuery, (String query) {
       if (textController.text != query) {
         textController.text = query;
@@ -65,7 +64,6 @@ class SearchView extends GetView<ArticleSearchController> {
       ),
       body: Column(
         children: [
-          // Search Input
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -110,7 +108,6 @@ class SearchView extends GetView<ArticleSearchController> {
             ),
           ),
 
-          // Segmented Tabs - only show when searching
           Obx(() {
             if (controller.searchQuery.value.isEmpty) {
               return const SizedBox.shrink();
@@ -235,7 +232,6 @@ class SearchView extends GetView<ArticleSearchController> {
             );
           }),
 
-          // Search Results or History
           Expanded(
             child: Obx(() {
               if (controller.searchQuery.value.isEmpty) {

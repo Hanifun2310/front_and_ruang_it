@@ -129,7 +129,6 @@ class NotificationService extends GetxService {
     final userData = authService.currentUser;
     if (userData == null) return;
     
-    // Safety parsing for userId
     final int? currentUserId = userData['id'] is int 
         ? userData['id'] as int 
         : int.tryParse(userData['id']?.toString() ?? '');
@@ -140,7 +139,6 @@ class NotificationService extends GetxService {
 
     for (final article in articles) {
       if (article.id == null) continue;
-      // Only notify if the article belongs to the current user
       if (article.user?.id != currentUserId) continue;
 
       final previous =
@@ -156,7 +154,6 @@ class NotificationService extends GetxService {
       final String currentStatus = article.status?.toLowerCase() ?? 'published';
       final String previousStatus = (previous['status'] as String?)?.toLowerCase() ?? 'published';
 
-      // Safety parsing for previous metrics
       final int prevLikes = previous['likes'] is int ? previous['likes'] as int : 0;
       final int prevComments = previous['comments'] is int ? previous['comments'] as int : 0;
 
@@ -214,7 +211,7 @@ class NotificationService extends GetxService {
             articleTitle: article.title ?? 'Artikel Anda',
             message:
                 'Artikel "${article.title ?? 'artikel Anda'}" telah diaktifkan kembali oleh admin.',
-            type: 'notifications', // Use general notification type
+            type: 'notifications',
             createdAt: DateTime.now(),
           ),
         );
@@ -248,7 +245,6 @@ class NotificationService extends GetxService {
 
     for (final comment in comments) {
       if (comment.id == null) continue;
-      // Hanya proses komentar milik user saat ini
       if (comment.user?.id != currentUserId) continue;
 
       final previous = _commentBaseline[comment.id!] ??

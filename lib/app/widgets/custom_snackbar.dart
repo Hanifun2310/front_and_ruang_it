@@ -15,7 +15,6 @@ void showCustomSnackbar(
 }) {
   final isDarkMode = Get.isDarkMode;
   
-  // Normalize checking state via text content or custom fallback parameters
   final titleLower = title.toLowerCase();
   final messageLower = message.toLowerCase();
   
@@ -43,31 +42,28 @@ void showCustomSnackbar(
   Color primaryColor;
   IconData iconData;
 
-  // Modern neon matching colors
   if (isSuccess) {
-    primaryColor = const Color(0xFF10B981); // Emerald Green
+    primaryColor = const Color(0xFF10B981);
     iconData = Icons.check_circle_outline_rounded;
   } else if (isError) {
-    primaryColor = const Color(0xFFEF4444); // Neon Coral Red
+    primaryColor = const Color(0xFFEF4444);
     iconData = Icons.error_outline_rounded;
   } else if (isWarning) {
-    primaryColor = const Color(0xFFF59E0B); // Golden Amber
+    primaryColor = const Color(0xFFF59E0B);
     iconData = Icons.warning_amber_rounded;
   } else {
-    primaryColor = const Color(0xFF3B82F6); // Electric Blue (Default / Info)
+    primaryColor = const Color(0xFF3B82F6);
     iconData = Icons.info_outline_rounded;
   }
 
-  // Frosted glass background setup
   final Color baseBgColor = isDarkMode 
-      ? const Color(0xFF0D1527) // Slate Navy
-      : const Color(0xFFFAF8FF); // Pristine White/Cream
+      ? const Color(0xFF0D1527)
+      : const Color(0xFFFAF8FF);
 
   final Color finalBgColor = baseBgColor.withOpacity(0.88);
   final Color finalBorderColor = primaryColor.withOpacity(0.28);
   final Color glowShadowColor = primaryColor.withOpacity(0.12);
 
-  // Close snackbar manually if already open to avoid overlapping multiple snackbars
   if (Get.isSnackbarOpen) {
     Get.back();
   }
@@ -109,7 +105,7 @@ void showCustomSnackbar(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
     borderColor: finalBorderColor,
     borderWidth: 1.5,
-    barBlur: 15, // Frosted glass effect
+    barBlur: 15,
     snackPosition: snackPosition ?? SnackPosition.TOP,
     duration: duration ?? const Duration(seconds: 3),
     mainButton: mainButton ?? TextButton(

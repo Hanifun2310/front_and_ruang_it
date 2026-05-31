@@ -30,7 +30,6 @@ class ArticleCreateController extends GetxController {
         categories.value = response.data['data'] ?? response.data;
       }
     } catch (e) {
-      // Error fetching categories
     }
   }
 
@@ -43,7 +42,6 @@ class ArticleCreateController extends GetxController {
   }
 
   Future<void> publishArticle() async {
-    // Memeriksa apakah dokumen quill kosong
     if (titleController.text.isEmpty || quillController.document.isEmpty() || selectedCategoryId.value == 0) {
       showCustomSnackbar('Error', 'Judul, konten, dan kategori harus diisi');
       return;
@@ -59,12 +57,11 @@ class ArticleCreateController extends GetxController {
         fileName = selectedImage.value!.name;
       }
 
-      // MENGUBAH KONTEN QUILL MENJADI JSON STRING UNTUK DIKIRIM KE API/LARAVEL
       final contentJsonData = jsonEncode(quillController.document.toDelta().toJson());
 
       final response = await _apiProvider.createArticle(
         title: titleController.text,
-        content: contentJsonData, // Mengirim JSON Delta
+        content: contentJsonData,
         categoryId: selectedCategoryId.value,
         imageBytes: imageBytes,
         fileName: fileName,

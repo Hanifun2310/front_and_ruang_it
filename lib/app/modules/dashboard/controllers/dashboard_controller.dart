@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/app_routes.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // Tambahkan import ini
+import 'package:flutter_quill/flutter_quill.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/services/like_sync_service.dart';
@@ -14,16 +14,13 @@ import '../../../data/services/auth_service.dart';
 import '../../../widgets/custom_snackbar.dart';
 
 class DashboardController extends GetxController {
-  // SENIOR REFACTOR: Gunakan Get.find agar menggunakan satu instance Dio global yang sama
   final ApiProvider _apiProvider = Get.find<ApiProvider>();
 
-  // Observables
   var articles = <ArticleModel>[].obs;
   var categories = <CategoryModel>[].obs;
   var selectedCategory = Rxn<CategoryModel>();
   var searchQuery = ''.obs;
 
-  // Pagination states
   var isLoading = false.obs;
   var isFetchingMore = false.obs;
   var currentPage = 1;
@@ -48,9 +45,6 @@ class DashboardController extends GetxController {
     fetchCategories();
     fetchArticles();
 
-    // SENIOR REFACTOR: WORKER OTOMATIS
-    // Kunci sinkronisasi! Setiap kali ada perubahan status like di LikeSyncService (dari halaman mana pun),
-    // fungsi di bawah ini akan otomatis berjalan menyinkronkan list artikel di dashboard.
     ever(_likeSyncService.rxLikeEvent, (LikeEvent? event) {
       if (event != null) {
         _handleLocalArticleListSync(event.articleId, event.isLiked);
@@ -58,7 +52,6 @@ class DashboardController extends GetxController {
     });
   }
 
-  // Fungsi internal baru khusus untuk meng-update UI internal list dashboard secara reaktif
   void _handleLocalArticleListSync(int articleId, bool isLiked) {
     final index = articles.indexWhere((a) => a.id == articleId);
     if (index != -1) {
@@ -66,8 +59,8 @@ class DashboardController extends GetxController {
       if (article.isLiked != isLiked) {
         article.isLiked = isLiked;
         article.likesCount = (article.likesCount ?? 0) + (isLiked ? 1 : -1);
-        articles[index] = article; // Perbarui data di dalam list
-        articles.refresh();        // Memicu Obx di View untuk gambar ulang layar
+        articles[index] = article;
+        articles.refresh();
       }
     }
   }
@@ -83,7 +76,6 @@ class DashboardController extends GetxController {
         categories.value = fetchedCategories;
       }
     } catch (e) {
-      // Abaikan jika gagal
     }
   }
 
@@ -124,10 +116,8 @@ class DashboardController extends GetxController {
       if (newArticles.isEmpty) {
         hasMoreData.value = false;
       } else {
-        // SYNC: Perbarui baseline notifikasi jika ada perubahan status/metrik
         Get.find<NotificationService>().syncArticleMetrics(newArticles);
 
-        // FILTER: Jangan tampilkan artikel dari user yang dibanned atau artikel yang dibanned
         final publicArticles = newArticles.where((a) => !a.isBlocked).toList();
         
         final processedArticles = _likeSyncService.applyLikeStateToArticles(publicArticles);
@@ -140,7 +130,6 @@ class DashboardController extends GetxController {
 
         if (publicArticles.isEmpty && newArticles.isNotEmpty) {
           currentPage++;
-          // Wait for the recursive call to finish to maintain correct loading state
           await fetchArticles();
           return;
         }
@@ -159,7 +148,6 @@ class DashboardController extends GetxController {
     }
   }
 
-  // SENIOR REFACTOR: Logika toggleLike Baru yang fully Optimistic & Safe
   Future<void> toggleLike(int articleId) async {
 
     final index = articles.indexWhere((a) => a.id == articleId);
@@ -169,9 +157,7 @@ class DashboardController extends GetxController {
     final isCurrentlyLiked = article.isLiked ?? false;
     final newLikedState = !isCurrentlyLiked;
 
-    // 1. Simpan ke service utama (Ini memicu worker internal dashboard agar UI langsung berubah instan)
     _likeSyncService.updateLikeStatus(articleId, newLikedState);
-    // 2. Jembatan Sementara: Beri tahu controller lain yang BELUM di-refactor agar tidak patah sinkronisasinya
     _syncLikeState(articleId, newLikedState);
 
 
@@ -184,10 +170,8 @@ class DashboardController extends GetxController {
     if (isLiking.value) return;
     isLiking.value = true;
     try {
-      // 3. Eksekusi request API di background
       await _apiProvider.toggleLike(articleId);
     } catch (e) {
-      // 4. ROLLBACK: Jika internet putus/gagal, kembalikan ke status semula
       _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
       _syncLikeState(articleId, isCurrentlyLiked);
       showCustomSnackbar('Gagal', 'Tidak dapat menyukai artikel saat ini, periksa koneksi Anda.');
@@ -196,15 +180,10 @@ class DashboardController extends GetxController {
     }
   }
 
-  // JEMBATAN SEMENTARA: Tetap dipertahankan agar Profile/Explore/Search controller yang lama 
-  // tidak error saat mereka memanggil fungsi ini sebelum mereka di-refactor.
   void updateArticleLikeState(int articleId, bool isLiked) {
-    // Alihkan langsung ke pusat data tunggal
     _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
-  // JEMBATAN SEMENTARA: Tetap dipertahankan agar halaman lain yang belum menggunakan worker
-  // tetap bisa ter-update ketika Dashboard melakukan toggle like.
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<ProfileController>()) {
@@ -234,7 +213,6 @@ class DashboardController extends GetxController {
     }
   }
 
-  // --- FUNGSI MENGUBAH JSON MENJADI TEKS PREVIEW ---
   String getSnippetText(String? content) {
     if (content == null || content.trim().isEmpty) {
       return 'Tidak ada ringkasan...';

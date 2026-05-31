@@ -58,7 +58,6 @@ class ExploreView extends GetView<ExploreController> {
         children: [
           const SizedBox(height: 16),
 
-          // Categories filter
           SizedBox(
             height: 40,
             child: Obx(
@@ -114,7 +113,6 @@ class ExploreView extends GetView<ExploreController> {
 
           const SizedBox(height: 16),
 
-          // Article List
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {

@@ -17,7 +17,6 @@ class DashboardView extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    // Controller untuk mendeteksi scroll mentok ke bawah (untuk load more)
     final ScrollController scrollController = ScrollController();
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
@@ -68,7 +67,6 @@ class DashboardView extends GetView<DashboardController> {
       ),
       body: Column(
         children: [
-          // TABS
           Container(
             height: 50,
             decoration: BoxDecoration(
@@ -90,7 +88,6 @@ class DashboardView extends GetView<DashboardController> {
           
 
 
-          // --- DAFTAR ARTIKEL (INFINITE SCROLL) ---
           Expanded(
             child: Obx(() {
               final isTerbaru = controller.activeTab.value == 0;
@@ -119,7 +116,7 @@ class DashboardView extends GetView<DashboardController> {
                 child: ListView.builder(
                   controller: isTerbaru
                       ? scrollController
-                      : null, // hanya scroll paging di tab terbaru
+                      : null,
                   itemCount:
                       displayList.length +
                       (isTerbaru && controller.hasMoreData.value ? 1 : 0),
@@ -210,7 +207,6 @@ class DashboardView extends GetView<DashboardController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Theme Label
             Row(
               children: [
                 Icon(
@@ -232,7 +228,6 @@ class DashboardView extends GetView<DashboardController> {
             ),
             const SizedBox(height: 12),
 
-            // Author Info
             InkWell(
               onTap: () {
                 if (article.user != null) {
@@ -262,7 +257,6 @@ class DashboardView extends GetView<DashboardController> {
             ),
             const SizedBox(height: 12),
 
-            // Article Content Preview
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -289,7 +283,6 @@ class DashboardView extends GetView<DashboardController> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Thumbnail Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
@@ -314,7 +307,6 @@ class DashboardView extends GetView<DashboardController> {
             ),
             const SizedBox(height: 12),
 
-            // Article Meta & Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -476,7 +468,7 @@ class DashboardView extends GetView<DashboardController> {
                 ),
               ),
               onTap: () {
-                Get.back(); // close bottom sheet
+                Get.back();
                 Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
               },
             ),
@@ -491,7 +483,7 @@ class DashboardView extends GetView<DashboardController> {
                 ),
               ),
               onTap: () {
-                Get.back(); // close bottom sheet
+                Get.back();
                 _showDeleteConfirmation(article.id);
               },
             ),
@@ -562,7 +554,7 @@ class DashboardView extends GetView<DashboardController> {
           selection: const TextSelection.collapsed(offset: 0),
         );
         return SizedBox(
-          height: 44, // Sekitar 2 baris teks
+          height: 44,
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
             child: AbsorbPointer(

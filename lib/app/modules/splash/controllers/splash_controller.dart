@@ -9,7 +9,6 @@ class SplashController extends GetxController {
   }
 
   Future<void> _navigateToDashboard() async {
-    // Extended delay to allow the light theme animations to fully show off
     await Future.delayed(const Duration(milliseconds: 5000));
     Get.offAllNamed(Routes.DASHBOARD);
   }

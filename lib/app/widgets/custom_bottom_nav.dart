@@ -16,13 +16,12 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color backgroundColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8F9FF); // Matching stitch bg 'surface'
+    final Color backgroundColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8F9FF);
     final Color activeColor = isDark ? Colors.blueAccent : const Color(0xFF0058BE);
     final Color inactiveColor = isDark ? Colors.white54 : const Color(0xFF424754);
     final Color borderColor = isDark ? Colors.white10 : const Color(0xFFC2C6D6);
 
     return Container(
-      // Added relative spacing safety for newer devices if needed. Scaffold handles safe area usually
       height: 64 + MediaQuery.of(context).padding.bottom * 0.5,
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -63,7 +62,6 @@ class CustomBottomNav extends StatelessWidget {
                     if (currentIndex != 1) Get.offNamed(Routes.EXPLORE);
                   },
                 ),
-                // Empty slot for the Floating button center space
                 const Expanded(child: SizedBox()),
                 _buildNavItem(
                   icon: Icons.search_outlined,
@@ -90,10 +88,9 @@ class CustomBottomNav extends StatelessWidget {
               ],
             ),
           ),
-          // Center Action Button
           if (showCreateButton)
             Positioned(
-              top: -24, // Raised above the navbar
+              top: -24,
               left: 0,
               right: 0,
               child: Center(

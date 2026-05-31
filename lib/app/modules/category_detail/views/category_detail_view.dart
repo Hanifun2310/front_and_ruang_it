@@ -10,12 +10,11 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFF7D7D), // Salmon background from HTML
+      backgroundColor: const Color(0xFFFF7D7D),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
               child: Column(
@@ -53,7 +52,7 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF222330), // Dark color
+                            backgroundColor: const Color(0xFF222330),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             shape: RoundedRectangleBorder(
@@ -76,7 +75,6 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
               ),
             ),
             
-            // Main Content Area
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -99,12 +97,11 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                   return SingleChildScrollView(
                     child: Column(
                       children: [
-                        // Profile Card
                         Container(
                           margin: const EdgeInsets.only(top: 16, bottom: 24),
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF222330), // Dark card
+                            color: const Color(0xFF222330),
                             borderRadius: BorderRadius.circular(32),
                             boxShadow: const [
                               BoxShadow(
@@ -117,7 +114,6 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Profile Header
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -154,7 +150,6 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                                       ],
                                     ),
                                   ),
-                                  // Refresh Button
                                   GestureDetector(
                                     onTap: () => controller.fetchAuthorArticles(),
                                     child: Container(
@@ -173,7 +168,6 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                                 ],
                               ),
                               const SizedBox(height: 18),
-                              // Bio
                               Text(
                                 author.bio ?? 'No bio available.',
                                 style: const TextStyle(
@@ -189,7 +183,6 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
                                 color: Colors.white10,
                               ),
                               const SizedBox(height: 18),
-                              // Articles Section
                               const Text(
                                 'ARTIKEL POPULER',
                                 style: TextStyle(
@@ -281,7 +274,6 @@ class CategoryDetailView extends GetView<CategoryDetailController> {
               ),
             ),
             
-            // Footer Section
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: SizedBox(

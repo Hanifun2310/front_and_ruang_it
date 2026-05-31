@@ -57,7 +57,6 @@ class InterestSelectionController extends GetxController {
       return;
     }
     
-    // Filter categories that are selected to pass them
     final selectedCategoriesList = categories.where((c) => selectedCategoryIds.contains(c.id)).toList();
     Get.toNamed(Routes.TOPIC_RECOMMENDATION, arguments: selectedCategoriesList);
   }

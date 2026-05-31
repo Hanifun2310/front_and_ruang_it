@@ -32,14 +32,12 @@ class AuthService extends GetxService {
     await box.remove('user');
     isLoggedIn.value = false;
     
-    // Bersihkan like state persisten agar tidak bocor ke user lain
     try {
       if (Get.isRegistered<LikeSyncService>()) {
         Get.find<LikeSyncService>().clearAll();
       }
     } catch (_) {}
     
-    // Redirect to homepage (dashboard) after logout
     Get.offAllNamed(Routes.DASHBOARD);
   }
 

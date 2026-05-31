@@ -14,7 +14,6 @@ class ArticleModel {
   String? status;
 
   bool get isBlocked {
-    // Robust check for banned status (support both 'banned' and 'blocked')
     final String? articleStatus = status?.toLowerCase();
     final String? userStatus = user?.status?.toLowerCase();
     
@@ -33,13 +32,11 @@ class ArticleModel {
     return '${createdAt!.day} ${months[createdAt!.month - 1]} ${createdAt!.year}';
   }
 
-  // Relasi
   UserModel? user;
   CategoryModel? category;
 
   String get snippet {
     if (content == null || content!.isEmpty) return "";
-    // Simple HTML strip
     String plainText = content!.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
     plainText = plainText.replaceAll(RegExp(r'\s+'), ' ').trim();
     if (plainText.length <= 100) return plainText;
@@ -68,10 +65,8 @@ class ArticleModel {
     }
     if (path.startsWith('http')) return path;
 
-    // Remove leading slash if exists
     String cleanPath = path.startsWith('/') ? path.substring(1) : path;
 
-    // Avoid double 'storage/' if the backend already provides it
     if (cleanPath.startsWith('storage/')) {
       return 'https://ruang-it.vibedev.my.id/$cleanPath';
     }
@@ -133,8 +128,6 @@ class ArticleModel {
   }
 }
 
-// --- Dummy Model User & Category agar tidak error ---
-// Nanti pisahkan ke file user_model.dart dan category_model.dart
 class UserModel {
   int? id;
   String? name;

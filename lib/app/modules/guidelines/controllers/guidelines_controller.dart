@@ -102,6 +102,5 @@ class GuidelinesController extends GetxController {
   }
 
   void loadGuidelines() {
-    // Tidak perlu memuat dari API lagi karena sudah statis
   }
 }

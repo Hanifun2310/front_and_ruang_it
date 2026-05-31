@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // Import library Quill
+import 'package:flutter_quill/flutter_quill.dart';
 import '../../../widgets/loading_widget.dart';
 import '../../../widgets/custom_bottom_nav.dart';
 import '../../../widgets/guest_prompt_widget.dart';
@@ -57,7 +57,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -126,7 +125,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 16),
             
-            // Tombol Terbitkan
             Row(
               children: [
                 Obx(() => ElevatedButton(
@@ -158,7 +156,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
             
-            // Cover Image Upload
             GestureDetector(
               onTap: () => controller.pickImage(),
               child: Obx(() => Container(
@@ -212,7 +209,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
-            // Form Title (Judul)
             TextField(
               controller: controller.titleController,
               style: GoogleFonts.kulimPark(
@@ -236,7 +232,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
-            // Dropdown Kategori
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -278,7 +273,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
             ),
             const SizedBox(height: 24),
 
-            // Area Quill Editor
             Text(
               'Isi Konten',
               style: GoogleFonts.kulimPark(
@@ -296,7 +290,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
               ),
               child: Column(
                 children: [
-                  // Toolbar bawaan Quill
                   QuillToolbar.simple(
                     configurations: QuillSimpleToolbarConfigurations(
                       controller: controller.quillController,
@@ -343,9 +336,8 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                     ),
                   ),
                   const Divider(height: 1, color: Color(0xFFC5C5D6)),
-                  // Area mengetik Quill
                   Container(
-                    height: 400, // Diperbesar agar nyaman mengetik panjang
+                    height: 400,
                     padding: const EdgeInsets.all(16),
                     child: QuillEditor.basic(
                       configurations: QuillEditorConfigurations(
@@ -374,7 +366,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                 ],
               ),
             ),
-            const SizedBox(height: 100), // Extra space untuk bottom nav
+            const SizedBox(height: 100),
           ],
         ),
       );

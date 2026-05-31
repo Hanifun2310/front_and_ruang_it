@@ -22,7 +22,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
         );
       }
 
-      // Prevent index range errors during transition
       int idx = controller.currentIndex.value;
       if (idx >= controller.selectedCategories.length) idx = 0;
 
@@ -36,7 +35,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
         body: SafeArea(
           child: Column(
             children: [
-              // Header Section
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20.0,
@@ -104,7 +102,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                 ),
               ),
 
-              // PageView Main Content with Navigation Arrows
               Expanded(
                 child: Stack(
                   children: [
@@ -120,7 +117,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                         return AnimatedPadding(
                           duration: const Duration(milliseconds: 300),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 40.0, // More space for arrows
+                            horizontal: 40.0,
                             vertical: 12.0,
                           ),
                           child: Container(
@@ -159,7 +156,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                           ),
                                         ),
                                         const SizedBox(height: 20),
-                                        // Image Container
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(24),
                                           child: Image.network(
@@ -185,7 +181,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                           ),
                                         ),
                                         const SizedBox(height: 20),
-                                        // Title
                                         Text(
                                           article.title ?? 'Untitled',
                                           maxLines: 2,
@@ -198,7 +193,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                           ),
                                         ),
                                         const SizedBox(height: 12),
-                                        // Content snippet
                                         Text(
                                           article.snippet,
                                           maxLines: 3,
@@ -216,7 +210,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                           thickness: 1,
                                         ),
                                         const SizedBox(height: 12),
-                                        // Bottom Author Area
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -274,7 +267,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                                 ],
                                               ),
                                             ),
-                                            // Action Pill
                                             Container(
                                               padding: const EdgeInsets.symmetric(
                                                 horizontal: 10,
@@ -309,7 +301,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                         );
                       },
                     ),
-                    // Navigation Arrows
                     if (controller.currentIndex.value > 0)
                       Positioned(
                         left: 5,
@@ -344,7 +335,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                 ),
               ),
 
-              // Footer Section
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -376,7 +366,6 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Indicators
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(

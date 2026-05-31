@@ -31,7 +31,7 @@ class LoadingWidget extends StatelessWidget {
             width: size * 0.5,
             height: size * 0.5,
             errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.rocket_launch_rounded, // Fallback icon
+              Icons.rocket_launch_rounded,
               size: 20,
               color: Colors.blueAccent,
             ),

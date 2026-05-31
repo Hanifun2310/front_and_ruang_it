@@ -21,7 +21,7 @@ class ArticleSearchController extends GetxController {
   var articles = <ArticleModel>[].obs;
   var isLoading = false.obs;
   var searchHistory = <String>[].obs;
-  var searchTab = 0.obs; // 0 for Artikel, 1 for Penulis
+  var searchTab = 0.obs;
   var users = <UserModel>[].obs;
 
   final String _historyKey = 'search_history';
@@ -31,7 +31,6 @@ class ArticleSearchController extends GetxController {
     super.onInit();
     loadSearchHistory();
 
-    // Real-time search with debounce (500ms)
     debounce(
       searchQuery,
       (_) => fetchArticles(),
@@ -49,11 +48,9 @@ class ArticleSearchController extends GetxController {
   void saveToHistory(String query) {
     if (query.isEmpty) return;
 
-    // Remove if already exists to move it to the top
     searchHistory.remove(query);
     searchHistory.insert(0, query);
 
-    // Limit to 10 items
     if (searchHistory.length > 10) {
       searchHistory.removeLast();
     }
@@ -81,7 +78,6 @@ class ArticleSearchController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 1. Fetch Articles dan Users secara paralel
       final results = await Future.wait([
         _apiProvider.getArticles(search: currentQuery, page: 1),
         _apiProvider.searchUsers(currentQuery),
@@ -92,14 +88,11 @@ class ArticleSearchController extends GetxController {
       final searchArticlesFetched = results[0] as List<ArticleModel>;
       final directUsers = results[1] as List<UserModel>;
 
-      // SYNC: Perbarui baseline notifikasi
       Get.find<NotificationService>().syncArticleMetrics(searchArticlesFetched);
 
-      // FILTER ARTIKEL: Hanya tampilkan artikel yang TIDAK diblokir/banned
       final filteredArticles = searchArticlesFetched.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filteredArticles);
 
-      // Split query untuk fuzzy matching
       final queryLower = currentQuery.toLowerCase();
       final queryTokens = queryLower
           .split(RegExp(r'[,\s\.]+'))
@@ -126,11 +119,9 @@ class ArticleSearchController extends GetxController {
         return false;
       }
 
-      // USER SEARCH: Gunakan hasil langsung dari API /users?search= sebagai sumber utama
-      // Enrich data user dari direct search jika belum lengkap
       final List<UserModel> enrichedDirectUsers = await Future.wait(
         directUsers.map((u) async {
-          if (u.isBanned) return u; // skip enrichment untuk yang banned
+          if (u.isBanned) return u;
           if (u.bio != null || u.profession != null) return u;
           try {
             final res = await _apiProvider.getAuthorProfile(u.id!);
@@ -150,7 +141,6 @@ class ArticleSearchController extends GetxController {
               }
               if (userData != null) {
                 final enriched = UserModel.fromJson(userData);
-                // Preserve data dari direct search jika enriched tidak punya
                 return UserModel(
                   id: enriched.id ?? u.id,
                   name: enriched.name ?? u.name,
@@ -174,7 +164,6 @@ class ArticleSearchController extends GetxController {
       final Set<int> addedUserIds = {};
       final List<UserModel> matchingUsers = [];
 
-      // PERTAMA: Tambahkan semua hasil direct search yang tidak banned
       for (var user in enrichedDirectUsers) {
         if (user.isBanned) continue;
         if (user.id == null) continue;
@@ -184,8 +173,6 @@ class ArticleSearchController extends GetxController {
         }
       }
 
-      // KEDUA: Cari user dari artikel hasil pencarian (sebagai suplemen)
-      // Hanya tambahkan jika belum ada di hasil direct search DAN cocok dengan query
       for (var article in searchArticlesFetched) {
         final u = article.user;
         if (u == null || u.id == null || u.isBanned) continue;
@@ -196,7 +183,6 @@ class ArticleSearchController extends GetxController {
         }
       }
 
-      // Sort: exact match di atas, prefix match, lalu alphabetical
       matchingUsers.sort((a, b) {
         final aName = (a.name ?? '').toLowerCase();
         final bName = (b.name ?? '').toLowerCase();
@@ -227,7 +213,6 @@ class ArticleSearchController extends GetxController {
 
   void selectHistory(String query) {
     searchQuery.value = query;
-    // This will trigger the debounce fetchArticles
   }
 
   Future<void> toggleLike(int articleId) async {
@@ -245,7 +230,6 @@ class ArticleSearchController extends GetxController {
       final article = articles[index];
       final isCurrentlyLiked = article.isLiked ?? false;
 
-      // Optimistic update
       article.isLiked = !isCurrentlyLiked;
       article.likesCount =
           (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
@@ -256,10 +240,8 @@ class ArticleSearchController extends GetxController {
       await _apiProvider.toggleLike(articleId);
       _likeSyncService.updateLikeStatus(articleId, !isCurrentlyLiked);
 
-      // SYNC: Update other controllers
       _syncLikeState(articleId, !isCurrentlyLiked);
     } catch (e) {
-      // Revert if error
       fetchArticles();
     }
   }

@@ -22,7 +22,6 @@ class AuthorProfileController extends GetxController {
 
   var userArticles = <ArticleModel>[].obs;
   
-  // Search & Filter
   var articleSearchQuery = ''.obs;
   var selectedCategoryFilter = Rxn<String>();
   final articleSearchController = TextEditingController();
@@ -41,14 +40,12 @@ class AuthorProfileController extends GetxController {
     final q = articleSearchQuery.value.trim().toLowerCase();
     final cat = selectedCategoryFilter.value;
     
-    // Safety check: ensure userArticles is not empty and author data is consistent
     if (userArticles.isEmpty) return [];
 
     return userArticles.where((a) {
       final matchQuery = q.isEmpty || (a.title ?? '').toLowerCase().contains(q);
       final matchCategory = cat == null || a.category?.name == cat;
       
-      // Secondary safety: ensure we only show articles for THIS author
       final bool isCorrectAuthor = a.user?.id == author.id || a.user?.name == author.name;
       
       return matchQuery && matchCategory && isCorrectAuthor;
@@ -72,7 +69,6 @@ class AuthorProfileController extends GetxController {
       author = Get.arguments as UserModel;
       rxAuthor.value = author;
 
-      // Centralized banned user enforcement! If author is banned, block profile viewing.
       if (author.isBanned) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           showCustomSnackbar(
@@ -106,28 +102,22 @@ class AuthorProfileController extends GetxController {
     try {
       final response = await _apiProvider.getAuthorProfile(author.id!);
       if (response.statusCode == 200) {
-        // Coba berbagai kemungkinan struktur response dari backend
         final responseBody = response.data;
         Map<String, dynamic>? userData;
 
         if (responseBody is Map<String, dynamic>) {
-          // Kemungkinan 1: { data: { user: {...} } }
           if (responseBody['data'] is Map && (responseBody['data'] as Map).containsKey('user')) {
             userData = Map<String, dynamic>.from((responseBody['data'] as Map)['user']);
           }
-          // Kemungkinan 2: { data: {...} } (langsung user)
           else if (responseBody['data'] is Map<String, dynamic>) {
             userData = Map<String, dynamic>.from(responseBody['data']);
           }
-          // Kemungkinan 3: { user: {...} }
           else if (responseBody.containsKey('user') && responseBody['user'] is Map) {
             userData = Map<String, dynamic>.from(responseBody['user']);
           }
-          // Kemungkinan 4: response langsung adalah user object
           else if (responseBody.containsKey('id') || responseBody.containsKey('name')) {
             userData = Map<String, dynamic>.from(responseBody);
           }
-          // Fallback: rawData
           else {
             userData = Map<String, dynamic>.from(responseBody['data'] ?? responseBody);
           }
@@ -137,7 +127,6 @@ class AuthorProfileController extends GetxController {
 
         final detailedUser = UserModel.fromJson(userData);
         
-        // Re-enforce banned check with latest data from server
         if (detailedUser.isBanned) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             showCustomSnackbar(
@@ -151,7 +140,6 @@ class AuthorProfileController extends GetxController {
           return;
         }
 
-        // Merge: pertahankan data lama jika data baru null/kosong (profession, bio, dll)
         final currentAuthor = rxAuthor.value;
         final mergedUser = UserModel(
           id: detailedUser.id ?? currentAuthor.id,
@@ -170,7 +158,6 @@ class AuthorProfileController extends GetxController {
         rxAuthor.value = mergedUser;
         rxAuthor.refresh();
 
-        // Update stats from the rich profile data
         if (mergedUser.articlesCount != null && mergedUser.articlesCount! > 0) {
           articlesCount.value = mergedUser.articlesCount!;
         }
@@ -184,7 +171,6 @@ class AuthorProfileController extends GetxController {
     } catch (e) {
       print('Error fetching detailed author info: $e');
       
-      // Fallback: If getAuthorProfile fails, try to find a rich user object from one of their articles
       try {
         var userArticle = userArticles.firstWhereOrNull((a) => a.user?.id == author.id);
         if (userArticle == null) {
@@ -194,7 +180,6 @@ class AuthorProfileController extends GetxController {
         if (userArticle != null && userArticle.slug != null) {
           final detail = await _apiProvider.getArticleDetail(userArticle.slug!);
           if (detail.user != null) {
-            // Merge dengan data yang ada
             final currentAuthor = rxAuthor.value;
             final mergedUser = UserModel(
               id: detail.user!.id ?? currentAuthor.id,
@@ -242,7 +227,6 @@ class AuthorProfileController extends GetxController {
       List<ArticleModel> fetchedArticles = [];
       bool useUserEndpoint = false;
 
-      // Coba endpoint /users/$userId/articles terlebih dahulu (lebih akurat)
       try {
         final userSpecificArticles = await _apiProvider.getUserArticles(
           author.id!,
@@ -254,14 +238,12 @@ class AuthorProfileController extends GetxController {
         }
       } catch (_) {}
 
-      // Fallback: ambil artikel umum dan filter lokal
       if (!useUserEndpoint) {
         fetchedArticles = await _apiProvider.getArticles(page: _currentArticlesPage);
       }
       
       final updatedArticles = _likeSyncService.applyLikeStateToArticles(fetchedArticles);
 
-      // Filter: hanya artikel dari author ini yang TIDAK diblokir/banned
       final authorArticles = useUserEndpoint
           ? updatedArticles.where((a) {
               final articleStatus = a.status?.toLowerCase();
@@ -288,7 +270,6 @@ class AuthorProfileController extends GetxController {
         _currentArticlesPage++;
       }
 
-      // Only set stats locally if overall counts aren't loaded yet from fetchDetailedAuthorInfo
       if (likesCount.value == 0 && commentsCount.value == 0 && articlesCount.value == 0) {
         int totalLikes = 0;
         int totalComments = 0;
@@ -333,7 +314,6 @@ class AuthorProfileController extends GetxController {
       final isCurrentlyLiked = article.isLiked ?? false;
       final newLikedStatus = !isCurrentlyLiked;
 
-      // Optimistic update
       article.isLiked = newLikedStatus;
       article.likesCount = (article.likesCount ?? 0) + (newLikedStatus ? 1 : -1);
       userArticles[userIndex] = article;
@@ -342,7 +322,7 @@ class AuthorProfileController extends GetxController {
       _likeSyncService.updateLikeStatus(articleId, newLikedStatus);
       await _apiProvider.toggleLike(articleId);
     } catch (e) {
-      fetchAuthorArticles(); // Revert on error
+      fetchAuthorArticles();
     }
   }
 

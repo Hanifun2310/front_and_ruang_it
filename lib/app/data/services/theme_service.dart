@@ -35,7 +35,7 @@ class ThemeService extends GetxService {
         useMaterial3: true,
         brightness: Brightness.dark,
         colorSchemeSeed: Colors.blueAccent,
-        scaffoldBackgroundColor: const Color(0xFF020617), // Deeper black/navy
+        scaffoldBackgroundColor: const Color(0xFF020617),
         textTheme: GoogleFonts.kulimParkTextTheme(
           ThemeData(brightness: Brightness.dark).textTheme,
         ).apply(
@@ -43,7 +43,7 @@ class ThemeService extends GetxService {
           displayColor: Colors.white,
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF0F172A), // Slightly lighter than background
+          backgroundColor: Color(0xFF0F172A),
           foregroundColor: Colors.white,
           elevation: 0,
         ),

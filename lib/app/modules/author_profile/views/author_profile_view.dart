@@ -35,18 +35,14 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
                 controller: controller.scrollController,
                 child: Column(
                   children: [
-                    // Profile Header Info
                     Obx(() => _buildProfileHeader(context)),
 
-                    // Action Buttons
                     _buildActionButtons(context),
 
                     const SizedBox(height: 12),
 
-                    // Navigation Tabs (Only one tab for Author Profile)
                     _buildNavigationTabs(),
 
-                    // Article Feed
                     _buildArticlesSection(),
                   ],
                 ),
@@ -65,7 +61,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Avatar
           Container(
             width: 80,
             height: 80,
@@ -86,7 +81,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             ),
           ),
           const SizedBox(width: 16),
-          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,7 +316,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: TextField(
@@ -365,7 +358,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
               ),
             ),
           ),
-          // Category Chips
           if (controller.availableCategories.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
@@ -577,7 +569,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
                 ),
               ),
             ],
-            // Theme Label
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -637,7 +628,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             ),
             const SizedBox(height: 12),
 
-            // Author Info
             Row(
               children: [
                 CircleAvatar(
@@ -660,7 +650,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             ),
             const SizedBox(height: 12),
 
-            // Article Content Preview
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -687,7 +676,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Thumbnail Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
@@ -712,7 +700,6 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             ),
             const SizedBox(height: 12),
 
-            // Article Meta & Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -825,7 +812,7 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
           selection: const TextSelection.collapsed(offset: 0),
         );
         return SizedBox(
-          height: 44, // Sekitar 2 baris teks
+          height: 44,
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
             child: AbsorbPointer(

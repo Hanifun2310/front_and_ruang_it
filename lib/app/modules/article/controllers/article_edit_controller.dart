@@ -30,7 +30,6 @@ class ArticleEditController extends GetxController {
     selectedCategoryId.value = article.category?.id ?? 0;
     currentImageUrl.value = article.imageUrl ?? "";
 
-    // Logika Pintar untuk membaca konten (JSON Delta atau Plain Text Lama)
     _initQuillController(article.content ?? "");
 
     fetchCategories();
@@ -38,15 +37,12 @@ class ArticleEditController extends GetxController {
 
   void _initQuillController(String content) {
     try {
-      // Coba parse sebagai JSON Delta (Artikel baru yang dibuat dengan Quill)
       final deltaJson = jsonDecode(content);
       quillController = QuillController(
         document: Document.fromJson(deltaJson),
         selection: const TextSelection.collapsed(offset: 0),
       );
     } catch (e) {
-      // Jika gagal di-parse, berarti ini artikel lama yang mungkin menggunakan HTML.
-      // Ubah tag baris baru menjadi newline, lalu hapus sisa tag HTML agar lebih rapi.
       String plainText = content
           .replaceAll(RegExp(r'</p>|<br\s*/?>', caseSensitive: false), '\n')
           .replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), '')

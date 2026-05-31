@@ -26,7 +26,6 @@ class RegisterView extends GetView<AuthController> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- Logo ---
                 Center(
                   child: Image.asset(
                     'assets/images/newlogo.png',
@@ -57,7 +56,6 @@ class RegisterView extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 40),
 
-                // --- Full Name ---
                 const Text(
                   "Nama Lengkap",
                   style: TextStyle(
@@ -91,7 +89,6 @@ class RegisterView extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 16),
 
-                // --- Email ---
                 const Text(
                   "Alamat Email",
                   style: TextStyle(
@@ -126,7 +123,6 @@ class RegisterView extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 16),
 
-                // --- Profession ---
                 const Text(
                   "Pekerjaan",
                   style: TextStyle(
@@ -160,7 +156,6 @@ class RegisterView extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 16),
 
-                // --- Password ---
                 const Text(
                   "Kata Sandi",
                   style: TextStyle(
@@ -204,7 +199,6 @@ class RegisterView extends GetView<AuthController> {
                 )),
                 const SizedBox(height: 32),
 
-                // --- Register Button ---
                 Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value ? () {} : controller.register,
                   style: ElevatedButton.styleFrom(

@@ -58,7 +58,6 @@ class AuthController extends GetxController {
       print("DIO ERROR: ${e.response?.data}");
       String message = _parseError(e, 'Gagal melakukan login. Silakan periksa kredensial Anda.');
       
-      // Check if user is banned/blocked
       bool isBanned = message.toLowerCase().contains('banned') || 
                       message.toLowerCase().contains('blocked') || 
                       message.toLowerCase().contains('ditangguhkan');

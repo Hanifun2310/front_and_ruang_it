@@ -6,10 +6,9 @@ import 'package:get_storage/get_storage.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/providers/api_provider.dart';
-import '../../../data/services/like_sync_service.dart'; // Pastikan import service ini ada
+import '../../../data/services/like_sync_service.dart';
 import '../../../data/services/auth_service.dart';
 
-// Import controller lain tidak wajib lagi jika tidak dipakai, tapi biarkan saja agar tidak ada error di file lain
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
@@ -20,7 +19,6 @@ import '../../../routes/app_routes.dart';
 import '../../../widgets/custom_snackbar.dart';
 
 class ArticleDetailController extends GetxController {
-  // SENIOR REFACTOR: Gunakan Get.find untuk performa memory pool Dio yang efisien
   final ApiProvider _apiProvider = Get.find<ApiProvider>();
   final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
   
@@ -31,7 +29,6 @@ class ArticleDetailController extends GetxController {
   var isLoading = true.obs;
   var isLiking = false.obs;
 
-  // Controller untuk membaca format Quill
   QuillController? quillController;
   final commentController = TextEditingController();
 
@@ -40,9 +37,6 @@ class ArticleDetailController extends GetxController {
     super.onInit();
     loadDetail();
 
-    // SENIOR REFACTOR: WORKER SINKRONISASI OTOMATIS
-    // Jika status like diubah dari halaman luar (misal Dashboard) saat halaman detail ini sedang terbuka,
-    // UI detail artikel akan langsung ikut ter-update secara otomatis tanpa bentrok.
     ever(_likeSyncService.rxLikeEvent, (LikeEvent? event) {
       if (event != null && article.value.id == event.articleId) {
         if (article.value.isLiked != event.isLiked) {
@@ -58,10 +52,8 @@ class ArticleDetailController extends GetxController {
   Future<void> loadDetail() async {
     try {
       isLoading.value = true;
-      // 1. Ambil Detail Artikel
       article.value = await _apiProvider.getArticleDetail(identifier);
       
-      // SYNC: Perbarui baseline notifikasi
       Get.find<NotificationService>().syncArticleMetrics([article.value]);
       
       if (article.value.isBlocked) {
@@ -83,7 +75,6 @@ class ArticleDetailController extends GetxController {
         return;
       }
 
-      // Increment views count locally using GetStorage
       if (article.value.id != null) {
         final box = GetStorage();
         final key = 'article_views_${article.value.id}';
@@ -95,12 +86,9 @@ class ArticleDetailController extends GetxController {
         });
       }
 
-      // Inisialisasi Quill Controller setelah data artikel didapat
       _initQuillController(article.value.content ?? "");
-      // 2. Ambil Komentar
       if (article.value.id != null) {
         await fetchComments();
-        // SYNC: Cek perubahan status komentar user
         Get.find<NotificationService>().syncCommentStatus(comments);
       }
     } catch (e) {
@@ -110,10 +98,8 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  // Fungsi pintar untuk membaca JSON Quill atau teks biasa
   void _initQuillController(String content) {
     try {
-      // Cek apakah content berupa list json (Quill format)
       if (content.trim().startsWith('[')) {
         final deltaJson = jsonDecode(content);
         quillController = QuillController(
@@ -121,7 +107,7 @@ class ArticleDetailController extends GetxController {
           selection: const TextSelection.collapsed(offset: 0),
         );
       } else {
-        quillController = null; // Biarkan null agar menggunakan HtmlWidget
+        quillController = null;
       }
     } catch (e) {
       quillController = null;
@@ -140,7 +126,6 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  // SENIOR REFACTOR: Logika Like Baru yang fully Optimistic, Instant, & Safe
   Future<void> toggleLike() async {
     if (article.value.id == null || isLiking.value) return;
 
@@ -159,14 +144,11 @@ class ArticleDetailController extends GetxController {
     final isCurrentlyLiked = article.value.isLiked ?? false;
     final newLikedState = !isCurrentlyLiked;
 
-    // 1. Langsung update ke service utama (UI lokal detail & UI halaman lain otomatis berubah instant via Worker)
     _likeSyncService.updateLikeStatus(articleId, newLikedState);
 
     try {
-      // 2. Kirim request ke backend di latar belakang tanpa me-blocking UI thread
       await _apiProvider.toggleLike(articleId);
     } catch (e) {
-      // 3. ROLLBACK: Jika internet putus/gagal, kembalikan status data ke semula
       _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
       showCustomSnackbar('Oops', 'Gagal memperbarui status Like, silakan periksa koneksi internet Anda.');
     } finally {
@@ -174,7 +156,6 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  // LOGIKA POST KOMENTAR
   Future<void> sendComment() async {
     final authService = Get.find<AuthService>();
     if (!authService.isLoggedIn.value) {
@@ -193,7 +174,7 @@ class ArticleDetailController extends GetxController {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         commentController.clear();
-        fetchComments(); // Refresh list komentar
+        fetchComments();
         showCustomSnackbar('Sukses', 'Komentar terkirim');
       }
     } catch (e) {
@@ -201,12 +182,11 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  // LOGIKA UPDATE KOMENTAR
   Future<void> updateComment(int commentId, String content) async {
     try {
       final response = await _apiProvider.updateComment(commentId, content);
       if (response.statusCode == 200) {
-        fetchComments(); // Refresh list komentar
+        fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil diperbarui');
       }
     } catch (e) {
@@ -214,12 +194,11 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  // LOGIKA HAPUS KOMENTAR
   Future<void> deleteComment(int commentId) async {
     try {
       final response = await _apiProvider.deleteComment(commentId);
       if (response.statusCode == 200) {
-        fetchComments(); // Refresh list komentar
+        fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil dihapus');
       }
     } catch (e) {

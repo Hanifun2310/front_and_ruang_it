@@ -50,10 +50,8 @@ class ExploreController extends GetxController {
         category: selectedCategory.value?.id.toString(),
       );
       
-      // SYNC: Perbarui baseline notifikasi
       Get.find<NotificationService>().syncArticleMetrics(fetchedArticles);
 
-      // FILTER: Jangan tampilkan artikel dari user yang dibanned atau artikel yang dibanned
       final filtered = fetchedArticles.where((a) => !a.isBlocked).toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filtered);
     } catch (e) {
@@ -87,7 +85,6 @@ class ExploreController extends GetxController {
       final article = articles[index];
       final isCurrentlyLiked = article.isLiked ?? false;
 
-      // Optimistic update
       article.isLiked = !isCurrentlyLiked;
       article.likesCount =
           (article.likesCount ?? 0) + (isCurrentlyLiked ? -1 : 1);
@@ -98,10 +95,9 @@ class ExploreController extends GetxController {
       await _apiProvider.toggleLike(articleId);
       _likeSyncService.updateLikeStatus(articleId, !isCurrentlyLiked);
 
-      // SYNC: Update other controllers
       _syncLikeState(articleId, !isCurrentlyLiked);
     } catch (e) {
-      fetchArticles(); // Revert on error
+      fetchArticles();
     }
   }
 

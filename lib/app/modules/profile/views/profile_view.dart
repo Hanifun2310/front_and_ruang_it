@@ -44,7 +44,6 @@ class ProfileView extends GetView<ProfileController> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top App Bar Area (Placeholder for Settings Icon)
             Padding(
               padding: const EdgeInsets.only(
                 top: 16.0,
@@ -170,18 +169,14 @@ class ProfileView extends GetView<ProfileController> {
                 controller: controller.scrollController,
                 child: Column(
                   children: [
-                    // Profile Header Info
                     _buildProfileHeader(context),
 
-                    // Action Buttons
                     _buildActionButtons(context),
 
                     const SizedBox(height: 12),
 
-                    // Navigation Tabs
                     _buildNavigationTabs(),
 
-                    // Article Feed
                     _buildArticlesSection(),
                   ],
                 ),
@@ -202,14 +197,12 @@ class ProfileView extends GetView<ProfileController> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Avatar Shimmer
               const SkeletonBox(
                 width: 80,
                 height: 80,
                 borderRadius: BorderRadius.all(Radius.circular(40)),
               ),
               const SizedBox(width: 16),
-              // Text Details Shimmer
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +237,6 @@ class ProfileView extends GetView<ProfileController> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Avatar
             Container(
               width: 80,
               height: 80,
@@ -266,7 +258,6 @@ class ProfileView extends GetView<ProfileController> {
               ),
             ),
             const SizedBox(width: 16),
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -541,7 +532,6 @@ class ProfileView extends GetView<ProfileController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isMyArticlesTab) ...[
-            // Search Bar
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: TextField(
@@ -589,7 +579,6 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ),
             ),
-            // Category Chips
             if (controller.availableCategories.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
@@ -597,7 +586,6 @@ class ProfileView extends GetView<ProfileController> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      // "Semua" chip
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: ChoiceChip(
@@ -831,7 +819,6 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ),
             ],
-            // Theme Label
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -893,7 +880,6 @@ class ProfileView extends GetView<ProfileController> {
             ),
             const SizedBox(height: 12),
 
-            // Author Info
             InkWell(
               onTap: () {
                 if (article.user != null) {
@@ -925,7 +911,6 @@ class ProfileView extends GetView<ProfileController> {
             ),
             const SizedBox(height: 12),
 
-            // Article Content Preview
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -952,7 +937,6 @@ class ProfileView extends GetView<ProfileController> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Thumbnail Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
@@ -977,7 +961,6 @@ class ProfileView extends GetView<ProfileController> {
             ),
             const SizedBox(height: 12),
 
-            // Article Meta & Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1139,7 +1122,7 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ),
               onTap: () {
-                Get.back(); // close bottom sheet
+                Get.back();
                 Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
               },
             ),
@@ -1154,7 +1137,7 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ),
               onTap: () {
-                Get.back(); // close bottom sheet
+                Get.back();
                 _showDeleteConfirmation(context, article);
               },
             ),
@@ -1289,7 +1272,6 @@ class ProfileView extends GetView<ProfileController> {
               ),
               const SizedBox(height: 24),
   
-              // Edit Photo Section
               Center(
                 child: Stack(
                   children: [
@@ -1503,7 +1485,7 @@ class ProfileView extends GetView<ProfileController> {
           selection: const TextSelection.collapsed(offset: 0),
         );
         return SizedBox(
-          height: 44, // Sekitar 2 baris teks
+          height: 44,
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
             child: AbsorbPointer(

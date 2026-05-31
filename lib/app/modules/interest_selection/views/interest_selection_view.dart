@@ -16,7 +16,6 @@ class InterestSelectionView extends GetView<InterestSelectionController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               IconButton(
                 padding: EdgeInsets.zero,
                 alignment: Alignment.centerLeft,
@@ -48,7 +47,6 @@ class InterestSelectionView extends GetView<InterestSelectionController> {
               ),
               const SizedBox(height: 32),
               
-              // Content
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
@@ -103,14 +101,13 @@ class InterestSelectionView extends GetView<InterestSelectionController> {
                 }),
               ),
               
-              // Footer
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => controller.lanjutkan(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4A90E2), // Blue from HTML
+                    backgroundColor: const Color(0xFF4A90E2),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

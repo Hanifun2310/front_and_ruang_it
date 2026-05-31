@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'app_routes.dart';
 import 'auth_middleware.dart';
 
-// Import file yang baru saja kita buat
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/login_view.dart';
 import '../modules/auth/views/register_view.dart';
@@ -47,11 +46,9 @@ import '../modules/splash/views/splash_view.dart';
 class AppPages {
   AppPages._();
 
-  // UBAH INI: Jadikan Login sebagai rute awal saat aplikasi dibuka
   static const INITIAL = Routes.LOGIN;
 
   static final routes = <GetPage>[
-    // Daftarkan rute Login
     GetPage(
       name: Routes.LOGIN,
       page: () => const LoginView(),

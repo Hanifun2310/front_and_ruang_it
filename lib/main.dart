@@ -14,10 +14,8 @@ import 'app/data/providers/api_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Inisialisasi Storage
   await GetStorage.init();
 
-  // 2. Registrasi Services secara global
 
   Get.put(ApiProvider());
   Get.put(AuthService());

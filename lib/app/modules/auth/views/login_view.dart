@@ -19,12 +19,11 @@ class LoginView extends GetView<AuthController> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- Logo ---
                 Center(
                   child: Image.asset(
                     'assets/images/newlogo.png',
                     height: 100,
-                    fit: BoxFit.contain, // Correction: BoxFit.contain
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -35,7 +34,7 @@ class LoginView extends GetView<AuthController> {
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
-                    color: Color(0xFF1E293B), // Dark slate
+                    color: Color(0xFF1E293B),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -50,7 +49,6 @@ class LoginView extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 48),
 
-                // --- Email Input ---
                 const Text(
                   "Alamat Email",
                   style: TextStyle(
@@ -85,7 +83,6 @@ class LoginView extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 16),
 
-                // --- Password Input ---
                 const Text(
                   "Kata Sandi",
                   style: TextStyle(
@@ -129,7 +126,6 @@ class LoginView extends GetView<AuthController> {
                 )),
                 const SizedBox(height: 32),
                 
-                // --- Login Button ---
                 Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value ? () {} : controller.login,
                   style: ElevatedButton.styleFrom(

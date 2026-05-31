@@ -19,7 +19,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    // Adjusted duration to 3 seconds for a smoother, premium slow animation
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
@@ -60,7 +59,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    // Ensure the controller is registered and bound
     Get.find<SplashController>();
 
     return Scaffold(
@@ -72,9 +70,9 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFAF9FD), // Soft Light Lavender
-              Color(0xFFF3F5FA), // Light Pastel Blueish White
-              Color(0xFFFFFFFF), // Pristine Pure White
+              Color(0xFFFAF9FD),
+              Color(0xFFF3F5FA),
+              Color(0xFFFFFFFF),
             ],
             stops: [0.0, 0.5, 1.0],
           ),
@@ -82,7 +80,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Ambient soft glowing light blue background glow
             Positioned(
               top: MediaQuery.of(context).size.height * 0.25,
               child: Container(
@@ -101,11 +98,9 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               ),
             ),
             
-            // Central Logo and Text
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Animated Logo Container
                 AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
@@ -141,7 +136,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                         height: 110,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          // Resilient fallback icon
                           return Container(
                             width: 110,
                             height: 110,
@@ -159,7 +153,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                 ),
                 const SizedBox(height: 36),
                 
-                // Animated Typography "Ruang IT"
                 SlideTransition(
                   position: _slideAnimation,
                   child: FadeTransition(
@@ -171,7 +164,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                           style: GoogleFonts.kulimPark(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF0F172A), // Deep Premium Slate Navy
+                            color: const Color(0xFF0F172A),
                             letterSpacing: 1.2,
                             shadows: [
                               Shadow(
@@ -187,7 +180,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                           'Portal Informasi & Komunitas IT',
                           style: GoogleFonts.kulimPark(
                             fontSize: 14,
-                            color: const Color(0xFF475569), // Soft Slate Grey for Legibility
+                            color: const Color(0xFF475569),
                             letterSpacing: 0.8,
                           ),
                         ),
@@ -198,7 +191,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               ],
             ),
 
-            // Bottom loading progress & version details
             Positioned(
               bottom: 65,
               child: FadeTransition(
@@ -223,7 +215,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                       'v1.0.0',
                       style: GoogleFonts.kulimPark(
                         fontSize: 12,
-                        color: const Color(0xFF94A3B8), // Slate 400 Light Grey
+                        color: const Color(0xFF94A3B8),
                         letterSpacing: 0.5,
                       ),
                     ),

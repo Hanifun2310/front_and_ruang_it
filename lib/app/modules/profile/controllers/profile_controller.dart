@@ -26,7 +26,6 @@ class ProfileController extends GetxController {
   static const int _articlesPageSize = 10;
   final ScrollController scrollController = ScrollController();
 
-  // Controllers sesuai field di Laravel
   final nameController = TextEditingController();
   final professionController = TextEditingController();
   final bioController = TextEditingController();
@@ -37,18 +36,15 @@ class ProfileController extends GetxController {
   var name = "".obs;
   var userId = 0.obs;
 
-  // Image Picking
   final ImagePicker _picker = ImagePicker();
   var selectedImagePath = "".obs;
   var selectedImageBytes = <int>[].obs;
   var selectedFileName = "".obs;
 
-  // Articles & Tabs
   var userArticles = <ArticleModel>[].obs;
   var likedArticles = <ArticleModel>[].obs;
   var selectedTab = 0.obs;
 
-  // Search & Filter
   var articleSearchQuery = ''.obs;
   var selectedCategoryFilter = Rxn<String>();
   final articleSearchController = TextEditingController();
@@ -71,7 +67,6 @@ class ProfileController extends GetxController {
     articleSearchController.clear();
   }
 
-  // Stats
   var articlesCount = 0.obs;
   var likesCount = 0.obs;
   var commentsCount = 0.obs;
@@ -116,15 +111,12 @@ class ProfileController extends GetxController {
         photoProfile.value = user.photoProfile ?? '';
         userId.value = user.id ?? 0;
 
-        // Stats dari profile response (biasanya backend menyertakan total)
         articlesCount.value = user.articlesCount ?? userData['articles_count'] ?? userData['posts_count'] ?? userData['articles'] ?? 0;
         likesCount.value = user.likesCount ?? userData['likes_count'] ?? userData['total_likes'] ?? userData['likes'] ?? 0;
         commentsCount.value = user.commentsCount ?? userData['comments_count'] ?? userData['total_comments'] ?? userData['comments'] ?? 0;
         
-        // Simpan ke storage agar sinkron
         await _authService.saveSession(_authService.token ?? '', userData);
 
-        // Ambil info detail dari /users/$userId untuk mendapatkan total keseluruhan yang akurat
         if (userId.value != 0) {
           try {
             final userDetailResponse = await _apiProvider.getAuthorProfile(userId.value);
@@ -133,23 +125,18 @@ class ProfileController extends GetxController {
               Map<String, dynamic>? userDetailData;
 
               if (responseBody is Map<String, dynamic>) {
-                // Kemungkinan 1: { data: { user: {...} } }
                 if (responseBody['data'] is Map && (responseBody['data'] as Map).containsKey('user')) {
                   userDetailData = Map<String, dynamic>.from((responseBody['data'] as Map)['user']);
                 }
-                // Kemungkinan 2: { data: {...} } (langsung user)
                 else if (responseBody['data'] is Map<String, dynamic>) {
                   userDetailData = Map<String, dynamic>.from(responseBody['data']);
                 }
-                // Kemungkinan 3: { user: {...} }
                 else if (responseBody.containsKey('user') && responseBody['user'] is Map) {
                   userDetailData = Map<String, dynamic>.from(responseBody['user']);
                 }
-                // Kemungkinan 4: response langsung adalah user object
                 else if (responseBody.containsKey('id') || responseBody.containsKey('name')) {
                   userDetailData = Map<String, dynamic>.from(responseBody);
                 }
-                // Fallback
                 else {
                   userDetailData = Map<String, dynamic>.from(responseBody['data'] ?? responseBody);
                 }
@@ -158,7 +145,6 @@ class ProfileController extends GetxController {
               if (userDetailData != null) {
                 final detailedUser = UserModel.fromJson(userDetailData);
                 
-                // Update stats hanya jika nilai dari API > 0 (hindari overwrite dengan 0)
                 final newArticlesCount = detailedUser.articlesCount ?? userDetailData['articles_count'] ?? userDetailData['posts_count'] ?? userDetailData['articles'];
                 final newLikesCount = detailedUser.likesCount ?? userDetailData['likes_count'] ?? userDetailData['total_likes'] ?? userDetailData['likes'];
                 final newCommentsCount = detailedUser.commentsCount ?? userDetailData['comments_count'] ?? userDetailData['total_comments'] ?? userDetailData['comments'];
@@ -174,7 +160,6 @@ class ProfileController extends GetxController {
         }
       }
     } catch (e) {
-      // Fallback ke data local jika offline/error
       final userData = _authService.currentUser;
       if (userData != null) {
         final user = UserModel.fromJson(userData);
@@ -196,7 +181,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Fungsi baru untuk mengambil SEMUA kategori milik user tanpa terpengaruh pagination artikel
   Future<void> fetchAllUserCategories() async {
     try {
       final Set<String> cats = {};
@@ -278,8 +262,6 @@ class ProfileController extends GetxController {
 
       Get.find<NotificationService>().syncArticleMetrics(userArticles);
 
-      // JANGAN update stats di sini jika ingin stats berdasarkan SELURUH data (sudah dihandle di loadUserData)
-      // Namun jika loadUserData/getAuthorProfile gagal dan semua stats bernilai 0, kita bisa hitung total dari yang ada sebagai fallback minimum
       if (articlesCount.value == 0 && likesCount.value == 0 && commentsCount.value == 0) {
         int totalLikes = 0;
         int totalComments = 0;
@@ -314,7 +296,6 @@ class ProfileController extends GetxController {
         name: nameController.text,
         profession: professionController.text,
         bio: bioController.text,
-        // Tetap kirim path untuk mobile jika ada, tapi utamakan bytes jika tersedia di ApiProvider
         imagePath: !kIsWeb && selectedImagePath.value.isNotEmpty
             ? selectedImagePath.value
             : null,
@@ -329,12 +310,10 @@ class ProfileController extends GetxController {
       if (response.statusCode == 200) {
         print('UPDATE PROFILE RESPONSE: ${response.data}');
 
-        // Ambil data user, tangani jika dibungkus 'data', 'user', atau tidak
         final dynamic responseData =
             response.data['data'] ?? response.data['user'] ?? response.data;
 
         if (responseData is Map<String, dynamic>) {
-          // Merge data lama dengan data baru agar stats tidak hilang jika API tidak mengirimnya kembali
           final Map<String, dynamic> oldData = Map<String, dynamic>.from(
             _authService.currentUser ?? {},
           );
@@ -342,22 +321,18 @@ class ProfileController extends GetxController {
             responseData,
           );
 
-          // Gabungkan: newData akan menimpa oldData
           final mergedData = {...oldData, ...newData};
 
           await _authService.box.write('user', mergedData);
 
-          // Refresh local observable state
           loadUserData();
 
-          // Reset selection
           selectedImagePath.value = "";
           selectedImageBytes.clear();
           selectedFileName.value = "";
 
           showCustomSnackbar('Sukses', 'Profil berhasil diperbarui');
 
-          // AUTO CLOSE BOTTOM SHEET ON SUCCESS
           if (Get.isBottomSheetOpen ?? false) {
             Get.back();
           } else if (Get.isDialogOpen ?? false) {
@@ -381,7 +356,6 @@ class ProfileController extends GetxController {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         selectedImagePath.value = image.path;
-        // Baca bytes untuk semua platform agar konsisten dengan logic Article
         selectedImageBytes.assignAll(await image.readAsBytes());
         selectedFileName.value = image.name;
       }
@@ -403,9 +377,7 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Sync method for other controllers to update state
   void updateArticleLikeState(int articleId, bool isLiked) {
-    // Sync user articles
     final userIndex = userArticles.indexWhere((a) => a.id == articleId);
     if (userIndex != -1) {
       final article = userArticles[userIndex];
@@ -418,9 +390,7 @@ class ProfileController extends GetxController {
       }
     }
 
-    // Sync liked articles (add or remove)
     if (isLiked) {
-      // If liked, check if it's already in the likedArticles list
       if (!likedArticles.any((a) => a.id == articleId)) {
         ArticleModel? existsInAll;
         for (var a in userArticles) {
@@ -459,7 +429,6 @@ class ProfileController extends GetxController {
         }
 
         if (existsInAll == null) {
-          // Placeholder that gets updated asynchronously
           existsInAll = ArticleModel(
             id: articleId,
             isLiked: true,
@@ -499,7 +468,6 @@ class ProfileController extends GetxController {
 
   Future<void> toggleLike(int articleId) async {
     try {
-      // Sync userArticles
       final userIndex = userArticles.indexWhere((a) => a.id == articleId);
       final likedIndex = likedArticles.indexWhere((a) => a.id == articleId);
 
@@ -512,17 +480,14 @@ class ProfileController extends GetxController {
 
       final newLikedStatus = !isCurrentlyLiked;
 
-      // Update local state
       updateArticleLikeState(articleId, newLikedStatus);
 
-      // API Call
       await _apiProvider.toggleLike(articleId);
       _likeSyncService.updateLikeStatus(articleId, newLikedStatus);
 
-      // SYNC: Update other controllers
       _syncLikeState(articleId, newLikedStatus);
     } catch (e) {
-      fetchUserArticles(); // Revert on error
+      fetchUserArticles();
     }
   }
 

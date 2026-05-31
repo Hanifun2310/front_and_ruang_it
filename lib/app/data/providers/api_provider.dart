@@ -228,7 +228,6 @@ class ApiProvider extends GetxService {
 
   Future<List<UserModel>> searchUsers(String query) async {
     try {
-      // Coba dengan parameter 'search' terlebih dahulu (paling umum)
       final response = await _dio.get('/users', queryParameters: {'search': query});
       if (response.statusCode == 200) {
         final responseData = response.data;
@@ -242,8 +241,6 @@ class ApiProvider extends GetxService {
       }
       return [];
     } catch (e) {
-      // Jika search endpoint tidak ada atau error, kembalikan list kosong
-      // Discovery dari artikel akan menjadi fallback di search controller
       return [];
     }
   }
@@ -260,7 +257,6 @@ class ApiProvider extends GetxService {
       }
       return [];
     } catch (e) {
-      // Endpoint mungkin tidak ada — fallback ke getArticles dengan filter lokal
       return [];
     }
   }
