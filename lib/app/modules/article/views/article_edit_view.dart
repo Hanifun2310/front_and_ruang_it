@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -114,7 +115,7 @@ class ArticleEditView extends GetView<ArticleEditController> {
                 if (controller.selectedImage.value != null) {
                   return _buildImageContainer(
                     child: kIsWeb
-                        ? Image.network(
+                        ? CachedNetworkImage(imageUrl: 
                             controller.selectedImage.value!.path,
                             fit: BoxFit.cover,
                           )
@@ -125,10 +126,10 @@ class ArticleEditView extends GetView<ArticleEditController> {
                   );
                 } else if (controller.currentImageUrl.value.isNotEmpty) {
                   return _buildImageContainer(
-                    child: Image.network(
+                    child: CachedNetworkImage(imageUrl: 
                       controller.currentImageUrl.value,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                      errorWidget: (_, __, ___) => _buildPlaceholder(),
                     ),
                   );
                 } else {

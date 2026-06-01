@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -174,7 +175,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: kIsWeb 
-                        ? Image.network(
+                        ? CachedNetworkImage(imageUrl: 
                             controller.selectedImage.value!.path,
                             fit: BoxFit.cover,
                           )

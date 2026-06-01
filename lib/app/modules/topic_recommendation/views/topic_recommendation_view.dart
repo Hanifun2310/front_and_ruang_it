@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import '../../../widgets/loading_widget.dart';
 import '../controllers/topic_recommendation_controller.dart';
@@ -158,7 +159,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                         const SizedBox(height: 20),
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(24),
-                                          child: Image.network(
+                                          child: CachedNetworkImage(imageUrl: 
                                             article.imageUrl ??
                                                 'https://via.placeholder.com/600x400',
                                             height:
@@ -166,7 +167,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                                 0.22,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (c, e, s) => Container(
+                                            errorWidget: (c, e, s) => Container(
                                               height:
                                                   MediaQuery.of(
                                                     context,

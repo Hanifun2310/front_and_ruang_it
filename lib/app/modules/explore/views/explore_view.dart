@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/skeleton_widget.dart';
@@ -250,12 +251,12 @@ class ExploreView extends GetView<ExploreController> {
                 const SizedBox(width: 16),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
+                  child: CachedNetworkImage(imageUrl: 
                     imageUrl,
                     width: 100,
                     height: 70,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    errorWidget: (context, error, stackTrace) => Container(
                       width: 100,
                       height: 70,
                       color: Colors.grey.shade200,

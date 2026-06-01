@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
 import 'package:flutter_quill/flutter_quill.dart';
@@ -33,10 +34,10 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                 background: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(
+                    CachedNetworkImage(imageUrl: 
                       art.imageUrl ?? 'https://via.placeholder.com/600x400',
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                      errorWidget: (context, error, stackTrace) => Container(
                         color: Colors.grey.shade100,
                         child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
                       ),
@@ -216,112 +217,115 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    if (controller.comments.isEmpty)
-                      Text(
-                        "Belum ada komentar. Jadilah yang pertama!",
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: controller.comments.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 24),
-                      itemBuilder: (context, index) {
-                        final comment = controller.comments[index];
-                        final currentUserId = Get.find<AuthService>().currentUser?['id'];
-                        final isCommentOwner = comment.user?.id != null && comment.user?.id == currentUserId;
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 18,
-                              backgroundColor: Colors.grey.shade200,
-                              backgroundImage: (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
-                                  ? NetworkImage(comment.user!.photoProfile!) as ImageProvider
-                                  : const AssetImage('assets/images/fallback_pp.png'),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    comment.user?.name ?? 'User',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  if (comment.isHidden == true)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Komentar ini telah disembunyikan oleh moderator karena melanggar ketentuan.',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                            fontStyle: FontStyle.italic,
-                                            height: 1.5,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        GestureDetector(
-                                          onTap: () => Get.toNamed(Routes.GUIDELINES),
-                                          child: const Text(
-                                            'Pelajari Panduan Penulisan',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.blueAccent,
-                                              fontWeight: FontWeight.bold,
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  else
+                    Obx(() {
+                      if (controller.comments.isEmpty) {
+                        return const Text(
+                          "Belum ada komentar. Jadilah yang pertama!",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        );
+                      }
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: controller.comments.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 24),
+                        itemBuilder: (context, index) {
+                          final comment = controller.comments[index];
+                          final currentUserId = Get.find<AuthService>().currentUser?['id'];
+                          final isCommentOwner = comment.user?.id != null && comment.user?.id == currentUserId;
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Colors.grey.shade200,
+                                backgroundImage: (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
+                                    ? NetworkImage(comment.user!.photoProfile!) as ImageProvider
+                                    : const AssetImage('assets/images/fallback_pp.png'),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Text(
-                                      comment.content ?? '',
-                                      style: TextStyle(
+                                      comment.user?.name ?? 'User',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
                                         fontSize: 14,
-                                        color: Get.isDarkMode ? Colors.white70 : Colors.black87,
-                                        height: 1.5,
                                       ),
                                     ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    if (comment.isHidden == true)
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Komentar ini telah disembunyikan oleh moderator karena melanggar ketentuan.',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                              fontStyle: FontStyle.italic,
+                                              height: 1.5,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          GestureDetector(
+                                            onTap: () => Get.toNamed(Routes.GUIDELINES),
+                                            child: const Text(
+                                              'Pelajari Panduan Penulisan',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.blueAccent,
+                                                fontWeight: FontWeight.bold,
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    else
+                                      Text(
+                                        comment.content ?? '',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Get.isDarkMode ? Colors.white70 : Colors.black87,
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            if (isCommentOwner)
-                              PopupMenuButton<String>(
-                                icon: const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
-                                onSelected: (value) {
-                                  if (value == 'edit') {
-                                    _showEditCommentDialog(context, comment);
-                                  } else if (value == 'delete') {
-                                    _showDeleteCommentDialog(context, comment);
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'edit',
-                                    child: Text('Edit Komentar'),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'delete',
-                                    child: Text('Hapus Komentar', style: TextStyle(color: Colors.red)),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        );
-                      },
-                    ),
+                              if (isCommentOwner)
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      _showEditCommentDialog(context, comment);
+                                    } else if (value == 'delete') {
+                                      _showDeleteCommentDialog(context, comment);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: Text('Edit Komentar'),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: Text('Hapus Komentar', style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          );
+                        },
+                      );
+                    }),
                     const SizedBox(height: 100),
                   ],
                 ),
@@ -406,16 +410,16 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                   ? controller.toggleLike
                   : null,
               icon: Icon(
-                authService.isLoggedIn.value && controller.article.value.isLiked == true
+                authService.isLoggedIn.value && controller.rxIsLiked.value == true
                     ? Icons.thumb_up
                     : Icons.thumb_up_outlined,
-                color: authService.isLoggedIn.value && controller.article.value.isLiked == true
+                color: authService.isLoggedIn.value && controller.rxIsLiked.value == true
                     ? Colors.blueAccent
                     : Colors.grey,
               ),
             )),
             Obx(() => Text(
-              "${controller.article.value.likesCount ?? 0}",
+              "${controller.rxLikesCount.value}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             )),
             const SizedBox(width: 16),

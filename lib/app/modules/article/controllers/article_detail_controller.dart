@@ -33,6 +33,9 @@ class ArticleDetailController extends GetxController {
   final commentController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   var readingProgress = 0.0.obs;
+  
+  var rxIsLiked = false.obs;
+  var rxLikesCount = 0.obs;
 
   @override
   void onInit() {
@@ -51,11 +54,9 @@ class ArticleDetailController extends GetxController {
 
     ever(_likeSyncService.rxLikeEvent, (LikeEvent? event) {
       if (event != null && article.value.id == event.articleId) {
-        if (article.value.isLiked != event.isLiked) {
-          article.update((val) {
-            val!.isLiked = event.isLiked;
-            val.likesCount = (val.likesCount ?? 0) + (event.isLiked ? 1 : -1);
-          });
+        if (rxIsLiked.value != event.isLiked) {
+          rxIsLiked.value = event.isLiked;
+          rxLikesCount.value += event.isLiked ? 1 : -1;
         }
       }
     });
@@ -65,6 +66,9 @@ class ArticleDetailController extends GetxController {
     try {
       isLoading.value = true;
       article.value = await _apiProvider.getArticleDetail(identifier);
+      
+      rxIsLiked.value = article.value.isLiked ?? false;
+      rxLikesCount.value = article.value.likesCount ?? 0;
       
       Get.find<NotificationService>().syncArticleMetrics([article.value]);
       
@@ -153,15 +157,21 @@ class ArticleDetailController extends GetxController {
     isLiking.value = true;
 
     final articleId = article.value.id!;
-    final isCurrentlyLiked = article.value.isLiked ?? false;
+    final isCurrentlyLiked = rxIsLiked.value;
     final newLikedState = !isCurrentlyLiked;
 
     _likeSyncService.updateLikeStatus(articleId, newLikedState);
+
+    // Update local state immediately for fast feedback
+    rxIsLiked.value = newLikedState;
+    rxLikesCount.value += newLikedState ? 1 : -1;
 
     try {
       await _apiProvider.toggleLike(articleId);
     } catch (e) {
       _likeSyncService.updateLikeStatus(articleId, isCurrentlyLiked);
+      rxIsLiked.value = isCurrentlyLiked;
+      rxLikesCount.value += isCurrentlyLiked ? 1 : -1;
       showCustomSnackbar('Oops', 'Gagal memperbarui status Like, silakan periksa koneksi internet Anda.');
     } finally {
       isLiking.value = false;

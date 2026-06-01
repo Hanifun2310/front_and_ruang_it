@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/loading_widget.dart';
@@ -286,12 +287,12 @@ class DashboardView extends GetView<DashboardController> {
                 const SizedBox(width: 16),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
+                  child: CachedNetworkImage(imageUrl: 
                     imageUrl,
                     width: 120,
                     height: 80,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
+                    errorWidget: (context, error, stackTrace) {
                       return Container(
                         width: 120,
                         height: 80,

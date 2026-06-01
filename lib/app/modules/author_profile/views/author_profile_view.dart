@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
@@ -72,10 +73,10 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(40),
               child: (author.photoProfile != null && author.photoProfile!.isNotEmpty)
-                  ? Image.network(
+                  ? CachedNetworkImage(imageUrl: 
                       author.photoProfile!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildAvatarFallback(),
+                      errorWidget: (context, error, stackTrace) => _buildAvatarFallback(),
                     )
                   : _buildAvatarFallback(),
             ),
@@ -678,12 +679,12 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
                 const SizedBox(width: 16),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
+                  child: CachedNetworkImage(imageUrl: 
                     imageUrl,
                     width: 120,
                     height: 80,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
+                    errorWidget: (context, error, stackTrace) {
                       return Container(
                         width: 120,
                         height: 80,

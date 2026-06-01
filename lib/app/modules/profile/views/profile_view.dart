@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
@@ -248,10 +249,10 @@ class ProfileView extends GetView<ProfileController> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(40),
                 child: controller.photoProfile.value.isNotEmpty
-                    ? Image.network(
+                    ? CachedNetworkImage(imageUrl: 
                         controller.photoProfile.value,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
+                        errorWidget: (context, error, stackTrace) =>
                             _buildAvatarFallback(),
                       )
                     : _buildAvatarFallback(),
@@ -939,12 +940,12 @@ class ProfileView extends GetView<ProfileController> {
                 const SizedBox(width: 16),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
+                  child: CachedNetworkImage(imageUrl: 
                     imageUrl,
                     width: 120,
                     height: 80,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
+                    errorWidget: (context, error, stackTrace) {
                       return Container(
                         width: 120,
                         height: 80,
@@ -1292,7 +1293,7 @@ class ProfileView extends GetView<ProfileController> {
                           borderRadius: BorderRadius.circular(50),
                           child: controller.selectedImagePath.value.isNotEmpty
                               ? (kIsWeb
-                                    ? Image.network(
+                                    ? CachedNetworkImage(imageUrl: 
                                         controller.selectedImagePath.value,
                                         fit: BoxFit.cover,
                                       )
@@ -1301,10 +1302,10 @@ class ProfileView extends GetView<ProfileController> {
                                         fit: BoxFit.cover,
                                       ))
                               : (controller.photoProfile.value.isNotEmpty
-                                  ? Image.network(
+                                  ? CachedNetworkImage(imageUrl: 
                                       controller.photoProfile.value,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
+                                      errorWidget: (context, error, stackTrace) =>
                                           Image.asset(
                                             'assets/images/fallback_pp.png',
                                             fit: BoxFit.cover,
