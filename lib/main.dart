@@ -17,7 +17,10 @@ void main() async {
 
   await GetStorage.init();
 
+
   Get.put(NetworkController(), permanent: true);
+  // 2. Registrasi Services secara global
+
   Get.put(ApiProvider());
   
   final authService = AuthService();
@@ -31,7 +34,8 @@ void main() async {
 
   runApp(
     DevicePreview(
-      enabled: !kReleaseMode,
+      // UBAH DI SINI: Set ke true agar selalu aktif, termasuk saat di-deploy ke web
+      enabled: true, 
       builder: (context) => GetMaterialApp(
         useInheritedMediaQuery: true,
         locale: DevicePreview.locale(context),
