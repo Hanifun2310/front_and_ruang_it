@@ -240,13 +240,30 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CircleAvatar(
-                                radius: 18,
-                                backgroundColor: Colors.grey.shade200,
-                                backgroundImage: (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
-                                    ? NetworkImage(comment.user!.photoProfile!) as ImageProvider
-                                    : const AssetImage('assets/images/fallback_pp.png'),
-                              ),
+                              (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
+                                  ? ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: comment.user!.photoProfile!,
+                                        width: 36,
+                                        height: 36,
+                                        fit: BoxFit.cover,
+                                        errorWidget: (context, url, error) => Image.asset(
+                                          'assets/images/fallback_pp.png',
+                                          width: 36,
+                                          height: 36,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        placeholder: (context, url) => Container(
+                                          width: 36,
+                                          height: 36,
+                                          color: Colors.grey.shade200,
+                                        ),
+                                      ),
+                                    )
+                                  : const CircleAvatar(
+                                      radius: 18,
+                                      backgroundImage: AssetImage('assets/images/fallback_pp.png'),
+                                    ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(

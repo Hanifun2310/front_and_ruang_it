@@ -233,6 +233,7 @@ class ProfileController extends GetxController {
     try {
       final fetchedArticles = await _apiProvider.getArticles(
         page: _currentArticlesPage,
+        userId: userId.value,
       );
       final updatedArticles = _likeSyncService.applyLikeStateToArticles(
         fetchedArticles,

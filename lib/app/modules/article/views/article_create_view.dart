@@ -43,7 +43,6 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
         ),
       ),
       body: _buildBody(context),
-      bottomNavigationBar: const CustomBottomNav(currentIndex: -1),
     );
   }
 

@@ -396,13 +396,30 @@ class SearchView extends GetView<ArticleSearchController> {
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: Get.isDarkMode ? Colors.white24 : Colors.grey.shade200,
-              backgroundImage: avatarUrl.isNotEmpty
-                  ? NetworkImage(avatarUrl) as ImageProvider
-                  : const AssetImage('assets/images/fallback_pp.png'),
-            ),
+            avatarUrl.isNotEmpty
+                ? ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: avatarUrl,
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/images/fallback_pp.png',
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                      ),
+                      placeholder: (context, url) => Container(
+                        width: 56,
+                        height: 56,
+                        color: Get.isDarkMode ? Colors.white24 : Colors.grey.shade200,
+                      ),
+                    ),
+                  )
+                : const CircleAvatar(
+                    radius: 28,
+                    backgroundImage: AssetImage('assets/images/fallback_pp.png'),
+                  ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(

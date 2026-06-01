@@ -805,7 +805,52 @@ class ProfileView extends GetView<ProfileController> {
                   color: Get.isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
+              Center(
+                child: GestureDetector(
+                  onTap: () => controller.pickImage(),
+                  child: Obx(() {
+                    ImageProvider? imageProvider;
+                    if (controller.selectedImagePath.value.isNotEmpty) {
+                      imageProvider = kIsWeb 
+                          ? NetworkImage(controller.selectedImagePath.value) 
+                          : FileImage(File(controller.selectedImagePath.value)) as ImageProvider;
+                    } else if (controller.photoProfile.value.isNotEmpty) {
+                      imageProvider = NetworkImage(controller.photoProfile.value);
+                    } else {
+                      imageProvider = const AssetImage('assets/images/fallback_pp.png');
+                    }
+
+                    return Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: imageProvider,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.blueAccent,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 24),
               TextField(
                 controller: controller.nameController,
                 style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black87),

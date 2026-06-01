@@ -93,7 +93,7 @@ class ApiProvider extends GetxService {
     return await _dio.post('/logout');
   }
 
-  Future<List<ArticleModel>> getArticles({int page = 1, String? category, String? search}) async {
+  Future<List<ArticleModel>> getArticles({int page = 1, String? category, String? search, int? userId}) async {
     try {
       Map<String, dynamic> queryParams = {'page': page};
       if (category != null && category.isNotEmpty) {
@@ -101,6 +101,9 @@ class ApiProvider extends GetxService {
       }
       if (search != null && search.isNotEmpty) {
         queryParams['search'] = search;
+      }
+      if (userId != null) {
+        queryParams['user_id'] = userId;
       }
       final response = await _dio.get('/articles', queryParameters: queryParams);
       if (response.statusCode == 200) {

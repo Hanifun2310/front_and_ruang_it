@@ -1,4 +1,5 @@
 import 'package:get_storage/get_storage.dart';
+import '../providers/api_provider.dart';
 
 class ArticleModel {
   int? id;
@@ -67,11 +68,19 @@ class ArticleModel {
 
     String cleanPath = path.startsWith('/') ? path.substring(1) : path;
 
+    String host = 'https://ruang-it.vibedev.my.id';
+    try {
+      host = ApiProvider.baseUrl.replaceAll('/api/v1', '');
+      if (host.endsWith('/')) {
+        host = host.substring(0, host.length - 1);
+      }
+    } catch (_) {}
+
     if (cleanPath.startsWith('storage/')) {
-      return 'https://ruang-it.vibedev.my.id/$cleanPath';
+      return '$host/$cleanPath';
     }
 
-    return 'https://ruang-it.vibedev.my.id/storage/$cleanPath';
+    return '$host/storage/$cleanPath';
   }
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
@@ -166,10 +175,10 @@ class UserModel {
     email: json['email'],
     role: json['role'],
     status: json['status']?.toString().toLowerCase(),
-    photoProfile: (json['photo_profile'] == null && json['profile_photo'] == null)
+    photoProfile: (json['photo_profile_url'] == null && json['photo_profile'] == null && json['profile_photo'] == null)
       ? ''
       : ArticleModel.formatImageUrl(
-          json['photo_profile'] ?? json['profile_photo'],
+          json['photo_profile_url'] ?? json['photo_profile'] ?? json['profile_photo'],
         ),
     profession: json['profession'],
     bio: json['bio'],
