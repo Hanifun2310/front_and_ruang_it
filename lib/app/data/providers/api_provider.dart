@@ -10,7 +10,7 @@ import '../../widgets/custom_snackbar.dart';
 class ApiProvider extends GetxService {
   late Dio _dio;
   
-  static const String baseUrl = 'https://ruang-it.vibedev.my.id/api';
+  static const String baseUrl = 'https://ruang-it.vibedev.my.id/api/v1';
 
   ApiProvider() {
     _dio = Dio(BaseOptions(
