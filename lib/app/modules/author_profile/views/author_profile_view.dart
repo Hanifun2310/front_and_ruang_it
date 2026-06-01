@@ -797,75 +797,57 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
   }
 
   Widget _buildSnippetPreview(String? content) {
-    if (content == null || content.isEmpty) {
+    if (content == null || content.trim().isEmpty) {
       return Text(
         'Tidak ada ringkasan...',
         style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
       );
     }
 
+    String plainText = '';
     try {
       if (content.trim().startsWith('[')) {
-        final deltaJson = jsonDecode(content);
-        final quillController = QuillController(
-          document: Document.fromJson(deltaJson),
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-        return SizedBox(
-          height: 44,
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: AbsorbPointer(
-              child: QuillEditor.basic(
-                configurations: QuillEditorConfigurations(
-                  controller: quillController,
-                  readOnly: true,
-                  showCursor: false,
-                  autoFocus: false,
-                  expands: false,
-                  padding: EdgeInsets.zero,
-                  customStyles: DefaultStyles(
-                    paragraph: DefaultTextBlockStyle(
-                      GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Get.isDarkMode
-                            ? Colors.white54
-                            : Colors.grey.shade500,
-                        height: 1.4,
-                      ),
-                      const VerticalSpacing(0, 0),
-                      const VerticalSpacing(0, 0),
-                      null,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
+        final List<dynamic> deltaList = jsonDecode(content);
+        final buffer = StringBuffer();
+        for (var op in deltaList) {
+          if (op is Map && op.containsKey('insert')) {
+            final insertValue = op['insert'];
+            if (insertValue is String) {
+              buffer.write(insertValue);
+            }
+          }
+        }
+        plainText = buffer.toString().trim().replaceAll('\n', ' ');
       } else {
-        return SizedBox(
-          height: 44,
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: AbsorbPointer(
-              child: HtmlWidget(
-                content,
-                textStyle: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ),
-        );
+        final RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+        plainText = content.replaceAll(exp, '').trim().replaceAll('\n', ' ');
+        plainText = plainText
+            .replaceAll('&nbsp;', ' ')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('&quot;', '"');
       }
     } catch (e) {
-      return Text(
-        'Tidak ada ringkasan...',
-        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
-      );
+      plainText = 'Gagal memuat ringkasan...';
     }
+
+    if (plainText.isEmpty) {
+      plainText = 'Tidak ada ringkasan...';
+    }
+
+    return SizedBox(
+      height: 44,
+      child: Text(
+        plainText,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          color: Get.isDarkMode ? Colors.white54 : Colors.grey.shade500,
+          height: 1.4,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }

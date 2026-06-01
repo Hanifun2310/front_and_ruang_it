@@ -31,11 +31,23 @@ class ArticleDetailController extends GetxController {
 
   QuillController? quillController;
   final commentController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  var readingProgress = 0.0.obs;
 
   @override
   void onInit() {
     super.onInit();
     loadDetail();
+
+    scrollController.addListener(() {
+      if (scrollController.hasClients) {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        final currentScroll = scrollController.position.pixels;
+        if (maxScroll > 0) {
+          readingProgress.value = (currentScroll / maxScroll).clamp(0.0, 1.0);
+        }
+      }
+    });
 
     ever(_likeSyncService.rxLikeEvent, (LikeEvent? event) {
       if (event != null && article.value.id == event.articleId) {
@@ -204,5 +216,11 @@ class ArticleDetailController extends GetxController {
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus komentar');
     }
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
   }
 }

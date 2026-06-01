@@ -22,6 +22,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
         final art = controller.article.value;
 
         return CustomScrollView(
+          controller: controller.scrollController,
           slivers: [
             SliverAppBar(
               expandedHeight: 300,
@@ -29,18 +30,61 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               backgroundColor: context.theme.scaffoldBackgroundColor,
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
-                background: Image.network(
-                  art.imageUrl ?? 'https://via.placeholder.com/600x400',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey.shade100,
-                    child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                  ),
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      art.imageUrl ?? 'https://via.placeholder.com/600x400',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey.shade100,
+                        child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.6),
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.4),
+                          ],
+                          stops: const [0.0, 0.4, 1.0],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Get.back(),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.bookmark_border, color: Colors.white),
+                  onPressed: () {
+                    Get.snackbar('Segera Hadir', 'Fitur Bookmark akan segera tersedia!', colorText: Colors.white, backgroundColor: Colors.blueAccent);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.share, color: Colors.white),
+                  onPressed: () {
+                    Get.snackbar('Segera Hadir', 'Fitur Share akan segera tersedia!', colorText: Colors.white, backgroundColor: Colors.blueAccent);
+                  },
+                ),
+                const SizedBox(width: 8),
+              ],
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(4.0),
+                child: Obx(() => LinearProgressIndicator(
+                  value: controller.readingProgress.value,
+                  backgroundColor: Colors.transparent,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+                  minHeight: 4.0,
+                )),
               ),
             ),
             SliverToBoxAdapter(
