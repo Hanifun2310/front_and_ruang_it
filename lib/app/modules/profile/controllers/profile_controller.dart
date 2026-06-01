@@ -323,7 +323,7 @@ class ProfileController extends GetxController {
 
           final mergedData = {...oldData, ...newData};
 
-          await _authService.box.write('user', mergedData);
+          await _authService.saveSession(_authService.token ?? '', mergedData);
 
           loadUserData();
 

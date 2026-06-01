@@ -89,7 +89,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blueAccent.withOpacity(0.04),
+                      color: Colors.blueAccent.withAlpha((0.04 * 255).round()),
                       blurRadius: 120,
                       spreadRadius: 40,
                     ),
@@ -118,12 +118,12 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                       shape: BoxShape.circle,
                       color: Colors.white,
                       border: Border.all(
-                        color: Colors.blueAccent.withOpacity(0.12),
+                        color: Colors.blueAccent.withAlpha((0.12 * 255).round()),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blueAccent.withOpacity(0.06),
+                          color: Colors.blueAccent.withAlpha((0.06 * 255).round()),
                           blurRadius: 30,
                           spreadRadius: 1,
                         ),
@@ -139,7 +139,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                           return Container(
                             width: 110,
                             height: 110,
-                            color: Colors.blueAccent.withOpacity(0.05),
+                            color: Colors.blueAccent.withAlpha((0.05 * 255).round()),
                             child: const Icon(
                               Icons.code_rounded,
                               size: 55,
@@ -168,7 +168,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                             letterSpacing: 1.2,
                             shadows: [
                               Shadow(
-                                color: Colors.blueAccent.withOpacity(0.15),
+                                color: Colors.blueAccent.withAlpha((0.15 * 255).round()),
                                 offset: const Offset(0, 2),
                                 blurRadius: 8,
                               ),
@@ -203,7 +203,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
                           minHeight: 2.5,
-                          backgroundColor: Colors.blueAccent.withOpacity(0.08),
+                          backgroundColor: Colors.blueAccent.withAlpha((0.08 * 255).round()),
                           valueColor: const AlwaysStoppedAnimation<Color>(
                             Colors.blueAccent,
                           ),

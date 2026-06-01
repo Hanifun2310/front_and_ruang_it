@@ -754,4 +754,102 @@ class ProfileView extends GetView<ProfileController> {
       );
     });
   }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Konfirmasi Logout', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+        content: Text('Apakah Anda yakin ingin keluar?', style: GoogleFonts.inter()),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Batal', style: GoogleFonts.inter(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.logout();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: Text('Keluar', style: GoogleFonts.inter(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditProfileSheet(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Edit Profil',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: controller.nameController,
+                style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black87),
+                decoration: const InputDecoration(labelText: 'Nama Lengkap'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller.professionController,
+                style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black87),
+                decoration: const InputDecoration(labelText: 'Pekerjaan / Jabatan'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller.bioController,
+                style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black87),
+                decoration: const InputDecoration(labelText: 'Bio Singkat'),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: Obx(() => ElevatedButton(
+                  onPressed: controller.isLoading.value ? null : () => controller.updateProfile(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text('Simpan Perubahan', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
+                )),
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
 }
