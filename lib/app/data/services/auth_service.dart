@@ -1,35 +1,45 @@
+import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../routes/app_routes.dart';
 import 'like_sync_service.dart';
 
 class AuthService extends GetxService {
-  final box = GetStorage();
+  final _storage = const FlutterSecureStorage();
   
   final RxBool isLoggedIn = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    checkLoginStatus();
-  }
+  String? _token;
+  Map<String, dynamic>? _currentUser;
 
-  void checkLoginStatus() {
-    String? token = box.read('token');
-    if (token != null && token.isNotEmpty) {
+  Future<void> initStorage() async {
+    _token = await _storage.read(key: 'token');
+    final userString = await _storage.read(key: 'user');
+    
+    if (userString != null && userString.isNotEmpty) {
+      try {
+        _currentUser = jsonDecode(userString);
+      } catch (_) {}
+    }
+
+    if (_token != null && _token!.isNotEmpty) {
       isLoggedIn.value = true;
     }
   }
 
   Future<void> saveSession(String token, Map<String, dynamic> userData) async {
-    await box.write('token', token);
-    await box.write('user', userData);
+    _token = token;
+    _currentUser = userData;
+    await _storage.write(key: 'token', value: token);
+    await _storage.write(key: 'user', value: jsonEncode(userData));
     isLoggedIn.value = true;
   }
 
   Future<void> logout() async {
-    await box.remove('token');
-    await box.remove('user');
+    _token = null;
+    _currentUser = null;
+    await _storage.delete(key: 'token');
+    await _storage.delete(key: 'user');
     isLoggedIn.value = false;
     
     try {
@@ -41,6 +51,6 @@ class AuthService extends GetxService {
     Get.offAllNamed(Routes.DASHBOARD);
   }
 
-  String? get token => box.read('token');
-  Map<String, dynamic>? get currentUser => box.read('user');
+  String? get token => _token;
+  Map<String, dynamic>? get currentUser => _currentUser;
 }

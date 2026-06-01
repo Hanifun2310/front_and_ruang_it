@@ -16,9 +16,12 @@ void main() async {
 
   await GetStorage.init();
 
-
   Get.put(ApiProvider());
-  Get.put(AuthService());
+  
+  final authService = AuthService();
+  await authService.initStorage();
+  Get.put(authService);
+
   Get.put(NotificationService());
 
   final themeService = Get.put(ThemeService());

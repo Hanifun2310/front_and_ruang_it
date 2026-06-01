@@ -35,11 +35,6 @@ class AuthController extends GetxController {
         emailController.text, 
         passwordController.text
       );
-
-      print("========== BALASAN DARI LARAVEL ==========");
-      print(response.data);
-      print("==========================================");
-
       if (response.statusCode == 200) {
         String? token = response.data['token'] ?? response.data['access_token'];
         
@@ -55,7 +50,6 @@ class AuthController extends GetxController {
         }
       }
     } on DioException catch (e) {
-      print("DIO ERROR: ${e.response?.data}");
       String message = _parseError(e, 'Gagal melakukan login. Silakan periksa kredensial Anda.');
       
       bool isBanned = message.toLowerCase().contains('banned') || 
@@ -126,7 +120,6 @@ class AuthController extends GetxController {
         }
       }
     } on DioException catch (e) {
-      print("ERROR REGISTRASI: ${e.response?.data}");
       String message = _parseError(e, 'Gagal memproses pendaftaran. Pastikan data yang dimasukkan benar.');
       showCustomSnackbar('Registrasi Gagal', message, backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 4));
     } catch (e) {
