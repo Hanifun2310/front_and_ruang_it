@@ -10,12 +10,14 @@ import 'app/data/services/notification_service.dart';
 import 'app/data/services/theme_service.dart';
 import 'app/data/services/like_sync_service.dart';
 import 'app/data/providers/api_provider.dart';
+import 'app/controllers/network_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await GetStorage.init();
 
+  Get.put(NetworkController(), permanent: true);
   Get.put(ApiProvider());
   
   final authService = AuthService();

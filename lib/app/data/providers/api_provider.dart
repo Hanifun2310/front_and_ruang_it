@@ -7,6 +7,8 @@ import '../../routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/custom_snackbar.dart';
 
+import 'package:dio_smart_retry/dio_smart_retry.dart';
+
 class ApiProvider extends GetxService {
   late Dio _dio;
   
@@ -21,6 +23,17 @@ class ApiProvider extends GetxService {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+    ));
+
+    _dio.interceptors.add(RetryInterceptor(
+      dio: _dio,
+      logPrint: print, 
+      retries: 3, 
+      retryDelays: const [
+        Duration(seconds: 1), 
+        Duration(seconds: 2), 
+        Duration(seconds: 3), 
+      ],
     ));
 
     _dio.interceptors.add(InterceptorsWrapper(
