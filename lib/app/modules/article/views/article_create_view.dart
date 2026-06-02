@@ -1,13 +1,10 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import '../../../widgets/loading_widget.dart';
-import '../../../widgets/custom_bottom_nav.dart';
 import '../../../widgets/guest_prompt_widget.dart';
 import '../../../data/services/auth_service.dart';
 import '../controllers/article_create_controller.dart';
@@ -21,25 +18,71 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: context.theme.appBarTheme.backgroundColor,
+        backgroundColor: context.theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.theme.appBarTheme.foregroundColor),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Get.isDarkMode ? Colors.white : Colors.black,
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Ruang IT',
-          style: GoogleFonts.kulimPark(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: context.theme.appBarTheme.foregroundColor,
-            letterSpacing: -0.5,
+          'Tulis Artikel Baru',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Get.isDarkMode ? Colors.white : Colors.black,
           ),
         ),
-        actions: const [],
+        actions: [
+          Obx(() => Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Center(
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.blueAccent,
+                          ),
+                        )
+                      : OutlinedButton(
+                          onPressed: () => controller.publishArticle(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor:
+                                Get.isDarkMode ? Colors.white : Colors.black,
+                            side: BorderSide(
+                              color:
+                                  Get.isDarkMode ? Colors.white : Colors.black,
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
+                          child: Text(
+                            'Publish',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                ),
+              )),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: const Color(0xFFE2E7FF), height: 1),
+          child: Container(
+            color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade200,
+            height: 1,
+          ),
         ),
       ),
       body: _buildBody(context),
@@ -53,296 +96,167 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
     }
 
     return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tulis Artikel Baru',
-                        style: GoogleFonts.kulimPark(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: context.theme.textTheme.bodyLarge?.color,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Bagikan wawasan teknologi Anda kepada komunitas.',
-                        style: GoogleFonts.kulimPark(
-                          fontSize: 13,
-                          color: Get.isDarkMode ? Colors.white60 : const Color(0xFF444653),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF8FAFF),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFD6E0FF)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sebelum menulis, pastikan mengikuti panduan penulisan artikel agar kontenmu sesuai standar komunitas dan mudah dipahami pembaca.',
-                    style: GoogleFonts.kulimPark(
-                      fontSize: 13,
-                      color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed(Routes.GUIDELINES);
-                    },
-                    child: Text(
-                      'Buka Panduan Penulisan',
-                      style: GoogleFonts.kulimPark(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: Get.isDarkMode ? const Color(0xFF6366F1) : const Color(0xFF092BA2),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Banner/Info guidelines
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Get.isDarkMode
+                  ? const Color(0xFF1E293B)
+                  : const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Get.isDarkMode ? Colors.white12 : const Color(0xFFE5E7EB),
               ),
             ),
-            const SizedBox(height: 16),
-            
-            Row(
-              children: [
-                Obx(() => ElevatedButton(
-                  onPressed: controller.isLoading.value ? null : () => controller.publishArticle(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF092BA2),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    elevation: 0,
-                  ),
-                  child: controller.isLoading.value 
-                    ? const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2)
-                    : Row(
-                        children: [
-                          Text(
-                            'Terbitkan',
-                            style: GoogleFonts.kulimPark(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.send, size: 18),
-                        ],
-                      ),
-                )),
-              ],
-            ),
-            const SizedBox(height: 24),
-            
-            GestureDetector(
-              onTap: () => controller.pickImage(),
-              child: Obx(() => Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6),
-                    width: 2,
-                    style: BorderStyle.solid, 
-                  ),
-                ),
-                child: controller.selectedImage.value != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: kIsWeb 
-                        ? CachedNetworkImage(imageUrl: 
-                            controller.selectedImage.value!.path,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.file(
-                            File(controller.selectedImage.value!.path),
-                            fit: BoxFit.cover,
-                          ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.image_outlined, size: 40, color: Color(0xFF444653)),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Klik untuk unggah atau seret file',
-                          style: GoogleFonts.kulimPark(
-                            fontSize: 15,
-                            color: context.theme.textTheme.bodyLarge?.color,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Rekomendasi ukuran: 1200 x 630 px (Max 2MB)',
-                          style: GoogleFonts.kulimPark(
-                            fontSize: 13,
-                            color: const Color(0xFF444653),
-                          ),
-                        ),
-                      ],
-                    ),
-              )),
-            ),
-            const SizedBox(height: 24),
-
-            TextField(
-              controller: controller.titleController,
-              style: GoogleFonts.kulimPark(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: context.theme.textTheme.bodyLarge?.color,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Judul Artikel...',
-                hintStyle: GoogleFonts.kulimPark(
-                  color: const Color(0xFFC5C5D6),
-                ),
-                enabledBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFDAE2FD), width: 2),
-                ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF092BA2), width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kategori Utama',
-                  style: GoogleFonts.kulimPark(
+                  'Sebelum menulis, pastikan mengikuti panduan penulisan artikel agar kontenmu sesuai standar komunitas.',
+                  style: GoogleFonts.inter(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF444653),
+                    color: Get.isDarkMode ? Colors.white70 : const Color(0xFF4B5563),
+                    height: 1.5,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Obx(() => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<int>(
-                      dropdownColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                      value: controller.selectedCategoryId.value == 0 ? null : controller.selectedCategoryId.value,
-                      hint: Text('Pilih Kategori...', style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653))),
-                      isExpanded: true,
-                      items: controller.categories.map((cat) {
-                        return DropdownMenuItem<int>(
-                          value: cat['id'],
-                          child: Text(cat['name'], style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E))),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) controller.selectedCategoryId.value = val;
-                      },
+                GestureDetector(
+                  onTap: () => Get.toNamed(Routes.GUIDELINES),
+                  child: Text(
+                    'Buka Panduan Penulisan',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Get.isDarkMode
+                          ? Colors.blue.shade300
+                          : const Color(0xFF2563EB),
+                      decoration: TextDecoration.underline,
                     ),
                   ),
-                )),
+                ),
               ],
             ),
-            const SizedBox(height: 24),
+          ),
+          const SizedBox(height: 24),
 
-            Text(
-              'Isi Konten',
-              style: GoogleFonts.kulimPark(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF444653),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
-              ),
-              child: Column(
-                children: [
-                  QuillToolbar.simple(
-                    configurations: QuillSimpleToolbarConfigurations(
-                      controller: controller.quillController,
-                      multiRowsDisplay: true,
-                      buttonOptions: const QuillSimpleToolbarButtonOptions(
-                        base: QuillToolbarBaseButtonOptions(
-                          iconSize: 18,
-                        ),
-                      ),
-                      toolbarSectionSpacing: 8,
-                      showDividers: false,
-                      showFontFamily: false,
-                      showFontSize: false,
-                      showBoldButton: true,
-                      showItalicButton: true,
-                      showUnderLineButton: true,
-                      showStrikeThrough: true,
-                      showInlineCode: true,
-                      showLink: true,
-                      showListNumbers: true,
-                      showListBullets: true,
-                      showColorButton: false,
-                      showBackgroundColorButton: false,
-                      showClearFormat: false,
-                      showAlignmentButtons: false,
-                      showHeaderStyle: false,
-                      showListCheck: false,
-                      showCodeBlock: false,
-                      showQuote: false,
-                      showIndent: false,
-                      showDirection: false,
-                      showSearchButton: false,
-                      showSubscript: false,
-                      showSuperscript: false,
-                      showUndo: true,
-                      showRedo: true,
-                      decoration: BoxDecoration(
-                        color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
+          // Cover Image Upload Container
+          GestureDetector(
+            onTap: () => controller.pickImage(),
+            child: Obx(() => Container(
+                  width: double.infinity,
+                  height: 208,
+                  decoration: BoxDecoration(
+                    color: Get.isDarkMode
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFFAFAFA),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+                      width: 1,
                     ),
                   ),
-                  const Divider(height: 1, color: Color(0xFFC5C5D6)),
-                  Container(
-                    height: 400,
+                  child: controller.selectedImage.value != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: kIsWeb
+                              ? CachedNetworkImage(
+                                  imageUrl: controller.selectedImage.value!.path,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(controller.selectedImage.value!.path),
+                                  fit: BoxFit.cover,
+                                ),
+                        )
+                      : Center(
+                          child: Text(
+                            'Upload sampul artikel disini',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              color: const Color(0xFF8C8C8C),
+                            ),
+                          ),
+                        ),
+                )),
+          ),
+          const SizedBox(height: 24),
+
+          // Title Input Section
+          Text(
+            'Judul',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: controller.titleController,
+            maxLines: 3,
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Tulis judul disini',
+              hintStyle: GoogleFonts.inter(
+                color: const Color(0xFF8C8C8C),
+                fontSize: 15,
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Get.isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              filled: true,
+              fillColor:
+                  Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Content Editor Box
+          Text(
+            'Isi Artikel',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 400,
+            decoration: BoxDecoration(
+              color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+              ),
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
                     padding: const EdgeInsets.all(16),
                     child: QuillEditor.basic(
                       configurations: QuillEditorConfigurations(
                         controller: controller.quillController,
-                        placeholder: 'Mulai menulis intisari teknologi Anda di sini...',
+                        placeholder: 'Tulis isi artikel disini',
                         scrollable: true,
                         autoFocus: false,
                         readOnly: false,
@@ -350,9 +264,9 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                         padding: EdgeInsets.zero,
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
-                            GoogleFonts.kulimPark(
+                            GoogleFonts.inter(
                               fontSize: 15,
-                              color: context.theme.textTheme.bodyMedium?.color,
+                              color: Get.isDarkMode ? Colors.white : Colors.black,
                               height: 1.5,
                             ),
                             const VerticalSpacing(0, 0),
@@ -363,12 +277,120 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const Divider(height: 1, color: Color(0xFFD1D5DB)),
+                QuillToolbar.simple(
+                  configurations: QuillSimpleToolbarConfigurations(
+                    controller: controller.quillController,
+                    multiRowsDisplay: false,
+                    buttonOptions: const QuillSimpleToolbarButtonOptions(
+                      base: QuillToolbarBaseButtonOptions(
+                        iconSize: 18,
+                      ),
+                    ),
+                    toolbarSectionSpacing: 8,
+                    showDividers: false,
+                    showFontFamily: false,
+                    showFontSize: false,
+                    showBoldButton: true,
+                    showItalicButton: true,
+                    showUnderLineButton: true,
+                    showStrikeThrough: true,
+                    showInlineCode: true,
+                    showLink: true,
+                    showListNumbers: true,
+                    showListBullets: true,
+                    showColorButton: false,
+                    showBackgroundColorButton: false,
+                    showClearFormat: false,
+                    showAlignmentButtons: false,
+                    showHeaderStyle: false,
+                    showListCheck: false,
+                    showCodeBlock: false,
+                    showQuote: false,
+                    showIndent: false,
+                    showDirection: false,
+                    showSearchButton: false,
+                    showSubscript: false,
+                    showSuperscript: false,
+                    showUndo: true,
+                    showRedo: true,
+                    decoration: BoxDecoration(
+                      color: Get.isDarkMode
+                          ? const Color(0xFF0F172A)
+                          : const Color(0xFFFAFAFA),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 100),
-          ],
-        ),
-      );
+          ),
+          const SizedBox(height: 24),
+
+          // Category Dropdown Section
+          Text(
+            'Kategori',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Obx(() => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color:
+                        Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    dropdownColor:
+                        Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    value: controller.selectedCategoryId.value == 0
+                        ? null
+                        : controller.selectedCategoryId.value,
+                    hint: Text(
+                      'Masukan topik',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        color: const Color(0xFF8C8C8C),
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: Colors.black54),
+                    items: controller.categories.map((cat) {
+                      return DropdownMenuItem<int>(
+                        value: cat['id'],
+                        child: Text(
+                          cat['name'],
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            color: Get.isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        controller.selectedCategoryId.value = val;
+                      }
+                    },
+                  ),
+                ),
+              )),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
   }
 }

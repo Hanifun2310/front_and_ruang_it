@@ -217,6 +217,52 @@ class ProfileController extends GetxController {
     }
   }
 
+  Future<void> fetchLikedArticles() async {
+    final ids = _likeSyncService.likedArticleIds.toList();
+    if (ids.isEmpty) {
+      likedArticles.clear();
+      return;
+    }
+
+    final List<ArticleModel> fetched = [];
+    final List<int> idsToFetch = [];
+
+    for (var id in ids) {
+      final ownArticle = userArticles.firstWhereOrNull((a) => a.id == id);
+      if (ownArticle != null) {
+        fetched.add(ownArticle);
+      } else {
+        idsToFetch.add(id);
+      }
+    }
+
+    if (idsToFetch.isNotEmpty) {
+      try {
+        final List<Future<ArticleModel?>> futures = idsToFetch.map((id) async {
+          try {
+            final article = await _apiProvider.getArticleDetail(id.toString());
+            article.isLiked = true;
+            return article;
+          } catch (e) {
+            print('Error fetching details for liked article $id: $e');
+            return null;
+          }
+        }).toList();
+
+        final results = await Future.wait(futures);
+        for (var a in results) {
+          if (a != null) {
+            fetched.add(a);
+          }
+        }
+      } catch (e) {
+        print('Error fetching liked articles details: $e');
+      }
+    }
+
+    likedArticles.value = fetched;
+  }
+
   Future<void> fetchUserArticles({bool reset = true}) async {
     if (reset) {
       _currentArticlesPage = 1;
@@ -249,13 +295,10 @@ class ProfileController extends GetxController {
 
       if (reset) {
         userArticles.value = filteredResults;
+        await fetchLikedArticles();
       } else {
         userArticles.addAll(filteredResults);
       }
-
-      likedArticles.value = userArticles
-          .where((a) => a.isLiked == true)
-          .toList();
 
       hasMoreUserArticles.value = fetchedArticles.length >= _articlesPageSize;
       if (hasMoreUserArticles.value) {
@@ -487,29 +530,26 @@ class ProfileController extends GetxController {
           existsInAll = ArticleModel(
             id: articleId,
             isLiked: true,
-            title: "Article #$articleId",
+            title: "Loading...",
             likesCount: 1,
             commentsCount: 0,
           );
 
           _apiProvider
-              .getArticles()
-              .then((articles) {
-                final fetched = articles.firstWhereOrNull(
+              .getArticleDetail(articleId.toString())
+              .then((fetched) {
+                final idx = likedArticles.indexWhere(
                   (a) => a.id == articleId,
                 );
-                if (fetched != null) {
-                  final idx = likedArticles.indexWhere(
-                    (a) => a.id == articleId,
-                  );
-                  if (idx != -1) {
-                    fetched.isLiked = true;
-                    likedArticles[idx] = fetched;
-                    likedArticles.refresh();
-                  }
+                if (idx != -1) {
+                  fetched.isLiked = true;
+                  likedArticles[idx] = fetched;
+                  likedArticles.refresh();
                 }
               })
-              .catchError((_) {});
+              .catchError((err) {
+                print('Error updating placeholder article details: $err');
+              });
         }
 
         likedArticles.add(existsInAll);

@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import '../../../widgets/loading_widget.dart';
 import '../../../widgets/guest_prompt_widget.dart';
 import '../../../data/services/auth_service.dart';
 import '../controllers/article_edit_controller.dart';
@@ -18,25 +17,71 @@ class ArticleEditView extends GetView<ArticleEditController> {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: context.theme.appBarTheme.backgroundColor,
+        backgroundColor: context.theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.theme.appBarTheme.foregroundColor),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Get.isDarkMode ? Colors.white : Colors.black,
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Ruang IT',
-          style: GoogleFonts.kulimPark(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: context.theme.appBarTheme.foregroundColor,
-            letterSpacing: -0.5,
+          'Edit Artikel',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Get.isDarkMode ? Colors.white : Colors.black,
           ),
         ),
-        actions: const [],
+        actions: [
+          Obx(() => Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Center(
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.blueAccent,
+                          ),
+                        )
+                      : OutlinedButton(
+                          onPressed: () => controller.updateArticle(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor:
+                                Get.isDarkMode ? Colors.white : Colors.black,
+                            side: BorderSide(
+                              color:
+                                  Get.isDarkMode ? Colors.white : Colors.black,
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
+                          child: Text(
+                            'Save',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                ),
+              )),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: const Color(0xFFE2E7FF), height: 1),
+          child: Container(
+            color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade200,
+            height: 1,
+          ),
         ),
       ),
       body: _buildBody(context),
@@ -50,235 +95,112 @@ class ArticleEditView extends GetView<ArticleEditController> {
     }
 
     return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Edit Artikel',
-                  style: GoogleFonts.kulimPark(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Perbarui wawasan teknologi Anda.',
-                  style: GoogleFonts.kulimPark(
-                    fontSize: 13,
-                    color: Get.isDarkMode ? Colors.white60 : const Color(0xFF444653),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            Obx(() => ElevatedButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : () => controller.updateArticle(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF092BA2),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    elevation: 0,
-                  ),
-                  child: controller.isLoading.value
-                      ? const LoadingWidget(color: Colors.white, size: 20, strokeWidth: 2)
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Simpan Perubahan',
-                              style: GoogleFonts.kulimPark(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.check_circle_outline, size: 18),
-                          ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Cover Image Upload / Selection Container
+          GestureDetector(
+            onTap: () => controller.pickImage(),
+            child: Obx(() {
+              if (controller.selectedImage.value != null) {
+                return _buildImageContainer(
+                  child: kIsWeb
+                      ? CachedNetworkImage(
+                          imageUrl: controller.selectedImage.value!.path,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(controller.selectedImage.value!.path),
+                          fit: BoxFit.cover,
                         ),
-                )),
-            const SizedBox(height: 24),
-
-            GestureDetector(
-              onTap: () => controller.pickImage(),
-              child: Obx(() {
-                if (controller.selectedImage.value != null) {
-                  return _buildImageContainer(
-                    child: kIsWeb
-                        ? CachedNetworkImage(imageUrl: 
-                            controller.selectedImage.value!.path,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.file(
-                            File(controller.selectedImage.value!.path),
-                            fit: BoxFit.cover,
-                          ),
-                  );
-                } else if (controller.currentImageUrl.value.isNotEmpty) {
-                  return _buildImageContainer(
-                    child: CachedNetworkImage(imageUrl: 
-                      controller.currentImageUrl.value,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => _buildPlaceholder(),
-                    ),
-                  );
-                } else {
-                  return _buildPlaceholder();
-                }
-              }),
-            ),
-            const SizedBox(height: 24),
-
-            TextField(
-              controller: controller.titleController,
-              style: GoogleFonts.kulimPark(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
-              ),
-              decoration: InputDecoration(
-                hintText: 'Judul Artikel...',
-                hintStyle: GoogleFonts.kulimPark(
-                  color: const Color(0xFFC5C5D6),
-                ),
-                enabledBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFDAE2FD), width: 2),
-                ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF092BA2), width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kategori Utama',
-                  style: GoogleFonts.kulimPark(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
+                );
+              } else if (controller.currentImageUrl.value.isNotEmpty) {
+                return _buildImageContainer(
+                  child: CachedNetworkImage(
+                    imageUrl: controller.currentImageUrl.value,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => _buildPlaceholder(),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Obx(() => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          dropdownColor: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                          value: controller.selectedCategoryId.value == 0
-                              ? null
-                              : controller.selectedCategoryId.value,
-                          hint: Text('Pilih Kategori...',
-                              style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653))),
-                          isExpanded: true,
-                          items: controller.categories.map((cat) {
-                            return DropdownMenuItem<int>(
-                              value: cat['id'],
-                              child: Text(cat['name'],
-                                  style: GoogleFonts.kulimPark(fontSize: 13, color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E))),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            if (val != null) {
-                              controller.selectedCategoryId.value = val;
-                            }
-                          },
-                        ),
-                      ),
-                    )),
-              ],
-            ),
-            const SizedBox(height: 24),
+                );
+              } else {
+                return _buildPlaceholder();
+              }
+            }),
+          ),
+          const SizedBox(height: 24),
 
-            Text(
-              'Isi Konten',
-              style: GoogleFonts.kulimPark(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Get.isDarkMode ? Colors.white70 : const Color(0xFF444653),
-              ),
+          // Title Input Section
+          Text(
+            'Judul',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
             ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: controller.titleController,
+            maxLines: 3,
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Tulis judul disini',
+              hintStyle: GoogleFonts.inter(
+                color: const Color(0xFF8C8C8C),
+                fontSize: 15,
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6)),
+                borderSide: BorderSide(
+                  color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+                ),
               ),
-              child: Column(
-                children: [
-                    QuillToolbar.simple(
-                    configurations: QuillSimpleToolbarConfigurations(
-                      controller: controller.quillController,
-                      multiRowsDisplay: true,
-                      buttonOptions: const QuillSimpleToolbarButtonOptions(
-                        base: QuillToolbarBaseButtonOptions(
-                          iconSize: 18,
-                        ),
-                      ),
-                      toolbarSectionSpacing: 8,
-                      showDividers: false,
-                      showFontFamily: false,
-                      showFontSize: false,
-                      showBoldButton: true,
-                      showItalicButton: true,
-                      showUnderLineButton: true,
-                      showStrikeThrough: true,
-                      showInlineCode: true,
-                      showLink: true,
-                      showListNumbers: true,
-                      showListBullets: true,
-                      showColorButton: false,
-                      showBackgroundColorButton: false,
-                      showClearFormat: false,
-                      showAlignmentButtons: false,
-                      showHeaderStyle: false,
-                      showListCheck: false,
-                      showCodeBlock: false,
-                      showQuote: false,
-                      showIndent: false,
-                      showDirection: false,
-                      showSearchButton: false,
-                      showSubscript: false,
-                      showSuperscript: false,
-                      showUndo: true,
-                      showRedo: true,
-                      decoration: BoxDecoration(
-                        color: Get.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF2F3FF),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Divider(height: 1, color: Color(0xFFC5C5D6)),
-                  Container(
-                    height: 400,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Get.isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              filled: true,
+              fillColor:
+                  Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Content Editor Container
+          Text(
+            'Isi Artikel',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 400,
+            decoration: BoxDecoration(
+              color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+              ),
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
                     padding: const EdgeInsets.all(16),
                     child: QuillEditor.basic(
                       configurations: QuillEditorConfigurations(
                         controller: controller.quillController,
-                        placeholder: 'Mulai perbarui artikel Anda di sini...',
+                        placeholder: 'Tulis isi artikel disini',
                         scrollable: true,
                         autoFocus: false,
                         readOnly: false,
@@ -286,9 +208,9 @@ class ArticleEditView extends GetView<ArticleEditController> {
                         padding: EdgeInsets.zero,
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
-                            GoogleFonts.kulimPark(
+                            GoogleFonts.inter(
                               fontSize: 15,
-                              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
+                              color: Get.isDarkMode ? Colors.white : Colors.black,
                               height: 1.5,
                             ),
                             const VerticalSpacing(0, 0),
@@ -299,26 +221,137 @@ class ArticleEditView extends GetView<ArticleEditController> {
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const Divider(height: 1, color: Color(0xFFD1D5DB)),
+                QuillToolbar.simple(
+                  configurations: QuillSimpleToolbarConfigurations(
+                    controller: controller.quillController,
+                    multiRowsDisplay: false,
+                    buttonOptions: const QuillSimpleToolbarButtonOptions(
+                      base: QuillToolbarBaseButtonOptions(
+                        iconSize: 18,
+                      ),
+                    ),
+                    toolbarSectionSpacing: 8,
+                    showDividers: false,
+                    showFontFamily: false,
+                    showFontSize: false,
+                    showBoldButton: true,
+                    showItalicButton: true,
+                    showUnderLineButton: true,
+                    showStrikeThrough: true,
+                    showInlineCode: true,
+                    showLink: true,
+                    showListNumbers: true,
+                    showListBullets: true,
+                    showColorButton: false,
+                    showBackgroundColorButton: false,
+                    showClearFormat: false,
+                    showAlignmentButtons: false,
+                    showHeaderStyle: false,
+                    showListCheck: false,
+                    showCodeBlock: false,
+                    showQuote: false,
+                    showIndent: false,
+                    showDirection: false,
+                    showSearchButton: false,
+                    showSubscript: false,
+                    showSuperscript: false,
+                    showUndo: true,
+                    showRedo: true,
+                    decoration: BoxDecoration(
+                      color: Get.isDarkMode
+                          ? const Color(0xFF0F172A)
+                          : const Color(0xFFFAFAFA),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 40),
-          ],
-        ),
-      );
+          ),
+          const SizedBox(height: 24),
+
+          // Category Dropdown
+          Text(
+            'Kategori',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Obx(() => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color:
+                        Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    dropdownColor:
+                        Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    value: controller.selectedCategoryId.value == 0
+                        ? null
+                        : controller.selectedCategoryId.value,
+                    hint: Text(
+                      'Masukan topik',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        color: const Color(0xFF8C8C8C),
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: Colors.black54),
+                    items: controller.categories.map((cat) {
+                      return DropdownMenuItem<int>(
+                        value: cat['id'],
+                        child: Text(
+                          cat['name'],
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            color: Get.isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        controller.selectedCategoryId.value = val;
+                      }
+                    },
+                  ),
+                ),
+              )),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
   }
 
   Widget _buildImageContainer({required Widget child}) {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 208,
       decoration: BoxDecoration(
-        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFFAFAFA),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6), width: 2),
+        border: Border.all(
+          color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+          width: 1,
+        ),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         child: child,
       ),
     );
@@ -327,25 +360,23 @@ class ArticleEditView extends GetView<ArticleEditController> {
   Widget _buildPlaceholder() {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 208,
       decoration: BoxDecoration(
-        color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: Get.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFFAFAFA),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFC5C5D6), width: 2),
+        border: Border.all(
+          color: Get.isDarkMode ? Colors.white24 : const Color(0xFFD1D5DB),
+          width: 1,
+        ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.image_outlined, size: 40, color: Color(0xFF444653)),
-          const SizedBox(height: 12),
-          Text(
-            'Klik untuk ganti cover artikel',
-            style: GoogleFonts.kulimPark(
-              fontSize: 15,
-              color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
-            ),
+      child: Center(
+        child: Text(
+          'Upload sampul artikel disini',
+          style: GoogleFonts.inter(
+            fontSize: 15,
+            color: const Color(0xFF8C8C8C),
           ),
-        ],
+        ),
       ),
     );
   }
