@@ -218,49 +218,80 @@ class ProfileController extends GetxController {
   }
 
   Future<void> fetchLikedArticles() async {
-    final ids = _likeSyncService.likedArticleIds.toList();
-    if (ids.isEmpty) {
-      likedArticles.clear();
-      return;
-    }
+    final List<ArticleModel> allArticles = [];
+    int page = 1;
+    bool hasMore = true;
 
-    final List<ArticleModel> fetched = [];
-    final List<int> idsToFetch = [];
-
-    for (var id in ids) {
-      final ownArticle = userArticles.firstWhereOrNull((a) => a.id == id);
-      if (ownArticle != null) {
-        fetched.add(ownArticle);
-      } else {
-        idsToFetch.add(id);
-      }
-    }
-
-    if (idsToFetch.isNotEmpty) {
-      try {
-        final List<Future<ArticleModel?>> futures = idsToFetch.map((id) async {
-          try {
-            final article = await _apiProvider.getArticleDetail(id.toString());
-            article.isLiked = true;
-            return article;
-          } catch (e) {
-            print('Error fetching details for liked article $id: $e');
-            return null;
-          }
-        }).toList();
-
-        final results = await Future.wait(futures);
-        for (var a in results) {
-          if (a != null) {
-            fetched.add(a);
-          }
+    try {
+      while (hasMore && page <= 10) {
+        final fetched = await _apiProvider.getArticles(page: page);
+        if (fetched.isEmpty) {
+          hasMore = false;
+          break;
         }
-      } catch (e) {
-        print('Error fetching liked articles details: $e');
+        allArticles.addAll(fetched);
+        if (fetched.length < 10) {
+          hasMore = false;
+        } else {
+          page++;
+        }
       }
-    }
 
-    likedArticles.value = fetched;
+      final updatedArticles = _likeSyncService.applyLikeStateToArticles(allArticles);
+
+      // Sync with LikeSyncService so that it stays in sync
+      for (var a in updatedArticles) {
+        if (a.isLiked == true && a.id != null) {
+          _likeSyncService.updateLikeStatus(a.id!, true);
+        }
+      }
+
+      likedArticles.value = updatedArticles.where((a) => a.isLiked == true).toList();
+    } catch (e) {
+      print('Error fetching liked articles from server: $e');
+
+      // Fallback: load using local likedArticleIds
+      final ids = _likeSyncService.likedArticleIds.toList();
+      if (ids.isEmpty) {
+        likedArticles.clear();
+        return;
+      }
+
+      final List<ArticleModel> fetched = [];
+      final List<int> idsToFetch = [];
+
+      for (var id in ids) {
+        final ownArticle = userArticles.firstWhereOrNull((a) => a.id == id);
+        if (ownArticle != null) {
+          fetched.add(ownArticle);
+        } else {
+          idsToFetch.add(id);
+        }
+      }
+
+      if (idsToFetch.isNotEmpty) {
+        try {
+          final List<Future<ArticleModel?>> futures = idsToFetch.map((id) async {
+            try {
+              final article = await _apiProvider.getArticleDetail(id.toString());
+              article.isLiked = true;
+              return article;
+            } catch (e) {
+              return null;
+            }
+          }).toList();
+
+          final results = await Future.wait(futures);
+          for (var a in results) {
+            if (a != null) {
+              fetched.add(a);
+            }
+          }
+        } catch (_) {}
+      }
+
+      likedArticles.value = fetched;
+    }
   }
 
   Future<void> fetchUserArticles({bool reset = true}) async {
