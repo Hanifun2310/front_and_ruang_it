@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/like_sync_service.dart';
 import '../../../data/services/notification_service.dart';
@@ -332,21 +333,49 @@ class ProfileController extends GetxController {
           selectedImageBytes.clear();
           selectedFileName.value = "";
 
-          showCustomSnackbar('Sukses', 'Profil berhasil diperbarui');
+          // Tutup bottom sheet / dialog edit profil
+          Get.back();
 
-          if (Get.isBottomSheetOpen ?? false) {
-            Get.back();
-          } else if (Get.isDialogOpen ?? false) {
-            Get.back();
-          }
+          showCustomSnackbar('Sukses', 'Profil berhasil diperbarui');
         }
       }
     } catch (e) {
-      print('Error update profile: $e');
-      showCustomSnackbar(
-        'Error',
-        'Gagal memperbarui profil. Pastikan semua data valid.',
-      );
+      print('===== ERROR UPDATE PROFILE =====');
+      print('Exception type: ${e.runtimeType}');
+      print('Exception: $e');
+
+      // Tampilkan detail response dari server jika ada
+      if (e is DioException) {
+        print('Status code  : ${e.response?.statusCode}');
+        print('Server message: ${e.response?.statusMessage}');
+        print('Response body : ${e.response?.data}');
+        print('Request URL  : ${e.requestOptions.uri}');
+        print('Request method: ${e.requestOptions.method}');
+
+        // Ekstrak pesan error dari body Laravel
+        final responseData = e.response?.data;
+        String errorMsg = 'Gagal memperbarui profil.';
+        if (responseData is Map) {
+          final serverMsg = responseData['message'] ??
+              responseData['error'] ??
+              responseData['errors']?.toString();
+          if (serverMsg != null) {
+            errorMsg = serverMsg.toString();
+            print('Laravel error msg: $serverMsg');
+          }
+          if (responseData['errors'] is Map) {
+            print('Validation errors: ${responseData['errors']}');
+          }
+        }
+
+        showCustomSnackbar('Error', errorMsg);
+      } else {
+        showCustomSnackbar(
+          'Error',
+          'Gagal memperbarui profil. Pastikan semua data valid.',
+        );
+      }
+      print('================================');
     } finally {
       isLoading.value = false;
     }
@@ -354,10 +383,35 @@ class ProfileController extends GetxController {
 
   Future<void> pickImage() async {
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85, // kompres gambar sedikit agar tidak terlalu besar
+      );
       if (image != null) {
+        // Validasi tipe file
+        final String ext = image.name.split('.').last.toLowerCase();
+        const List<String> allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (!allowedExtensions.contains(ext)) {
+          showCustomSnackbar(
+            'Format tidak didukung',
+            'Gunakan format gambar: JPG, PNG, WebP, atau GIF',
+          );
+          return;
+        }
+
+        // Validasi ukuran file (maks 2MB)
+        final bytes = await image.readAsBytes();
+        const int maxSizeBytes = 2 * 1024 * 1024; // 2MB
+        if (bytes.length > maxSizeBytes) {
+          showCustomSnackbar(
+            'Ukuran terlalu besar',
+            'Ukuran foto maksimal 2MB. Pilih gambar yang lebih kecil.',
+          );
+          return;
+        }
+
         selectedImagePath.value = image.path;
-        selectedImageBytes.assignAll(await image.readAsBytes());
+        selectedImageBytes.assignAll(bytes);
         selectedFileName.value = image.name;
       }
     } catch (e) {

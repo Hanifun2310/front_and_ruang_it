@@ -169,21 +169,43 @@ class ApiProvider extends GetxService {
       '_method': 'PUT',
     };
 
-    if (imageBytes != null && fileName != null) {
+    if (imagePath != null && imagePath.isNotEmpty) {
+      // Hanya kirim field 'photo_profile' (tidak duplikat ke 'image')
+      final String ext = imagePath.split('.').last.toLowerCase();
+      final String mimeType = _getMimeType(ext);
+      data['photo_profile'] = await MultipartFile.fromFile(
+        imagePath,
+        filename: imagePath.split('/').last,
+        contentType: DioMediaType.parse(mimeType),
+      );
+    } else if (imageBytes != null && fileName != null) {
+      final String ext = fileName.split('.').last.toLowerCase();
+      final String mimeType = _getMimeType(ext);
       data['photo_profile'] = MultipartFile.fromBytes(
         imageBytes,
         filename: fileName,
+        contentType: DioMediaType.parse(mimeType),
       );
-      data['image'] = MultipartFile.fromBytes(
-        imageBytes,
-        filename: fileName,
-      );
-    } else if (imagePath != null && imagePath.isNotEmpty) {
-      data['photo_profile'] = await MultipartFile.fromFile(imagePath);
-      data['image'] = await MultipartFile.fromFile(imagePath);
     }
 
     return await _dio.post('/profile', data: FormData.fromMap(data));
+  }
+
+  /// Helper untuk menentukan MIME type berdasarkan ekstensi file
+  String _getMimeType(String ext) {
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      default:
+        return 'image/jpeg';
+    }
   }
 
   Future<Response> createArticle({
