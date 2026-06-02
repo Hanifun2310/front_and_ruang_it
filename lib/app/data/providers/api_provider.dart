@@ -170,7 +170,6 @@ class ApiProvider extends GetxService {
     };
 
     if (imagePath != null && imagePath.isNotEmpty) {
-      // Hanya kirim field 'photo_profile' (tidak duplikat ke 'image')
       final String ext = imagePath.split('.').last.toLowerCase();
       final String mimeType = _getMimeType(ext);
       data['photo_profile'] = await MultipartFile.fromFile(
@@ -191,7 +190,6 @@ class ApiProvider extends GetxService {
     return await _dio.post('/profile', data: FormData.fromMap(data));
   }
 
-  /// Helper untuk menentukan MIME type berdasarkan ekstensi file
   String _getMimeType(String ext) {
     switch (ext) {
       case 'jpg':
