@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconly/iconly.dart';
 import '../routes/app_routes.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -9,7 +8,7 @@ class CustomBottomNav extends StatelessWidget {
   final bool showCreateButton;
 
   const CustomBottomNav({
-    super.key, 
+    super.key,
     required this.currentIndex,
     this.showCreateButton = true,
   });
@@ -17,10 +16,14 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color backgroundColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8F9FF);
-    final Color activeColor = isDark ? Colors.blueAccent : const Color(0xFF0058BE);
-    final Color inactiveColor = isDark ? Colors.white54 : const Color(0xFF424754);
-    final Color borderColor = isDark ? Colors.white10 : const Color(0xFFC2C6D6);
+    final Color backgroundColor =
+        isDark ? const Color(0xFF0F172A) : const Color(0xFFF8F9FF);
+    final Color activeColor =
+        isDark ? Colors.blueAccent : const Color(0xFF0058BE);
+    final Color inactiveColor =
+        isDark ? Colors.white54 : const Color(0xFF424754);
+    final Color borderColor =
+        isDark ? Colors.white10 : const Color(0xFFC2C6D6);
 
     return Container(
       height: 64 + MediaQuery.of(context).padding.bottom * 0.5,
@@ -37,13 +40,13 @@ class CustomBottomNav extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom * 0.3),
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom * 0.3),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildNavItem(
-                  icon: IconlyLight.home,
-                  activeIcon: IconlyBold.home,
+                  iconPath: 'assets/images/icon/Vector.png',
                   label: 'Home',
                   isSelected: currentIndex == 0,
                   activeColor: activeColor,
@@ -53,8 +56,7 @@ class CustomBottomNav extends StatelessWidget {
                   },
                 ),
                 _buildNavItem(
-                  icon: IconlyLight.discovery,
-                  activeIcon: IconlyBold.discovery,
+                  iconPath: 'assets/images/icon/Vector-1.png',
                   label: 'Explore',
                   isSelected: currentIndex == 1,
                   activeColor: activeColor,
@@ -65,8 +67,7 @@ class CustomBottomNav extends StatelessWidget {
                 ),
                 const Expanded(child: SizedBox()),
                 _buildNavItem(
-                  icon: IconlyLight.search,
-                  activeIcon: IconlyBold.search,
+                  iconPath: 'assets/images/icon/Group-1.png',
                   label: 'Search',
                   isSelected: currentIndex == 2,
                   activeColor: activeColor,
@@ -76,8 +77,7 @@ class CustomBottomNav extends StatelessWidget {
                   },
                 ),
                 _buildNavItem(
-                  icon: IconlyLight.profile,
-                  activeIcon: IconlyBold.profile,
+                  iconPath: 'assets/images/icon/Group.png',
                   label: 'Profile',
                   isSelected: currentIndex == 3,
                   activeColor: activeColor,
@@ -117,10 +117,14 @@ class CustomBottomNav extends StatelessWidget {
                         )
                       ],
                     ),
-                    child: const Icon(
-                      IconlyLight.edit,
-                      color: Colors.white,
-                      size: 26,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/icon/Vector-2.png',
+                        color: Colors.white,
+                        colorBlendMode: BlendMode.srcIn,
+                        width: 24,
+                        height: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -132,8 +136,7 @@ class CustomBottomNav extends StatelessWidget {
   }
 
   Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
+    required String iconPath,
     required String label,
     required bool isSelected,
     required Color activeColor,
@@ -148,10 +151,12 @@ class CustomBottomNav extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isSelected ? activeIcon : icon,
+            Image.asset(
+              iconPath,
               color: isSelected ? activeColor : inactiveColor,
-              size: 24,
+              colorBlendMode: BlendMode.srcIn,
+              width: 24,
+              height: 24,
             ),
             const SizedBox(height: 4),
             Text(
