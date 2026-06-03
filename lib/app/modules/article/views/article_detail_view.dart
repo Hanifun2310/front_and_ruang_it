@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../widgets/skeleton_widget.dart';
 import '../controllers/article_detail_controller.dart';
 import '../../../data/services/auth_service.dart';
@@ -22,8 +23,11 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
 
         final art = controller.article.value;
 
-        return CustomScrollView(
-          controller: controller.scrollController,
+        return Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                controller: controller.scrollController,
           slivers: [
             SliverAppBar(
               expandedHeight: 300,
@@ -65,15 +69,13 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.bookmark_border, color: Colors.white),
-                  onPressed: () {
-                    Get.snackbar('Segera Hadir', 'Fitur Bookmark akan segera tersedia!', colorText: Colors.white, backgroundColor: Colors.blueAccent);
-                  },
-                ),
-                IconButton(
                   icon: const Icon(Icons.share, color: Colors.white),
                   onPressed: () {
-                    Get.snackbar('Segera Hadir', 'Fitur Share akan segera tersedia!', colorText: Colors.white, backgroundColor: Colors.blueAccent);
+                    final String articleUrl = 'https://ruang-it.vibedev.my.id/articles/${art.id}';
+                    Share.share(
+                      'Baca artikel "${art.title}" di Ruang IT!\n\nLink: $articleUrl',
+                      subject: art.title,
+                    );
                   },
                 ),
                 const SizedBox(width: 8),
@@ -349,9 +351,12 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               ),
             ),
           ],
+              ),
+            ),
+            _buildBottomAction(),
+          ],
         );
       }),
-      bottomNavigationBar: _buildBottomAction(),
     );
   }
 

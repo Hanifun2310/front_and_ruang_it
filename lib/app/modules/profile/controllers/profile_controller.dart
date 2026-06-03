@@ -81,9 +81,18 @@ class ProfileController extends GetxController {
   }
 
   Future<void> initProfile() async {
-    await loadUserData();
-    await fetchUserArticles(reset: true);
-    await fetchAllUserCategories();
+    final userData = _authService.currentUser;
+    if (userData != null) {
+      final user = UserModel.fromJson(userData);
+      userId.value = user.id ?? 0;
+      name.value = user.name ?? "";
+    }
+
+    await Future.wait([
+      loadUserData(),
+      fetchUserArticles(reset: true),
+      fetchAllUserCategories(),
+    ]);
   }
 
   void _handleScroll() {
@@ -600,8 +609,27 @@ class ProfileController extends GetxController {
     } else {
       likedArticles.removeWhere((a) => a.id == articleId);
     }
-    likedArticles.refresh();
     _likeSyncService.updateLikeStatus(articleId, isLiked);
+  }
+
+  void updateArticleMetrics(int articleId, int viewsCount, int commentsCount) {
+    final userIndex = userArticles.indexWhere((a) => a.id == articleId);
+    if (userIndex != -1) {
+      final article = userArticles[userIndex];
+      article.viewsCount = viewsCount;
+      article.commentsCount = commentsCount;
+      userArticles[userIndex] = article;
+      userArticles.refresh();
+    }
+
+    final likedIndex = likedArticles.indexWhere((a) => a.id == articleId);
+    if (likedIndex != -1) {
+      final article = likedArticles[likedIndex];
+      article.viewsCount = viewsCount;
+      article.commentsCount = commentsCount;
+      likedArticles[likedIndex] = article;
+      likedArticles.refresh();
+    }
   }
 
   Future<void> toggleLike(int articleId) async {

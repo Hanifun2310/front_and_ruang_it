@@ -106,6 +106,7 @@ class ArticleDetailController extends GetxController {
       if (article.value.id != null) {
         await fetchComments();
         Get.find<NotificationService>().syncCommentStatus(comments);
+        _syncArticleMetricsToOtherControllers();
       }
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal memuat detail artikel');
@@ -136,6 +137,11 @@ class ArticleDetailController extends GetxController {
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['data'] ?? response.data;
         comments.value = data.map((e) => CommentModel.fromJson(e)).toList();
+        
+        article.update((val) {
+          val!.commentsCount = comments.length;
+        });
+        _syncArticleMetricsToOtherControllers();
       }
     } catch (e) {
       print("Error comments: $e");
@@ -226,6 +232,37 @@ class ArticleDetailController extends GetxController {
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus komentar');
     }
+  }
+
+  void _syncArticleMetricsToOtherControllers() {
+    final artId = article.value.id;
+    if (artId == null) return;
+    final views = article.value.viewsCount ?? 0;
+    final commentsCnt = article.value.commentsCount ?? 0;
+    _syncMetrics(artId, views, commentsCnt);
+  }
+
+  void _syncMetrics(int articleId, int viewsCount, int commentsCount) {
+    try {
+      if (Get.isRegistered<DashboardController>()) {
+        Get.find<DashboardController>().updateArticleMetrics(articleId, viewsCount, commentsCount);
+      }
+    } catch (_) {}
+    try {
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().updateArticleMetrics(articleId, viewsCount, commentsCount);
+      }
+    } catch (_) {}
+    try {
+      if (Get.isRegistered<ExploreController>()) {
+        Get.find<ExploreController>().updateArticleMetrics(articleId, viewsCount, commentsCount);
+      }
+    } catch (_) {}
+    try {
+      if (Get.isRegistered<ArticleSearchController>()) {
+        Get.find<ArticleSearchController>().updateArticleMetrics(articleId, viewsCount, commentsCount);
+      }
+    } catch (_) {}
   }
 
   @override

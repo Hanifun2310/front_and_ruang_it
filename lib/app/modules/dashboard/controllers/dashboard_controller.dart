@@ -184,6 +184,17 @@ class DashboardController extends GetxController {
     _likeSyncService.updateLikeStatus(articleId, isLiked);
   }
 
+  void updateArticleMetrics(int articleId, int viewsCount, int commentsCount) {
+    final index = articles.indexWhere((a) => a.id == articleId);
+    if (index != -1) {
+      final article = articles[index];
+      article.viewsCount = viewsCount;
+      article.commentsCount = commentsCount;
+      articles[index] = article;
+      articles.refresh();
+    }
+  }
+
   void _syncLikeState(int articleId, bool isLiked) {
     try {
       if (Get.isRegistered<ProfileController>()) {
