@@ -33,6 +33,7 @@ class ArticleDetailController extends GetxController {
   final commentController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   var readingProgress = 0.0.obs;
+  var isCommenting = false.obs;
   
   var rxIsLiked = false.obs;
   var rxLikesCount = 0.obs;
@@ -192,8 +193,9 @@ class ArticleDetailController extends GetxController {
       return;
     }
 
-    if (commentController.text.isEmpty) return;
+    if (commentController.text.isEmpty || isCommenting.value) return;
 
+    isCommenting.value = true;
     try {
       final response = await _apiProvider.postComment(
         article.value.id!, 
@@ -202,11 +204,14 @@ class ArticleDetailController extends GetxController {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         commentController.clear();
-        fetchComments();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar terkirim');
       }
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal mengirim komentar');
+    } finally {
+      isCommenting.value = false;
     }
   }
 

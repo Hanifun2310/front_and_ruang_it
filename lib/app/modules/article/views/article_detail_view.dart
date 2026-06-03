@@ -419,7 +419,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
   Widget _buildBottomAction() {
     final authService = Get.find<AuthService>();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
@@ -427,35 +427,38 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
       child: SafeArea(
         child: Row(
           children: [
-            Obx(() => IconButton(
-              onPressed: authService.isLoggedIn.value
+            Obx(() => GestureDetector(
+              onTap: authService.isLoggedIn.value
                   ? controller.toggleLike
                   : null,
-              icon: Icon(
+              child: Icon(
                 authService.isLoggedIn.value && controller.rxIsLiked.value == true
                     ? Icons.thumb_up
                     : Icons.thumb_up_outlined,
+                size: 20,
                 color: authService.isLoggedIn.value && controller.rxIsLiked.value == true
                     ? Colors.blueAccent
                     : Colors.grey,
               ),
             )),
+            const SizedBox(width: 6),
             Obx(() => Text(
               "${controller.rxLikesCount.value}",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             )),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Obx(() => TextField(
                 controller: controller.commentController,
                 enabled: authService.isLoggedIn.value,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
+                  isDense: true,
                   hintText: authService.isLoggedIn.value
                       ? "Tulis komentar..."
                       : "Login untuk komentar...",
                   hintStyle: const TextStyle(fontSize: 14),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -467,13 +470,23 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
             ),
             const SizedBox(width: 8),
             Obx(() => CircleAvatar(
+              radius: 15,
               backgroundColor: authService.isLoggedIn.value ? Colors.blueAccent : Colors.grey,
-              child: IconButton(
-                onPressed: authService.isLoggedIn.value
-                    ? controller.sendComment
-                    : null,
-                icon: const Icon(Icons.send, color: Colors.white, size: 18),
-              ),
+              child: controller.isCommenting.value
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: authService.isLoggedIn.value
+                          ? controller.sendComment
+                          : null,
+                      child: const Icon(Icons.send, color: Colors.white, size: 14),
+                    ),
             )),
           ],
         ),
