@@ -71,7 +71,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                 IconButton(
                   icon: const Icon(Icons.share, color: Colors.white),
                   onPressed: () {
-                    final String articleUrl = 'https://ruang-it.vibedev.my.id/articles/${art.id}';
+                    final String articleUrl = 'https://ruang-it.vibedev.my.id/guest/article/${art.slug ?? art.id}';
                     Share.share(
                       'Baca artikel "${art.title}" di Ruang IT!\n\nLink: $articleUrl',
                       subject: art.title,
@@ -351,9 +351,9 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               ),
             ),
           ],
-              ),
-            ),
-            _buildBottomAction(),
+        ),
+      ),
+            _buildBottomAction(context),
           ],
         );
       }),
@@ -416,80 +416,84 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
     );
   }
 
-  Widget _buildBottomAction() {
+  Widget _buildBottomAction(BuildContext context) {
     final authService = Get.find<AuthService>();
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 4,
+        bottom: 4 + (bottomPadding > 0 ? bottomPadding * 0.2 : 0),
+      ),
       decoration: BoxDecoration(
         color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Obx(() => GestureDetector(
-              onTap: authService.isLoggedIn.value
-                  ? controller.toggleLike
-                  : null,
-              child: Icon(
-                authService.isLoggedIn.value && controller.rxIsLiked.value == true
-                    ? Icons.thumb_up
-                    : Icons.thumb_up_outlined,
-                size: 20,
-                color: authService.isLoggedIn.value && controller.rxIsLiked.value == true
-                    ? Colors.blueAccent
-                    : Colors.grey,
+      child: Row(
+        children: [
+          Obx(() => GestureDetector(
+            onTap: authService.isLoggedIn.value
+                ? controller.toggleLike
+                : null,
+            child: Icon(
+              authService.isLoggedIn.value && controller.rxIsLiked.value == true
+                  ? Icons.thumb_up
+                  : Icons.thumb_up_outlined,
+              size: 18,
+              color: authService.isLoggedIn.value && controller.rxIsLiked.value == true
+                  ? Colors.blueAccent
+                  : Colors.grey,
+            ),
+          )),
+          const SizedBox(width: 4),
+          Obx(() => Text(
+            "${controller.rxLikesCount.value}",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          )),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Obx(() => TextField(
+              controller: controller.commentController,
+              enabled: authService.isLoggedIn.value,
+              style: const TextStyle(fontSize: 14),
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: authService.isLoggedIn.value
+                    ? "Tulis komentar..."
+                    : "Login untuk komentar...",
+                hintStyle: const TextStyle(fontSize: 14),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.grey.shade100,
               ),
             )),
-            const SizedBox(width: 6),
-            Obx(() => Text(
-              "${controller.rxLikesCount.value}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            )),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Obx(() => TextField(
-                controller: controller.commentController,
-                enabled: authService.isLoggedIn.value,
-                style: const TextStyle(fontSize: 14),
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: authService.isLoggedIn.value
-                      ? "Tulis komentar..."
-                      : "Login untuk komentar...",
-                  hintStyle: const TextStyle(fontSize: 14),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Get.isDarkMode ? const Color(0xFF0F172A) : Colors.grey.shade100,
-                ),
-              )),
-            ),
-            const SizedBox(width: 8),
-            Obx(() => CircleAvatar(
-              radius: 15,
-              backgroundColor: authService.isLoggedIn.value ? Colors.blueAccent : Colors.grey,
-              child: controller.isCommenting.value
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : GestureDetector(
-                      onTap: authService.isLoggedIn.value
-                          ? controller.sendComment
-                          : null,
-                      child: const Icon(Icons.send, color: Colors.white, size: 14),
+          ),
+          const SizedBox(width: 8),
+          Obx(() => CircleAvatar(
+            radius: 14,
+            backgroundColor: authService.isLoggedIn.value ? Colors.blueAccent : Colors.grey,
+            child: controller.isCommenting.value
+                ? const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
                     ),
-            )),
-          ],
-        ),
+                  )
+                : GestureDetector(
+                    onTap: authService.isLoggedIn.value
+                        ? controller.sendComment
+                        : null,
+                    child: const Icon(Icons.send, color: Colors.white, size: 14),
+                  ),
+          )),
+        ],
       ),
     );
   }
