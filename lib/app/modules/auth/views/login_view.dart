@@ -129,18 +129,16 @@ class LoginView extends GetView<AuthController> {
                 Obx(() => ElevatedButton(
                   onPressed: controller.isLoading.value ? () {} : controller.login,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: const StadiumBorder(),
                   ),
                   child: controller.isLoading.value
                       ? const SizedBox(
-                          height: 24,
-                          width: 24,
+                          height: 20,
+                          width: 20,
                           child: CircularProgressIndicator(
                             color: Colors.white,
                             strokeWidth: 2,
@@ -148,7 +146,7 @@ class LoginView extends GetView<AuthController> {
                         )
                       : const Text(
                           "Masuk",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                 )),
 
