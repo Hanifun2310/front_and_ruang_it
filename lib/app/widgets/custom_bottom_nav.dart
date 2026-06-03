@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../routes/app_routes.dart';
+import '../modules/dashboard/controllers/dashboard_controller.dart';
+import '../modules/explore/controllers/explore_controller.dart';
+import '../modules/profile/controllers/profile_controller.dart';
 
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -96,8 +99,20 @@ class CustomBottomNav extends StatelessWidget {
               right: 0,
               child: Center(
                 child: GestureDetector(
-                  onTap: () {
-                    Get.toNamed(Routes.ARTICLE_CREATE);
+                  onTap: () async {
+                    final result = await Get.toNamed(Routes.ARTICLE_CREATE);
+                    if (result == true) {
+                      if (Get.isRegistered<DashboardController>()) {
+                        Get.find<DashboardController>().refreshArticles();
+                      }
+                      if (Get.isRegistered<ExploreController>()) {
+                        Get.find<ExploreController>().fetchArticles();
+                      }
+                      if (Get.isRegistered<ProfileController>()) {
+                        Get.find<ProfileController>().fetchUserArticles(reset: true);
+                        Get.find<ProfileController>().loadUserData();
+                      }
+                    }
                   },
                   child: Container(
                     width: 56,

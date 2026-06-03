@@ -161,6 +161,7 @@ class ApiProvider extends GetxService {
     String? imagePath,
     List<int>? imageBytes,
     String? fileName,
+    bool removePhoto = false,
   }) async {
     Map<String, dynamic> data = {
       'name': name,
@@ -169,7 +170,12 @@ class ApiProvider extends GetxService {
       '_method': 'PUT',
     };
 
-    if (imagePath != null && imagePath.isNotEmpty) {
+    if (removePhoto) {
+      data['photo_profile'] = '';
+      data['remove_photo'] = '1';
+      data['delete_photo'] = '1';
+      data['remove_photo_profile'] = '1';
+    } else if (imagePath != null && imagePath.isNotEmpty) {
       final String ext = imagePath.split('.').last.toLowerCase();
       final String mimeType = _getMimeType(ext);
       data['photo_profile'] = await MultipartFile.fromFile(

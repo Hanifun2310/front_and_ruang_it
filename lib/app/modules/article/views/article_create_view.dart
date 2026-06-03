@@ -27,55 +27,67 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          'Tulis Artikel Baru',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Get.isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
+        title: Obx(() {
+          final authService = Get.find<AuthService>();
+          if (!authService.isLoggedIn.value) {
+            return const SizedBox.shrink();
+          }
+          return Text(
+            'Tulis Artikel Baru',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Get.isDarkMode ? Colors.white : Colors.black,
+            ),
+          );
+        }),
         actions: [
-          Obx(() => Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: Center(
-                  child: controller.isLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.blueAccent,
-                          ),
-                        )
-                      : OutlinedButton(
-                          onPressed: () => controller.publishArticle(),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor:
+          Obx(() {
+            final authService = Get.find<AuthService>();
+            if (!authService.isLoggedIn.value) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Center(
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.blueAccent,
+                        ),
+                      )
+                    : OutlinedButton(
+                        onPressed: () => controller.publishArticle(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor:
+                              Get.isDarkMode ? Colors.white : Colors.black,
+                          side: BorderSide(
+                            color:
                                 Get.isDarkMode ? Colors.white : Colors.black,
-                            side: BorderSide(
-                              color:
-                                  Get.isDarkMode ? Colors.white : Colors.black,
-                              width: 1.5,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                            width: 1.5,
                           ),
-                          child: Text(
-                            'Publish',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
                         ),
-                ),
-              )),
+                        child: Text(
+                          'Publish',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+              ),
+            );
+          }),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),

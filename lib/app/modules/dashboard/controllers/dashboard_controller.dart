@@ -213,6 +213,13 @@ class DashboardController extends GetxController {
     }
   }
 
+  Future<void> refreshArticles() async {
+    currentPage = 1;
+    hasMoreData.value = true;
+    articles.clear();
+    await fetchArticles();
+  }
+
   String getSnippetText(String? content) {
     if (content == null || content.trim().isEmpty) {
       return 'Tidak ada ringkasan...';

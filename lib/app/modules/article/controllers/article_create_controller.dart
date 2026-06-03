@@ -68,7 +68,7 @@ class ArticleCreateController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.back();
+        Get.back(result: true);
         showCustomSnackbar('Sukses', 'Artikel berhasil diterbitkan');
       } else {
         showCustomSnackbar('Gagal', 'Gagal menerbitkan artikel: ${response.statusMessage}');

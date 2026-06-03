@@ -779,7 +779,99 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
+  void _showPhotoOptions(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Obx(() {
+          final hasPhoto = controller.selectedImagePath.value.isNotEmpty ||
+              controller.photoProfile.value.isNotEmpty;
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Foto Profil',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Get.back();
+                  controller.pickImage();
+                },
+                icon: const Icon(Icons.photo_library, color: Colors.white),
+                label: Text(
+                  'Pilih dari Galeri',
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              if (hasPhoto) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Get.back();
+                    controller.clearProfilePhoto();
+                  },
+                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                  label: Text(
+                    'Hapus Foto Profil',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w600, color: Colors.redAccent),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.redAccent),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'Batal',
+                  style: GoogleFonts.inter(color: Colors.grey),
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
   void _showEditProfileSheet(BuildContext context) {
+    final originalSelectedPath = controller.selectedImagePath.value;
+    final originalSelectedBytes = List<int>.from(controller.selectedImageBytes);
+    final originalSelectedFileName = controller.selectedFileName.value;
+    final originalPhotoProfile = controller.photoProfile.value;
+    final originalShouldRemove = controller.shouldRemovePhotoOnServer.value;
+
+    controller.nameController.text = controller.name.value;
+    controller.professionController.text = controller.profession.value;
+    controller.bioController.text = controller.bio.value;
+
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.only(
@@ -808,7 +900,7 @@ class ProfileView extends GetView<ProfileController> {
               const SizedBox(height: 24),
               Center(
                 child: GestureDetector(
-                  onTap: () => controller.pickImage(),
+                  onTap: () => _showPhotoOptions(context),
                   child: Obx(() {
                     ImageProvider? imageProvider;
                     if (controller.selectedImagePath.value.isNotEmpty) {
@@ -895,6 +987,14 @@ class ProfileView extends GetView<ProfileController> {
         ),
       ),
       isScrollControlled: true,
-    );
+    ).then((_) {
+      if (!controller.isLoading.value) {
+        controller.selectedImagePath.value = originalSelectedPath;
+        controller.selectedImageBytes.value = originalSelectedBytes;
+        controller.selectedFileName.value = originalSelectedFileName;
+        controller.photoProfile.value = originalPhotoProfile;
+        controller.shouldRemovePhotoOnServer.value = originalShouldRemove;
+      }
+    });
   }
 }

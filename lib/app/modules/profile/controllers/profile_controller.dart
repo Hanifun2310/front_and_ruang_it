@@ -41,6 +41,7 @@ class ProfileController extends GetxController {
   var selectedImagePath = "".obs;
   var selectedImageBytes = <int>[].obs;
   var selectedFileName = "".obs;
+  var shouldRemovePhotoOnServer = false.obs;
 
   var userArticles = <ArticleModel>[].obs;
   var likedArticles = <ArticleModel>[].obs;
@@ -381,6 +382,7 @@ class ProfileController extends GetxController {
         fileName: selectedFileName.value.isNotEmpty
             ? selectedFileName.value
             : null,
+        removePhoto: shouldRemovePhotoOnServer.value,
       );
 
       if (response.statusCode == 200) {
@@ -406,6 +408,7 @@ class ProfileController extends GetxController {
           selectedImagePath.value = "";
           selectedImageBytes.clear();
           selectedFileName.value = "";
+          shouldRemovePhotoOnServer.value = false;
 
           // Tutup bottom sheet / dialog edit profil
           Get.back();
@@ -487,10 +490,19 @@ class ProfileController extends GetxController {
         selectedImagePath.value = image.path;
         selectedImageBytes.assignAll(bytes);
         selectedFileName.value = image.name;
+        shouldRemovePhotoOnServer.value = false;
       }
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal memilih gambar');
     }
+  }
+
+  void clearProfilePhoto() {
+    selectedImagePath.value = "";
+    selectedImageBytes.clear();
+    selectedFileName.value = "";
+    photoProfile.value = "";
+    shouldRemovePhotoOnServer.value = true;
   }
 
   Future<void> deleteArticle(int id) async {
