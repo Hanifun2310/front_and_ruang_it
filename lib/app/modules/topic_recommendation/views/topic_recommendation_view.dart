@@ -73,30 +73,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                             ),
                           ),
                         ),
-                        if (controller.topArticles[currentCategory.id] != null)
-                          GestureDetector(
-                            onTap: () => controller.goToArticleDetail(
-                              controller.topArticles[currentCategory.id]!,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1C1E2B),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: const Text(
-                                'Baca artikel',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ),
+
                       ],
                     ),
                   ],
@@ -121,8 +98,12 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                             horizontal: 40.0,
                             vertical: 12.0,
                           ),
-                          child: Container(
-                            decoration: BoxDecoration(
+                          child: GestureDetector(
+                            onTap: article == null
+                                ? null
+                                : () => controller.goToArticleDetail(article),
+                            child: Container(
+                              decoration: BoxDecoration(
                               color: const Color(0xFF1C1E2B),
                               borderRadius: BorderRadius.circular(32),
                               boxShadow: [
@@ -298,6 +279,7 @@ class TopicRecommendationView extends GetView<TopicRecommendationController> {
                                       ],
                                     ),
                                   ),
+                          ),
                           ),
                         );
                       },

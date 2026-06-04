@@ -423,8 +423,8 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
-        top: 4,
-        bottom: 4 + (bottomPadding > 0 ? bottomPadding * 0.2 : 0),
+        top: 12,
+        bottom: 12 + (bottomPadding > 0 ? bottomPadding * 0.8 : 0),
       ),
       decoration: BoxDecoration(
         color: Get.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
@@ -440,30 +440,30 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               authService.isLoggedIn.value && controller.rxIsLiked.value == true
                   ? Icons.thumb_up
                   : Icons.thumb_up_outlined,
-              size: 18,
+              size: 22,
               color: authService.isLoggedIn.value && controller.rxIsLiked.value == true
                   ? Colors.blueAccent
                   : Colors.grey,
             ),
           )),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           Obx(() => Text(
             "${controller.rxLikesCount.value}",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           )),
-          const SizedBox(width: 10),
+          const SizedBox(width: 14),
           Expanded(
             child: Obx(() => TextField(
               controller: controller.commentController,
               enabled: authService.isLoggedIn.value,
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 15),
               decoration: InputDecoration(
                 isDense: true,
                 hintText: authService.isLoggedIn.value
                     ? "Tulis komentar..."
                     : "Login untuk komentar...",
-                hintStyle: const TextStyle(fontSize: 14),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                hintStyle: const TextStyle(fontSize: 15),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -473,14 +473,14 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               ),
             )),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Obx(() => CircleAvatar(
-            radius: 14,
+            radius: 18,
             backgroundColor: authService.isLoggedIn.value ? Colors.blueAccent : Colors.grey,
             child: controller.isCommenting.value
                 ? const SizedBox(
-                    width: 14,
-                    height: 14,
+                    width: 16,
+                    height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: Colors.white,
@@ -490,7 +490,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                     onTap: authService.isLoggedIn.value
                         ? controller.sendComment
                         : null,
-                    child: const Icon(Icons.send, color: Colors.white, size: 14),
+                    child: const Icon(Icons.send, color: Colors.white, size: 16),
                   ),
           )),
         ],

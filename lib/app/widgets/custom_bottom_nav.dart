@@ -120,10 +120,6 @@ class CustomBottomNav extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: activeColor,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: backgroundColor,
-                        width: 4,
-                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2),
