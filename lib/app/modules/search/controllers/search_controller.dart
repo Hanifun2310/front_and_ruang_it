@@ -34,7 +34,7 @@ class ArticleSearchController extends GetxController {
     debounce(
       searchQuery,
       (_) => fetchArticles(),
-      time: const Duration(milliseconds: 500),
+      time: const Duration(milliseconds: 300),
     );
   }
 
@@ -90,10 +90,12 @@ class ArticleSearchController extends GetxController {
 
       Get.find<NotificationService>().syncArticleMetrics(searchArticlesFetched);
 
-      final filteredArticles = searchArticlesFetched.where((a) => !a.isBlocked).toList();
+      final queryLower = currentQuery.toLowerCase();
+      final filteredArticles = searchArticlesFetched
+          .where((a) => !a.isBlocked && (a.title ?? '').toLowerCase().contains(queryLower))
+          .toList();
       articles.value = _likeSyncService.applyLikeStateToArticles(filteredArticles);
 
-      final queryLower = currentQuery.toLowerCase();
       final queryTokens = queryLower
           .split(RegExp(r'[,\s\.]+'))
           .map((t) => t.trim())
@@ -119,47 +121,7 @@ class ArticleSearchController extends GetxController {
         return false;
       }
 
-      final List<UserModel> enrichedDirectUsers = await Future.wait(
-        directUsers.map((u) async {
-          if (u.isBanned) return u;
-          if (u.bio != null || u.profession != null) return u;
-          try {
-            final res = await _apiProvider.getAuthorProfile(u.id!);
-            if (res.statusCode == 200) {
-              final responseBody = res.data;
-              Map<String, dynamic>? userData;
-              if (responseBody is Map<String, dynamic>) {
-                if (responseBody['data'] is Map && (responseBody['data'] as Map).containsKey('user')) {
-                  userData = Map<String, dynamic>.from((responseBody['data'] as Map)['user']);
-                } else if (responseBody['data'] is Map<String, dynamic>) {
-                  userData = Map<String, dynamic>.from(responseBody['data']);
-                } else if (responseBody.containsKey('user') && responseBody['user'] is Map) {
-                  userData = Map<String, dynamic>.from(responseBody['user']);
-                } else if (responseBody.containsKey('id') || responseBody.containsKey('name')) {
-                  userData = Map<String, dynamic>.from(responseBody);
-                }
-              }
-              if (userData != null) {
-                final enriched = UserModel.fromJson(userData);
-                return UserModel(
-                  id: enriched.id ?? u.id,
-                  name: enriched.name ?? u.name,
-                  email: enriched.email ?? u.email,
-                  role: enriched.role ?? u.role,
-                  status: enriched.status ?? u.status,
-                  photoProfile: (enriched.photoProfile?.isNotEmpty == true) ? enriched.photoProfile : u.photoProfile,
-                  profession: (enriched.profession?.isNotEmpty == true) ? enriched.profession : u.profession,
-                  bio: (enriched.bio?.isNotEmpty == true) ? enriched.bio : u.bio,
-                  articlesCount: enriched.articlesCount ?? u.articlesCount,
-                  likesCount: enriched.likesCount ?? u.likesCount,
-                  commentsCount: enriched.commentsCount ?? u.commentsCount,
-                );
-              }
-            }
-          } catch (_) {}
-          return u;
-        }).toList()
-      );
+      final List<UserModel> enrichedDirectUsers = directUsers;
 
       final Set<int> addedUserIds = {};
       final List<UserModel> matchingUsers = [];

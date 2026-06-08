@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../routes/app_routes.dart';
 import 'like_sync_service.dart';
+import 'notification_service.dart';
 
 class AuthService extends GetxService {
   final _storage = const FlutterSecureStorage();
@@ -33,6 +34,12 @@ class AuthService extends GetxService {
     await _storage.write(key: 'token', value: token);
     await _storage.write(key: 'user', value: jsonEncode(userData));
     isLoggedIn.value = true;
+
+    try {
+      if (Get.isRegistered<NotificationService>()) {
+        Get.find<NotificationService>().loadNotificationsForCurrentUser();
+      }
+    } catch (_) {}
   }
 
   Future<void> logout() async {
@@ -45,6 +52,12 @@ class AuthService extends GetxService {
     try {
       if (Get.isRegistered<LikeSyncService>()) {
         Get.find<LikeSyncService>().clearAll();
+      }
+    } catch (_) {}
+
+    try {
+      if (Get.isRegistered<NotificationService>()) {
+        Get.find<NotificationService>().clearAll();
       }
     } catch (_) {}
     

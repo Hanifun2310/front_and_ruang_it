@@ -364,55 +364,81 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
     final TextEditingController editController = TextEditingController(text: comment.content);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Komentar'),
-        content: TextField(
-          controller: editController,
-          maxLines: 3,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Tulis komentar Anda...',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (editController.text.trim().isNotEmpty) {
-                controller.updateComment(comment.id, editController.text.trim());
-                Get.back();
-              }
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (context) => Obx(() {
+        final isLoading = controller.isCommentActionLoading.value;
+        return AlertDialog(
+          title: const Text('Edit Komentar'),
+          content: isLoading
+              ? const SizedBox(
+                  height: 100,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : TextField(
+                  controller: editController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Tulis komentar Anda...',
+                  ),
+                ),
+          actions: isLoading ? null : [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (editController.text.trim().isNotEmpty) {
+                  final success = await controller.updateComment(comment.id, editController.text.trim());
+                  if (success) {
+                    Get.back();
+                  }
+                }
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      }),
     );
   }
 
   void _showDeleteCommentDialog(BuildContext context, dynamic comment) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hapus Komentar'),
-        content: const Text('Apakah Anda yakin ingin menghapus komentar ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              controller.deleteComment(comment.id);
-              Get.back();
-            },
-            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (context) => Obx(() {
+        final isLoading = controller.isCommentActionLoading.value;
+        return AlertDialog(
+          title: const Text('Hapus Komentar'),
+          content: isLoading
+              ? const SizedBox(
+                  height: 100,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const Text('Apakah Anda yakin ingin menghapus komentar ini?'),
+          actions: isLoading ? null : [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final success = await controller.deleteComment(comment.id);
+                if (success) {
+                  Get.back();
+                }
+              },
+              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      }),
     );
   }
 

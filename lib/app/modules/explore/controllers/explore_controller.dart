@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../data/models/article_model.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../routes/app_routes.dart';
@@ -14,6 +15,10 @@ import '../../../widgets/custom_snackbar.dart';
 class ExploreController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   final LikeSyncService _likeSyncService = Get.find<LikeSyncService>();
+  final GetStorage _storage = GetStorage();
+
+  static const String _categoriesCacheKey = 'cached_categories';
+  static const String _articlesCacheKey = 'cached_articles';
 
   var articles = <ArticleModel>[].obs;
   var categories = <CategoryModel>[].obs;
@@ -24,17 +29,36 @@ class ExploreController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadCachedData();
     fetchCategories();
     fetchArticles();
   }
 
+  void _loadCachedData() {
+    try {
+      final cachedCats = _storage.read<List<dynamic>>(_categoriesCacheKey);
+      if (cachedCats != null) {
+        categories.value = cachedCats.map((e) => CategoryModel.fromJson(e)).toList();
+      }
+      final cachedArts = _storage.read<List<dynamic>>(_articlesCacheKey);
+      if (cachedArts != null) {
+        articles.value = cachedArts.map((e) => ArticleModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      Get.log('Error loading cached explore data: $e');
+    }
+  }
+
   Future<void> fetchCategories() async {
-    isCategoriesLoading.value = true;
+    if (categories.isEmpty) {
+      isCategoriesLoading.value = true;
+    }
     try {
       final response = await _apiProvider.getCategories();
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['data'] ?? response.data;
         categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
+        _storage.write(_categoriesCacheKey, data);
       }
     } catch (e) {
       Get.log('Error fetching categories: $e');
@@ -44,7 +68,9 @@ class ExploreController extends GetxController {
   }
 
   Future<void> fetchArticles() async {
-    isLoading.value = true;
+    if (articles.isEmpty) {
+      isLoading.value = true;
+    }
     try {
       final fetchedArticles = await _apiProvider.getArticles(
         category: selectedCategory.value?.id.toString(),
@@ -53,7 +79,13 @@ class ExploreController extends GetxController {
       Get.find<NotificationService>().syncArticleMetrics(fetchedArticles);
 
       final filtered = fetchedArticles.where((a) => !a.isBlocked).toList();
-      articles.value = _likeSyncService.applyLikeStateToArticles(filtered);
+      final finalArticles = _likeSyncService.applyLikeStateToArticles(filtered);
+      articles.value = finalArticles;
+
+      if (selectedCategory.value == null) {
+        final rawJson = fetchedArticles.map((e) => e.toJson()).toList();
+        _storage.write(_articlesCacheKey, rawJson);
+      }
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal memuat artikel');
     } finally {

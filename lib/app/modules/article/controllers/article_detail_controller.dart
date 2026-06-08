@@ -34,6 +34,7 @@ class ArticleDetailController extends GetxController {
   final ScrollController scrollController = ScrollController();
   var readingProgress = 0.0.obs;
   var isCommenting = false.obs;
+  var isCommentActionLoading = false.obs;
   
   var rxIsLiked = false.obs;
   var rxLikesCount = 0.obs;
@@ -215,27 +216,39 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  Future<void> updateComment(int commentId, String content) async {
+  Future<bool> updateComment(int commentId, String content) async {
+    isCommentActionLoading.value = true;
     try {
       final response = await _apiProvider.updateComment(commentId, content);
       if (response.statusCode == 200) {
-        fetchComments();
+        await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil diperbarui');
+        return true;
       }
+      return false;
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal memperbarui komentar');
+      return false;
+    } finally {
+      isCommentActionLoading.value = false;
     }
   }
 
-  Future<void> deleteComment(int commentId) async {
+  Future<bool> deleteComment(int commentId) async {
+    isCommentActionLoading.value = true;
     try {
       final response = await _apiProvider.deleteComment(commentId);
       if (response.statusCode == 200) {
-        fetchComments();
+        await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil dihapus');
+        return true;
       }
+      return false;
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus komentar');
+      return false;
+    } finally {
+      isCommentActionLoading.value = false;
     }
   }
 

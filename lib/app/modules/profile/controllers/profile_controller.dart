@@ -50,9 +50,18 @@ class ProfileController extends GetxController {
   var articleSearchQuery = ''.obs;
   var selectedCategoryFilter = Rxn<String>();
   final articleSearchController = TextEditingController();
-  var allUserCategories = <String>[].obs;
 
-  List<String> get availableCategories => allUserCategories;
+  List<String> get availableCategories {
+    final Set<String> cats = {};
+    for (var a in userArticles) {
+      if (a.category?.name != null) {
+        cats.add(a.category!.name!);
+      }
+    }
+    final list = cats.toList();
+    list.sort();
+    return list;
+  }
 
   List<ArticleModel> get filteredUserArticles {
     final q = articleSearchQuery.value.trim().toLowerCase();
@@ -91,7 +100,6 @@ class ProfileController extends GetxController {
     await Future.wait([
       loadUserData(),
       fetchUserArticles(reset: true),
-      fetchAllUserCategories(),
     ]);
   }
 
@@ -129,8 +137,7 @@ class ProfileController extends GetxController {
         await _authService.saveSession(_authService.token ?? '', userData);
 
         if (userId.value != 0) {
-          try {
-            final userDetailResponse = await _apiProvider.getAuthorProfile(userId.value);
+          _apiProvider.getAuthorProfile(userId.value).then((userDetailResponse) {
             if (userDetailResponse.statusCode == 200) {
               final responseBody = userDetailResponse.data;
               Map<String, dynamic>? userDetailData;
@@ -165,9 +172,9 @@ class ProfileController extends GetxController {
                 if (newCommentsCount != null) commentsCount.value = newCommentsCount;
               }
             }
-          } catch (e) {
+          }).catchError((e) {
             print('Error fetching detailed user profile for stats: $e');
-          }
+          });
         }
       }
     } catch (e) {
@@ -192,116 +199,51 @@ class ProfileController extends GetxController {
     }
   }
 
-  Future<void> fetchAllUserCategories() async {
-    try {
-      final Set<String> cats = {};
-      int page = 1;
-      bool hasMore = true;
-      
-      while (hasMore && page <= 5) {
-        final fetched = await _apiProvider.getArticles(page: page);
-        if (fetched.isEmpty) {
-          hasMore = false;
-          break;
-        }
-        
-        final myArticles = fetched.where((a) => a.user?.id == userId.value || a.user?.name == name.value);
-        for (var a in myArticles) {
-          if (a.category?.name != null) {
-            cats.add(a.category!.name!);
-          }
-        }
-        
-        if (fetched.length < 10) {
-          hasMore = false;
-        }
-        
-        page++;
-      }
-      
-      final sortedCats = cats.toList();
-      sortedCats.sort();
-      allUserCategories.value = sortedCats;
-    } catch (e) {
-      print('Error fetching categories: $e');
-    }
-  }
+
 
   Future<void> fetchLikedArticles() async {
-    final List<ArticleModel> allArticles = [];
-    int page = 1;
-    bool hasMore = true;
-
-    try {
-      while (hasMore && page <= 10) {
-        final fetched = await _apiProvider.getArticles(page: page);
-        if (fetched.isEmpty) {
-          hasMore = false;
-          break;
-        }
-        allArticles.addAll(fetched);
-        if (fetched.length < 10) {
-          hasMore = false;
-        } else {
-          page++;
-        }
-      }
-
-      final updatedArticles = _likeSyncService.applyLikeStateToArticles(allArticles);
-
-      // Sync with LikeSyncService so that it stays in sync
-      for (var a in updatedArticles) {
-        if (a.isLiked == true && a.id != null) {
-          _likeSyncService.updateLikeStatus(a.id!, true);
-        }
-      }
-
-      likedArticles.value = updatedArticles.where((a) => a.isLiked == true).toList();
-    } catch (e) {
-      print('Error fetching liked articles from server: $e');
-
-      // Fallback: load using local likedArticleIds
-      final ids = _likeSyncService.likedArticleIds.toList();
-      if (ids.isEmpty) {
-        likedArticles.clear();
-        return;
-      }
-
-      final List<ArticleModel> fetched = [];
-      final List<int> idsToFetch = [];
-
-      for (var id in ids) {
-        final ownArticle = userArticles.firstWhereOrNull((a) => a.id == id);
-        if (ownArticle != null) {
-          fetched.add(ownArticle);
-        } else {
-          idsToFetch.add(id);
-        }
-      }
-
-      if (idsToFetch.isNotEmpty) {
-        try {
-          final List<Future<ArticleModel?>> futures = idsToFetch.map((id) async {
-            try {
-              final article = await _apiProvider.getArticleDetail(id.toString());
-              article.isLiked = true;
-              return article;
-            } catch (e) {
-              return null;
-            }
-          }).toList();
-
-          final results = await Future.wait(futures);
-          for (var a in results) {
-            if (a != null) {
-              fetched.add(a);
-            }
-          }
-        } catch (_) {}
-      }
-
-      likedArticles.value = fetched;
+    final ids = _likeSyncService.likedArticleIds.toList();
+    if (ids.isEmpty) {
+      likedArticles.clear();
+      return;
     }
+
+    final List<ArticleModel> fetched = [];
+    final List<int> idsToFetch = [];
+
+    for (var id in ids) {
+      final ownArticle = userArticles.firstWhereOrNull((a) => a.id == id);
+      if (ownArticle != null) {
+        fetched.add(ownArticle);
+      } else {
+        idsToFetch.add(id);
+      }
+    }
+
+    if (idsToFetch.isNotEmpty) {
+      try {
+        final List<Future<ArticleModel?>> futures = idsToFetch.map((id) async {
+          try {
+            final article = await _apiProvider.getArticleDetail(id.toString());
+            article.isLiked = true;
+            return article;
+          } catch (e) {
+            return null;
+          }
+        }).toList();
+
+        final results = await Future.wait(futures);
+        for (var a in results) {
+          if (a != null) {
+            fetched.add(a);
+          }
+        }
+      } catch (e) {
+        print('Error fetching liked articles: $e');
+      }
+    }
+
+    likedArticles.value = fetched;
   }
 
   Future<void> fetchUserArticles({bool reset = true}) async {
@@ -336,7 +278,7 @@ class ProfileController extends GetxController {
 
       if (reset) {
         userArticles.value = filteredResults;
-        await fetchLikedArticles();
+        fetchLikedArticles();
       } else {
         userArticles.addAll(filteredResults);
       }

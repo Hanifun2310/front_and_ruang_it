@@ -10,9 +10,23 @@ class NotificationService extends GetxService {
   final notifications = <NotificationItem>[].obs;
   final unreadCount = 0.obs;
   final _box = GetStorage();
-  static const _storageKey = 'app_notifications';
-  static const _baselineKey = 'notification_article_baseline';
-  static const _commentBaselineKey = 'notification_comment_baseline';
+
+  int? get currentUserId {
+    try {
+      final authService = Get.find<AuthService>();
+      final userData = authService.currentUser;
+      if (userData == null) return null;
+      return userData['id'] is int 
+          ? userData['id'] as int 
+          : int.tryParse(userData['id']?.toString() ?? '');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String get _storageKey => 'app_notifications_${currentUserId ?? "guest"}';
+  String get _baselineKey => 'notification_article_baseline_${currentUserId ?? "guest"}';
+  String get _commentBaselineKey => 'notification_comment_baseline_${currentUserId ?? "guest"}';
 
   final Map<int, Map<String, dynamic>> _articleBaseline = {};
   final Map<int, Map<String, dynamic>> _commentBaseline = {};
@@ -20,10 +34,20 @@ class NotificationService extends GetxService {
   @override
   void onInit() {
     super.onInit();
-    _loadFromStorage();
+    loadNotificationsForCurrentUser();
   }
 
-  void _loadFromStorage() {
+  void loadNotificationsForCurrentUser() {
+    notifications.clear();
+    _articleBaseline.clear();
+    _commentBaseline.clear();
+
+    final userId = currentUserId;
+    if (userId == null) {
+      unreadCount.value = 0;
+      return;
+    }
+
     final rawNotifications = _box.read<List<dynamic>>(_storageKey);
     if (rawNotifications != null) {
       notifications.value = rawNotifications
@@ -63,6 +87,13 @@ class NotificationService extends GetxService {
     }
 
     _recalculateUnreadCount();
+  }
+
+  void clearAll() {
+    notifications.clear();
+    _articleBaseline.clear();
+    _commentBaseline.clear();
+    unreadCount.value = 0;
   }
 
   void _saveNotifications() {
