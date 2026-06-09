@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../widgets/custom_snackbar.dart';
 
@@ -57,11 +58,16 @@ class ArticleCreateController extends GetxController {
         fileName = selectedImage.value!.name;
       }
 
-      final contentJsonData = jsonEncode(quillController.document.toDelta().toJson());
+      final deltaJson = quillController.document.toDelta().toJson();
+      final converter = QuillDeltaToHtmlConverter(
+        List.castFrom(deltaJson),
+        ConverterOptions(),
+      );
+      final htmlContent = converter.convert();
 
       final response = await _apiProvider.createArticle(
         title: titleController.text,
-        content: contentJsonData,
+        content: htmlContent,
         categoryId: selectedCategoryId.value,
         imageBytes: imageBytes,
         fileName: fileName,

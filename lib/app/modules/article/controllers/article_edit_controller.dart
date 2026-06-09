@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
+import 'package:flutter_quill_delta_from_html/flutter_quill_delta_from_html.dart';
 import 'package:dio/dio.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
@@ -37,11 +39,19 @@ class ArticleEditController extends GetxController {
 
   void _initQuillController(String content) {
     try {
-      final deltaJson = jsonDecode(content);
-      quillController = QuillController(
-        document: Document.fromJson(deltaJson),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      if (content.trim().startsWith('[')) {
+        final deltaJson = jsonDecode(content);
+        quillController = QuillController(
+          document: Document.fromJson(deltaJson),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      } else {
+        final delta = HtmlToDelta().convert(content);
+        quillController = QuillController(
+          document: Document.fromDelta(delta),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      }
     } catch (e) {
       String plainText = content
           .replaceAll(RegExp(r'</p>|<br\s*/?>', caseSensitive: false), '\n')
@@ -90,12 +100,17 @@ class ArticleEditController extends GetxController {
         fileName = selectedImage.value!.name;
       }
 
-      final contentJsonData = jsonEncode(quillController.document.toDelta().toJson());
+      final deltaJson = quillController.document.toDelta().toJson();
+      final converter = QuillDeltaToHtmlConverter(
+        List.castFrom(deltaJson),
+        ConverterOptions(),
+      );
+      final htmlContent = converter.convert();
 
       final response = await _apiProvider.updateArticle(
         id: article.id!,
         title: titleController.text,
-        content: contentJsonData,
+        content: htmlContent,
         categoryId: selectedCategoryId.value,
         imageBytes: imageBytes,
         fileName: fileName,

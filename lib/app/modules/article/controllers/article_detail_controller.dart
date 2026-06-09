@@ -216,37 +216,33 @@ class ArticleDetailController extends GetxController {
     }
   }
 
-  Future<bool> updateComment(int commentId, String content) async {
+  Future<void> updateComment(int commentId, String content) async {
     isCommentActionLoading.value = true;
     try {
       final response = await _apiProvider.updateComment(commentId, content);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+        Get.back();
         await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil diperbarui');
-        return true;
       }
-      return false;
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal memperbarui komentar');
-      return false;
     } finally {
       isCommentActionLoading.value = false;
     }
   }
 
-  Future<bool> deleteComment(int commentId) async {
+  Future<void> deleteComment(int commentId) async {
     isCommentActionLoading.value = true;
     try {
       final response = await _apiProvider.deleteComment(commentId);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+        Get.back();
         await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil dihapus');
-        return true;
       }
-      return false;
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus komentar');
-      return false;
     } finally {
       isCommentActionLoading.value = false;
     }

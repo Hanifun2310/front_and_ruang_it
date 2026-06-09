@@ -390,12 +390,9 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               child: const Text('Batal'),
             ),
             ElevatedButton(
-              onPressed: () async {
+              onPressed: () {
                 if (editController.text.trim().isNotEmpty) {
-                  final success = await controller.updateComment(comment.id, editController.text.trim());
-                  if (success) {
-                    Get.back();
-                  }
+                  controller.updateComment(comment.id, editController.text.trim());
                 }
               },
               child: const Text('Simpan'),
@@ -428,11 +425,8 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
               child: const Text('Batal'),
             ),
             TextButton(
-              onPressed: () async {
-                final success = await controller.deleteComment(comment.id);
-                if (success) {
-                  Get.back();
-                }
+              onPressed: () {
+                controller.deleteComment(comment.id);
               },
               child: const Text('Hapus', style: TextStyle(color: Colors.red)),
             ),
