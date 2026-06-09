@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'custom_network_image.dart';
 import 'dart:convert';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -9,6 +9,10 @@ import '../data/models/article_model.dart';
 import '../routes/app_routes.dart';
 import '../data/services/auth_service.dart';
 import 'bouncing_widget.dart';
+import '../modules/dashboard/controllers/dashboard_controller.dart';
+import '../modules/explore/controllers/explore_controller.dart';
+import '../modules/profile/controllers/profile_controller.dart';
+import '../modules/search/controllers/search_controller.dart';
 
 class ArticleCard extends StatelessWidget {
   final ArticleModel article;
@@ -74,9 +78,32 @@ class ArticleCard extends StatelessWidget {
                   color: Get.isDarkMode ? Colors.white : const Color(0xFF131B2E),
                 ),
               ),
-              onTap: () {
+              onTap: () async {
                 Get.back();
-                Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
+                final result = await Get.toNamed(Routes.ARTICLE_EDIT, arguments: article);
+                if (result == true) {
+                  if (Get.isRegistered<DashboardController>()) {
+                    try {
+                      Get.find<DashboardController>().refreshArticles();
+                    } catch (_) {}
+                  }
+                  if (Get.isRegistered<ExploreController>()) {
+                    try {
+                      Get.find<ExploreController>().fetchArticles();
+                    } catch (_) {}
+                  }
+                  if (Get.isRegistered<ProfileController>()) {
+                    try {
+                      Get.find<ProfileController>().fetchUserArticles(reset: true);
+                      Get.find<ProfileController>().loadUserData();
+                    } catch (_) {}
+                  }
+                  if (Get.isRegistered<ArticleSearchController>()) {
+                    try {
+                      Get.find<ArticleSearchController>().fetchArticles();
+                    } catch (_) {}
+                  }
+                }
               },
             ),
             const Divider(),
@@ -209,7 +236,7 @@ class ArticleCard extends StatelessWidget {
                 children: [
                   avatarUrl.isNotEmpty
                       ? ClipOval(
-                          child: CachedNetworkImage(
+                          child: CustomNetworkImage(
                             imageUrl: avatarUrl,
                             width: 24,
                             height: 24,
@@ -270,7 +297,7 @@ class ArticleCard extends StatelessWidget {
                 const SizedBox(width: 16),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
+                  child: CustomNetworkImage(
                     imageUrl: imageUrl,
                     width: 120,
                     height: 80,

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../../widgets/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -176,7 +176,7 @@ class ArticleCreateView extends GetView<ArticleCreateController> {
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: kIsWeb
-                              ? CachedNetworkImage(
+                              ? CustomNetworkImage(
                                   imageUrl: controller.selectedImage.value!.path,
                                   fit: BoxFit.cover,
                                 )

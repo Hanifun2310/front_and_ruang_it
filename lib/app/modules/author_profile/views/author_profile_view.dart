@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/article_card.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../../widgets/custom_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
@@ -74,7 +74,7 @@ class AuthorProfileView extends GetView<AuthorProfileController> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(40),
               child: (author.photoProfile != null && author.photoProfile!.isNotEmpty)
-                  ? CachedNetworkImage(imageUrl: 
+                  ? CustomNetworkImage(imageUrl: 
                       author.photoProfile!,
                       fit: BoxFit.cover,
                       errorWidget: (context, error, stackTrace) => _buildAvatarFallback(),

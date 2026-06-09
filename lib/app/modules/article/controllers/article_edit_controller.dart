@@ -9,6 +9,10 @@ import 'package:dio/dio.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
 import '../../../widgets/custom_snackbar.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+import '../../explore/controllers/explore_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
+import '../../search/controllers/search_controller.dart';
 
 class ArticleEditController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -117,6 +121,28 @@ class ArticleEditController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().refreshArticles();
+          } catch (_) {}
+        }
+        if (Get.isRegistered<ExploreController>()) {
+          try {
+            Get.find<ExploreController>().fetchArticles();
+          } catch (_) {}
+        }
+        if (Get.isRegistered<ProfileController>()) {
+          try {
+            Get.find<ProfileController>().fetchUserArticles(reset: true);
+            Get.find<ProfileController>().loadUserData();
+          } catch (_) {}
+        }
+        if (Get.isRegistered<ArticleSearchController>()) {
+          try {
+            Get.find<ArticleSearchController>().fetchArticles();
+          } catch (_) {}
+        }
+
         Get.back(result: true);
         showCustomSnackbar('Sukses', 'Artikel berhasil diperbarui');
       } else {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/article_card.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../../widgets/custom_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
@@ -280,7 +280,7 @@ class ProfileView extends GetView<ProfileController> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(40),
                 child: controller.photoProfile.value.isNotEmpty
-                    ? CachedNetworkImage(imageUrl: 
+                    ? CustomNetworkImage(imageUrl: 
                         controller.photoProfile.value,
                         fit: BoxFit.cover,
                         errorWidget: (context, error, stackTrace) =>

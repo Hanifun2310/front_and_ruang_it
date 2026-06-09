@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../../widgets/custom_network_image.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart' hide DefaultStyles;
 import 'package:flutter_quill/flutter_quill.dart';
@@ -38,7 +38,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                 background: Stack(
                   fit: StackFit.expand,
                   children: [
-                    CachedNetworkImage(imageUrl: 
+                    CustomNetworkImage(imageUrl: 
                       art.imageUrl ?? 'https://via.placeholder.com/600x400',
                       fit: BoxFit.cover,
                       errorWidget: (context, error, stackTrace) => Container(
@@ -244,7 +244,7 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
                             children: [
                               (comment.user?.photoProfile != null && comment.user!.photoProfile!.isNotEmpty)
                                   ? ClipOval(
-                                      child: CachedNetworkImage(
+                                      child: CustomNetworkImage(
                                         imageUrl: comment.user!.photoProfile!,
                                         width: 36,
                                         height: 36,
