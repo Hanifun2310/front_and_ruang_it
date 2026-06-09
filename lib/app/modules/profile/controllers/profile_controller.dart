@@ -53,9 +53,26 @@ class ProfileController extends GetxController {
   var selectedCategoryFilter = Rxn<String>();
   final articleSearchController = TextEditingController();
 
+  // State untuk tab Artikel Favorit
+  var likedSearchQuery = ''.obs;
+  var selectedLikedCategoryFilter = Rxn<String>();
+  final likedArticleSearchController = TextEditingController();
+
   List<String> get availableCategories {
     final Set<String> cats = {};
     for (var a in userArticles) {
+      if (a.category?.name != null) {
+        cats.add(a.category!.name!);
+      }
+    }
+    final list = cats.toList();
+    list.sort();
+    return list;
+  }
+
+  List<String> get availableLikedCategories {
+    final Set<String> cats = {};
+    for (var a in likedArticles) {
       if (a.category?.name != null) {
         cats.add(a.category!.name!);
       }
@@ -75,9 +92,24 @@ class ProfileController extends GetxController {
     }).toList();
   }
 
+  List<ArticleModel> get filteredLikedArticles {
+    final q = likedSearchQuery.value.trim().toLowerCase();
+    final cat = selectedLikedCategoryFilter.value;
+    return likedArticles.where((a) {
+      final matchQuery = q.isEmpty || (a.title ?? '').toLowerCase().contains(q);
+      final matchCategory = cat == null || a.category?.name == cat;
+      return matchQuery && matchCategory;
+    }).toList();
+  }
+
   void clearArticleSearch() {
     articleSearchQuery.value = '';
     articleSearchController.clear();
+  }
+
+  void clearLikedSearch() {
+    likedSearchQuery.value = '';
+    likedArticleSearchController.clear();
   }
 
   var articlesCount = 0.obs;
@@ -634,6 +666,7 @@ class ProfileController extends GetxController {
   @override
   void onClose() {
     articleSearchController.dispose();
+    likedArticleSearchController.dispose();
     scrollController.dispose();
     super.onClose();
   }

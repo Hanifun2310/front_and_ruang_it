@@ -555,14 +555,17 @@ class ProfileView extends GetView<ProfileController> {
       final isMyArticlesTab = controller.selectedTab.value == 0;
       final currentArticles = isMyArticlesTab
           ? controller.filteredUserArticles
-          : controller.likedArticles;
-      final hasActiveFilter =
-          controller.articleSearchQuery.value.isNotEmpty ||
-          controller.selectedCategoryFilter.value != null;
+          : controller.filteredLikedArticles;
+      final hasActiveFilter = isMyArticlesTab
+          ? (controller.articleSearchQuery.value.isNotEmpty ||
+              controller.selectedCategoryFilter.value != null)
+          : (controller.likedSearchQuery.value.isNotEmpty ||
+              controller.selectedLikedCategoryFilter.value != null);
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Search bar & chip kategori: Semua Artikel ──
           if (isMyArticlesTab) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -701,6 +704,137 @@ class ProfileView extends GetView<ProfileController> {
             const SizedBox(height: 8),
           ],
 
+          // ── Search bar & chip kategori: Artikel Favorit ──
+          if (!isMyArticlesTab) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: TextField(
+                controller: controller.likedArticleSearchController,
+                onChanged: (v) => controller.likedSearchQuery.value = v,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Get.isDarkMode ? Colors.white : Colors.black87,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Cari artikel favorit...',
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Colors.grey.shade400,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: Colors.grey.shade400,
+                    size: 20,
+                  ),
+                  suffixIcon: Obx(
+                    () => controller.likedSearchQuery.value.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.grey.shade400,
+                            ),
+                            onPressed: controller.clearLikedSearch,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  filled: true,
+                  fillColor: Get.isDarkMode
+                      ? const Color.fromRGBO(255, 255, 255, 0.06)
+                      : Colors.grey.shade100,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            if (controller.availableLikedCategories.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(
+                            'Semua',
+                            style: GoogleFonts.inter(fontSize: 12),
+                          ),
+                          selected: controller.selectedLikedCategoryFilter.value == null,
+                          onSelected: (_) =>
+                              controller.selectedLikedCategoryFilter.value = null,
+                          selectedColor: const Color(0xFF092BA2),
+                          checkmarkColor: Colors.white,
+                          labelStyle: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: controller.selectedLikedCategoryFilter.value == null
+                                ? Colors.white
+                                : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                          ),
+                          backgroundColor: Get.isDarkMode
+                              ? const Color.fromRGBO(255, 255, 255, 0.08)
+                              : Colors.grey.shade100,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide.none,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                        ),
+                      ),
+                      ...controller.availableLikedCategories.map(
+                        (cat) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              cat,
+                              style: GoogleFonts.inter(fontSize: 12),
+                            ),
+                            selected: controller.selectedLikedCategoryFilter.value == cat,
+                            onSelected: (_) {
+                              controller.selectedLikedCategoryFilter.value =
+                                  controller.selectedLikedCategoryFilter.value == cat
+                                  ? null
+                                  : cat;
+                            },
+                            selectedColor: const Color(0xFF092BA2),
+                            checkmarkColor: Colors.white,
+                            labelStyle: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: controller.selectedLikedCategoryFilter.value == cat
+                                  ? Colors.white
+                                  : (Get.isDarkMode ? Colors.white70 : Colors.black87),
+                            ),
+                            backgroundColor: Get.isDarkMode
+                                ? const Color.fromRGBO(255, 255, 255, 0.08)
+                                : Colors.grey.shade100,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide.none,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            const SizedBox(height: 8),
+          ],
+
           if (currentArticles.isEmpty)
             Center(
               child: Padding(
@@ -708,7 +842,7 @@ class ProfileView extends GetView<ProfileController> {
                 child: Column(
                   children: [
                     Icon(
-                      isMyArticlesTab && hasActiveFilter
+                      hasActiveFilter
                           ? Icons.search_off_rounded
                           : Icons.article_outlined,
                       size: 48,
@@ -716,7 +850,7 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      isMyArticlesTab && hasActiveFilter
+                      hasActiveFilter
                           ? 'Tidak ada artikel yang cocok'
                           : isMyArticlesTab
                           ? 'Belum ada artikel'
@@ -784,6 +918,7 @@ class ProfileView extends GetView<ProfileController> {
       );
     });
   }
+
 
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
