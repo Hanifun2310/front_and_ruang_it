@@ -365,41 +365,32 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Obx(() {
-        final isLoading = controller.isCommentActionLoading.value;
-        return AlertDialog(
-          title: const Text('Edit Komentar'),
-          content: isLoading
-              ? const SizedBox(
-                  height: 100,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : TextField(
-                  controller: editController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Tulis komentar Anda...',
-                  ),
-                ),
-          actions: isLoading ? null : [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (editController.text.trim().isNotEmpty) {
-                  controller.updateComment(comment.id, editController.text.trim());
-                }
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
-        );
-      }),
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Komentar'),
+        content: TextField(
+          controller: editController,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'Tulis komentar Anda...',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (editController.text.trim().isNotEmpty) {
+                Get.back();
+                controller.updateComment(comment.id, editController.text.trim());
+              }
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -407,32 +398,23 @@ class ArticleDetailView extends GetView<ArticleDetailController> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Obx(() {
-        final isLoading = controller.isCommentActionLoading.value;
-        return AlertDialog(
-          title: const Text('Hapus Komentar'),
-          content: isLoading
-              ? const SizedBox(
-                  height: 100,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : const Text('Apakah Anda yakin ingin menghapus komentar ini?'),
-          actions: isLoading ? null : [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: const Text('Batal'),
-            ),
-            TextButton(
-              onPressed: () {
-                controller.deleteComment(comment.id);
-              },
-              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      }),
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Komentar'),
+        content: const Text('Apakah Anda yakin ingin menghapus komentar ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              controller.deleteComment(comment.id);
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 

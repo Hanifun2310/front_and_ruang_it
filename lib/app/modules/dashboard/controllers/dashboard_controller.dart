@@ -12,6 +12,7 @@ import '../../search/controllers/search_controller.dart';
 import '../../../data/services/notification_service.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../widgets/custom_snackbar.dart';
+import '../../../widgets/loading_widget.dart';
 
 class DashboardController extends GetxController {
   final ApiProvider _apiProvider = Get.find<ApiProvider>();
@@ -250,6 +251,17 @@ class DashboardController extends GetxController {
 
   Future<void> deleteArticle(int id) async {
     try {
+      Get.dialog(
+        const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: LoadingWidget(),
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
       final response = await _apiProvider.deleteArticle(id);
       if (response.statusCode == 200 || response.statusCode == 204) {
         articles.removeWhere((article) => article.id == id);
@@ -269,6 +281,10 @@ class DashboardController extends GetxController {
       }
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus artikel');
+    } finally {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
     }
   }
 }

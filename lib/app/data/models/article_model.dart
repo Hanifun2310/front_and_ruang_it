@@ -169,23 +169,36 @@ class UserModel {
     this.commentsCount,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json['id'],
-    name: json['name'] ?? 'User',
-    email: json['email'],
-    role: json['role'],
-    status: json['status']?.toString().toLowerCase(),
-    photoProfile: (json['photo_profile_url'] == null && json['photo_profile'] == null && json['profile_photo'] == null)
-      ? ''
-      : ArticleModel.formatImageUrl(
-          json['photo_profile_url'] ?? json['photo_profile'] ?? json['profile_photo'],
-        ),
-    profession: json['profession'],
-    bio: json['bio'],
-    articlesCount: json['articles_count'] ?? json['posts_count'] ?? json['articles'] ?? 0,
-    likesCount: json['likes_count'] ?? json['total_likes'] ?? json['likes'] ?? 0,
-    commentsCount: json['comments_count'] ?? json['total_comments'] ?? json['comments'] ?? 0,
-  );
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    String? rawPhoto = json['photo_profile_url'] ?? json['photo_profile'] ?? json['profile_photo'];
+    String photoUrl = '';
+    if (rawPhoto != null && rawPhoto.toString().isNotEmpty && rawPhoto.toString() != 'null') {
+      final photoStr = rawPhoto.toString().trim();
+      if (!photoStr.contains('ui-avatars.com') && 
+          !photoStr.contains('placeholder') && 
+          photoStr != '/storage/' && 
+          photoStr != 'storage/') {
+        photoUrl = ArticleModel.formatImageUrl(photoStr);
+        if (photoUrl.endsWith('/storage/') || photoUrl.endsWith('/storage')) {
+          photoUrl = '';
+        }
+      }
+    }
+
+    return UserModel(
+      id: json['id'],
+      name: json['name'] ?? 'User',
+      email: json['email'],
+      role: json['role'],
+      status: json['status']?.toString().toLowerCase(),
+      photoProfile: photoUrl,
+      profession: json['profession'],
+      bio: json['bio'],
+      articlesCount: json['articles_count'] ?? json['posts_count'] ?? json['articles'] ?? 0,
+      likesCount: json['likes_count'] ?? json['total_likes'] ?? json['likes'] ?? 0,
+      commentsCount: json['comments_count'] ?? json['total_comments'] ?? json['comments'] ?? 0,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,

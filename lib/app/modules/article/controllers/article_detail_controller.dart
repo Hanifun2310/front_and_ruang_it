@@ -221,7 +221,6 @@ class ArticleDetailController extends GetxController {
     try {
       final response = await _apiProvider.updateComment(commentId, content);
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
-        Get.back();
         await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil diperbarui');
       }
@@ -237,7 +236,6 @@ class ArticleDetailController extends GetxController {
     try {
       final response = await _apiProvider.deleteComment(commentId);
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
-        Get.back();
         await fetchComments();
         showCustomSnackbar('Sukses', 'Komentar berhasil dihapus');
       }

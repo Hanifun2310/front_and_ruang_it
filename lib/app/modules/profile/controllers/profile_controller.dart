@@ -12,6 +12,7 @@ import '../../dashboard/controllers/dashboard_controller.dart';
 import '../../explore/controllers/explore_controller.dart';
 import '../../search/controllers/search_controller.dart';
 import '../../../widgets/custom_snackbar.dart';
+import '../../../widgets/loading_widget.dart';
 
 class ProfileController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -458,6 +459,17 @@ class ProfileController extends GetxController {
 
   Future<void> deleteArticle(int id) async {
     try {
+      Get.dialog(
+        const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: LoadingWidget(),
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
       final response = await _apiProvider.deleteArticle(id);
       if (response.statusCode == 200 || response.statusCode == 204) {
         userArticles.removeWhere((article) => article.id == id);
@@ -466,6 +478,10 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus artikel');
+    } finally {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
     }
   }
 
