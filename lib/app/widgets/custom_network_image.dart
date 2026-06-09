@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'image_loader_mobile.dart'
+    if (dart.library.html) 'image_loader_web.dart';
 
 class CustomNetworkImage extends StatelessWidget {
   final String imageUrl;
@@ -23,33 +25,23 @@ class CustomNetworkImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
-      return Image.network(
+      final defaultErrorWidget = Container(
+        width: width,
+        height: height,
+        color: Colors.grey.shade200,
+        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+      );
+
+      return buildWebImage(
         imageUrl,
         width: width,
         height: height,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) {
-          if (errorWidget != null) {
-            return errorWidget!(context, imageUrl, error);
-          }
-          return Container(
-            width: width,
-            height: height,
-            color: Colors.grey.shade200,
-            child: const Icon(Icons.image_not_supported, color: Colors.grey),
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          if (placeholder != null) {
-            return placeholder!(context, imageUrl);
-          }
-          return Container(
-            width: width,
-            height: height,
-            color: Colors.grey.shade200,
-          );
-        },
+        errorWidget: errorWidget != null
+            ? errorWidget!(context, imageUrl, null)
+            : placeholder != null
+                ? placeholder!(context, imageUrl)
+                : defaultErrorWidget,
       );
     }
 
