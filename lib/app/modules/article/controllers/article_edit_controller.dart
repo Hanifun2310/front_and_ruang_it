@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
-import 'package:flutter_quill_delta_from_html/flutter_quill_delta_from_html.dart';
+import '../../../data/helpers/html_to_delta_helper.dart';
 import 'package:dio/dio.dart';
 import '../../../data/providers/api_provider.dart';
 import '../../../data/models/article_model.dart';
@@ -46,9 +46,9 @@ class ArticleEditController extends GetxController {
           selection: const TextSelection.collapsed(offset: 0),
         );
       } else {
-        final delta = HtmlToDelta().convert(content);
+        final deltaList = HtmlToDeltaHelper.htmlToDelta(content);
         quillController = QuillController(
-          document: Document.fromDelta(delta),
+          document: Document.fromJson(deltaList),
           selection: const TextSelection.collapsed(offset: 0),
         );
       }
