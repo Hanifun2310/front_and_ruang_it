@@ -1,12 +1,11 @@
 import 'dart:html' as html;
-import 'dart:ui' as ui;
+import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
 
 Widget buildWebImage(String url, {double? width, double? height, BoxFit? fit, Widget? errorWidget}) {
   final String viewType = 'web-img-${url.hashCode}-${width}-${height}';
   
-  // ignore: undefined_prefixed_name
-  ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
+  ui_web.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
     final html.ImageElement element = html.ImageElement()
       ..src = url
       ..style.width = '100%'
