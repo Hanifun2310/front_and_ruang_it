@@ -9,6 +9,7 @@ import '../../../widgets/custom_bottom_nav.dart';
 import '../controllers/dashboard_controller.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'dart:ui';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide DefaultStyles;
 import '../../../data/services/auth_service.dart';
@@ -68,76 +69,102 @@ class DashboardView extends GetView<DashboardController> {
           ),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Container(
-            height: 50,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade300,
+          Column(
+            children: [
+              Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Get.isDarkMode ? Colors.white10 : Colors.grey.shade300,
+                    ),
+                  ),
+                ),
+                child: Obx(
+                  () => Row(
+                    children: [
+                      _buildTab('Artikel Terbaru', 0),
+                      _buildTab('Artikel Populer', 1),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            child: Obx(
-              () => Row(
-                children: [
-                  _buildTab('Artikel Terbaru', 0),
-                  _buildTab('Artikel Populer', 1),
-                ],
-              ),
-            ),
-          ),
-          
+              Expanded(
+                child: Obx(() {
+                  final isTerbaru = controller.activeTab.value == 0;
+                  final displayList = isTerbaru
+                      ? controller.articles
+                      : controller.trendingArticles;
 
+                  if (controller.isLoading.value && displayList.isEmpty) {
+                    return const SkeletonList(itemCount: 5);
+                  }
 
-          Expanded(
-            child: Obx(() {
-              final isTerbaru = controller.activeTab.value == 0;
-              final displayList = isTerbaru
-                  ? controller.articles
-                  : controller.trendingArticles;
-
-              if (controller.isLoading.value && displayList.isEmpty) {
-                return const SkeletonList(itemCount: 5);
-              }
-
-              if (displayList.isEmpty) {
-                return Center(
-                  child: Text("Belum ada artikel.", style: GoogleFonts.inter()),
-                );
-              }
-
-              return RefreshIndicator(
-                onRefresh: () async {
-                  if (isTerbaru) {
-                    controller.changeCategory(
-                      controller.selectedCategory.value,
+                  if (displayList.isEmpty) {
+                    return Center(
+                      child: Text("Belum ada artikel.", style: GoogleFonts.inter()),
                     );
                   }
-                },
-                child: ListView.builder(
-                  controller: isTerbaru
-                      ? scrollController
-                      : null,
-                  itemCount:
-                      displayList.length +
-                      (isTerbaru && controller.hasMoreData.value ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (isTerbaru && index == displayList.length) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: LoadingWidget(size: 30),
-                      );
-                    }
 
-                    final article = displayList[index];
-                    return ArticleCard(article: article, onLikeToggle: (id) => controller.toggleLike(id), onDelete: (id) => controller.deleteArticle(id));
-                  },
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      if (isTerbaru) {
+                        controller.changeCategory(
+                          controller.selectedCategory.value,
+                        );
+                      }
+                    },
+                    child: ListView.builder(
+                      controller: isTerbaru
+                          ? scrollController
+                          : null,
+                      itemCount:
+                          displayList.length +
+                          (isTerbaru && controller.hasMoreData.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (isTerbaru && index == displayList.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: LoadingWidget(size: 30),
+                          );
+                        }
+
+                        final article = displayList[index];
+                        return ArticleCard(article: article, onLikeToggle: (id) => controller.toggleLike(id), onDelete: (id) => controller.deleteArticle(id));
+                      },
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+          Obx(() {
+            if (controller.isDeleting.value) {
+              return Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.1),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: const Center(
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: LoadingWidget(),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               );
-            }),
-          ),
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
       bottomNavigationBar: const CustomBottomNav(currentIndex: 0),

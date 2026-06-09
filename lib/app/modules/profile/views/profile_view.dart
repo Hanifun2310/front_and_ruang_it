@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide DefaultStyles;
@@ -43,8 +44,10 @@ class ProfileView extends GetView<ProfileController> {
 
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.only(
@@ -186,6 +189,33 @@ class ProfileView extends GetView<ProfileController> {
             ),
           ],
         ),
+      ),
+          Obx(() {
+            if (controller.isDeleting.value) {
+              return Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.1),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: const Center(
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: LoadingWidget(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
       ),
       bottomNavigationBar: const CustomBottomNav(currentIndex: 3),
     );

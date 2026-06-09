@@ -24,6 +24,7 @@ class DashboardController extends GetxController {
 
   var isLoading = false.obs;
   var isFetchingMore = false.obs;
+  var isDeleting = false.obs;
   var currentPage = 1;
   var hasMoreData = true.obs;
   var activeTab = 0.obs;
@@ -251,17 +252,7 @@ class DashboardController extends GetxController {
 
   Future<void> deleteArticle(int id) async {
     try {
-      Get.dialog(
-        const Center(
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: LoadingWidget(),
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      isDeleting.value = true;
       final response = await _apiProvider.deleteArticle(id);
       if (response.statusCode == 200 || response.statusCode == 204) {
         articles.removeWhere((article) => article.id == id);
@@ -282,9 +273,7 @@ class DashboardController extends GetxController {
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus artikel');
     } finally {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
+      isDeleting.value = false;
     }
   }
 }

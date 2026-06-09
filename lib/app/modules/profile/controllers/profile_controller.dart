@@ -22,6 +22,7 @@ class ProfileController extends GetxController {
   var isLoading = false.obs;
   var isProfileLoading = false.obs;
   var isArticlesLoading = false.obs;
+  var isDeleting = false.obs;
   var isLoadingMoreArticles = false.obs;
   var hasMoreUserArticles = false.obs;
   int _currentArticlesPage = 1;
@@ -279,7 +280,7 @@ class ProfileController extends GetxController {
 
       if (reset) {
         userArticles.value = filteredResults;
-        fetchLikedArticles();
+        await fetchLikedArticles();
       } else {
         userArticles.addAll(filteredResults);
       }
@@ -459,17 +460,7 @@ class ProfileController extends GetxController {
 
   Future<void> deleteArticle(int id) async {
     try {
-      Get.dialog(
-        const Center(
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: LoadingWidget(),
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      isDeleting.value = true;
       final response = await _apiProvider.deleteArticle(id);
       if (response.statusCode == 200 || response.statusCode == 204) {
         userArticles.removeWhere((article) => article.id == id);
@@ -479,9 +470,7 @@ class ProfileController extends GetxController {
     } catch (e) {
       showCustomSnackbar('Error', 'Gagal menghapus artikel');
     } finally {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
+      isDeleting.value = false;
     }
   }
 
