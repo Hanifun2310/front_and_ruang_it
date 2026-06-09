@@ -119,9 +119,19 @@ class ArticleDetailController extends GetxController {
 
   void _initQuillController(String content) {
     try {
-      final trimmed = content.trim();
-      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-        final decoded = jsonDecode(trimmed);
+      String cleanContent = content.trim();
+      if (cleanContent.contains('<') || cleanContent.contains('&')) {
+        cleanContent = cleanContent
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&#39;', "'")
+            .replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>');
+        cleanContent = cleanContent.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+      }
+
+      if (cleanContent.startsWith('[') || cleanContent.startsWith('{')) {
+        final decoded = jsonDecode(cleanContent);
         List<dynamic>? deltaList;
         if (decoded is List) {
           deltaList = decoded;
