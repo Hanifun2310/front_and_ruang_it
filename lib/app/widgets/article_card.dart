@@ -436,13 +436,23 @@ class _RichTextSnippetState extends State<_RichTextSnippet> {
 
   void _initController() {
     try {
-      if (widget.content.trim().startsWith('[')) {
-        final List<dynamic> deltaList = jsonDecode(widget.content);
-        final document = quill.Document.fromJson(deltaList);
-        _quillController = quill.QuillController(
-          document: document,
-          selection: const TextSelection.collapsed(offset: 0),
-        );
+      final trimmed = widget.content.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        final decoded = jsonDecode(trimmed);
+        List<dynamic>? deltaList;
+        if (decoded is List) {
+          deltaList = decoded;
+        } else if (decoded is Map && decoded.containsKey('ops') && decoded['ops'] is List) {
+          deltaList = decoded['ops'];
+        }
+
+        if (deltaList != null) {
+          final document = quill.Document.fromJson(deltaList);
+          _quillController = quill.QuillController(
+            document: document,
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+        }
       }
     } catch (_) {}
   }

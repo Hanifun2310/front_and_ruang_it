@@ -43,19 +43,30 @@ class ArticleEditController extends GetxController {
 
   void _initQuillController(String content) {
     try {
-      if (content.trim().startsWith('[')) {
-        final deltaJson = jsonDecode(content);
-        quillController = QuillController(
-          document: Document.fromJson(deltaJson),
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-      } else {
-        final deltaList = HtmlToDeltaHelper.htmlToDelta(content);
-        quillController = QuillController(
-          document: Document.fromJson(deltaList),
-          selection: const TextSelection.collapsed(offset: 0),
-        );
+      final trimmed = content.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        final decoded = jsonDecode(trimmed);
+        List<dynamic>? deltaList;
+        if (decoded is List) {
+          deltaList = decoded;
+        } else if (decoded is Map && decoded.containsKey('ops') && decoded['ops'] is List) {
+          deltaList = decoded['ops'];
+        }
+
+        if (deltaList != null) {
+          quillController = QuillController(
+            document: Document.fromJson(deltaList),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+          return;
+        }
       }
+
+      final deltaList = HtmlToDeltaHelper.htmlToDelta(content);
+      quillController = QuillController(
+        document: Document.fromJson(deltaList),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
     } catch (e) {
       String plainText = content
           .replaceAll(RegExp(r'</p>|<br\s*/?>', caseSensitive: false), '\n')

@@ -239,10 +239,20 @@ class DashboardController extends GetxController {
     }
 
     try {
-      if (content.trim().startsWith('[')) {
-        final deltaJson = jsonDecode(content);
-        final document = Document.fromJson(deltaJson);
-        return document.toPlainText().replaceAll('\n', ' ').trim();
+      final trimmed = content.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        final decoded = jsonDecode(trimmed);
+        List<dynamic>? deltaList;
+        if (decoded is List) {
+          deltaList = decoded;
+        } else if (decoded is Map && decoded.containsKey('ops') && decoded['ops'] is List) {
+          deltaList = decoded['ops'];
+        }
+
+        if (deltaList != null) {
+          final document = Document.fromJson(deltaList);
+          return document.toPlainText().replaceAll('\n', ' ').trim();
+        }
       }
       return content.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').trim();
     } catch (e) {

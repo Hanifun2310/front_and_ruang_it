@@ -99,6 +99,7 @@ class ExploreController extends GetxController {
     } else {
       selectedCategory.value = category;
     }
+    articles.clear();
     fetchArticles();
   }
 
