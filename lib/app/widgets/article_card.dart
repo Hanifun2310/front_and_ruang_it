@@ -434,6 +434,16 @@ class _RichTextSnippetState extends State<_RichTextSnippet> {
     _initController();
   }
 
+  @override
+  void didUpdateWidget(_RichTextSnippet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.content != widget.content) {
+      _quillController?.dispose();
+      _quillController = null;
+      _initController();
+    }
+  }
+
   void _initController() {
     try {
       String cleanContent = widget.content.trim();
